@@ -54,7 +54,7 @@ patched_rom = seed.create_patched_game(
     base_rom,
     heartspeed=None, #can be off, quarter, half, double or None.  None would default to normal speed.
     heartcolor='red', #can be red, 
-    spritename='Link',
-    music=False
+    spritename='Link', #can be any sprite listed at https://alttpr.com/sprites
+    music=False # true or false, defaults true
     )
 seed.write_rom(patched_rom, "outputs/patched_rom.sfc")
