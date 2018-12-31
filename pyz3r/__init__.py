@@ -12,38 +12,59 @@ class alttpr():
             self,
             settings=None,
             hash=None,
+            randomizer='item',
             baseurl='https://alttpr.com',
             seed_baseurl='https://s3.us-east-2.amazonaws.com/alttpr-patches',
         ):
         self.baseurl = baseurl
         self.seed_baseurl = seed_baseurl
+        self.randomizer = randomizer
+
+        if randomizer not in ['item','entrance']:
+            raise alttprException("randomizer must be \"item\" or \"entrance\"")
 
         if settings == None and hash==None:
             self.seed_data=None
+        else:
+            if settings:
+                if randomizer == 'item':
+                    req_gen = requests.post(
+                        url=self.baseurl + "/seed",
+                        json=settings
+                    )
+                elif randomizer == 'entrance':
+                    req_gen = requests.post(
+                        url=self.baseurl + "/entrance/seed",
+                        json=settings
+                    )
+                req_gen.raise_for_status()
+                #override whatever hash was provided and instead use what was gen'd
+                hash=json.loads(req_gen.text)['hash']
+                sleep(3)
 
-        if settings:
-            req_gen = requests.post(
-                url=self.baseurl + "/seed",
-                json=settings
+            req = requests.get(
+                url=self.seed_baseurl + '/' + hash + '.json'
             )
-            #override whatever hash was provided and instead use what was gen'd
-            hash=json.loads(req_gen.text)['hash']
-            sleep(3)
+            req.raise_for_status()
+            self.seed_data = json.loads(req.text)
 
-        req = requests.get(
-            url=self.seed_baseurl + '/' + hash + '.json'
-        )
-        self.seed_data = json.loads(req.text)
 
     def settings(self):
-        req = requests.get(
-            url=self.baseurl + "randomizer/settings",
-        )
+        if self.randomizer == 'item':
+            req = requests.get(
+                url=self.baseurl + "/randomizer/settings",
+            )
+        elif self.randomizer == 'entrance':
+            req = requests.get(
+                url=self.baseurl + "/entrance/randomizer/settings",
+            )
+        req.raise_for_status()
         return json.loads(req.text)
+
 
     def get_code(self):
         if not self.seed_data:
-            raise alttprException('Please use the seed function first to generate or retrieve a game.')
+            raise alttprException('Please specify a seed or hash first to generate or retrieve a game.')
         
         code_map = {
             0: 'Bow', 1: 'Boomerang', 2: 'Hookshot', 3: 'Bombs',
@@ -62,30 +83,36 @@ class alttpr():
                 p=list(map(lambda x: code_map[x], patch[seek][2:]))
                 return [p[0], p[1], p[2], p[3], p[4]]
 
+
     def url(self):
         if not self.seed_data:
-            raise alttprException('Please use the seed function first to generate or retrieve a game.')
+            raise alttprException('Please specify a seed or hash first to generate or retrieve a game.')
 
         return '{baseurl}/h/{hash}'.format(
             baseurl = self.baseurl,
             hash = self.seed_data['hash']
         )
 
+
     def get_hash(self):
         if not self.seed_data:
-            raise alttprException('Please use the seed function first to generate or retrieve a game.')
+            raise alttprException('Please specify a seed or hash first to generate or retrieve a game.')
 
         return self.seed_data['hash']
+
 
     def get_patch_base(self):
         req = requests.get(
             url=self.baseurl + "/base_rom/settings"
         )
+        req.raise_for_status()
         base_file = json.loads(req.text)['base_file']
         req_patch = requests.get(
             url=self.baseurl + base_file
         )
+        req_patch.raise_for_status()
         return json.loads(req_patch.text)
+
 
     def get_patch_heart_speed(self, speed=''):
         if speed == 'off':
@@ -102,6 +129,7 @@ class alttpr():
             '1572915': [sbyte]
         }]
         return patch
+
 
     def get_patch_heart_color(self,color='red'):
         if color=='blue':
@@ -131,6 +159,7 @@ class alttpr():
         ]
         return patch
 
+
     def patch(self, rom, patches):
         for patch in patches:
             offset = int(list(patch.keys())[0])
@@ -139,12 +168,13 @@ class alttpr():
                 rom[offset+idx] = value
         return rom
 
-    def create_patched_game(self, patchrom_array, heartspeed='half', heartcolor='red'):
-        if not self.seed_data:
-            raise alttprException('Please use the seed function first to generate or retrieve a game.')
 
-        #expand the ROM to 2MB
-        self.expand_rom(patchrom_array,2097151)
+    def create_patched_game(self, patchrom_array, heartspeed='half', heartcolor='red', spritename='Link'):
+        if not self.seed_data:
+            raise alttprException('Please specify a seed or hash first to generate or retrieve a game.')
+
+        #expand the ROM to size requested in seed_data
+        self.expand_rom(patchrom_array)
 
         # apply the base modifications
         patchrom_array = self.patch(
@@ -170,13 +200,62 @@ class alttpr():
             patches=self.get_patch_heart_color(heartcolor)
         )
 
+        #apply the sprite
+        patchrom_array = self.patch(
+            rom=patchrom_array,
+            patches=self.get_patch_sprite(name=spritename)
+        )
+
         #calculate the SNES checksum and apply it to the ROM
         patchrom_array = self.patch(
             rom=patchrom_array,
-            patches=self._checksum_patch(patchrom_array)
+            patches=self.checksum_patch(patchrom_array)
         )
 
         return patchrom_array
+
+    def get_patch_sprite(self, name, spr=None):
+        if spr==None:
+            req = requests.get(
+                url=self.baseurl + '/sprites'
+            )
+            req.raise_for_status()
+            sprites = json.loads(req.text)
+            for sprite in sprites:
+                if sprite['name'] == name:
+                    fileurl = sprite['file']
+                    break
+            req_sprite = requests.get(
+                url=fileurl
+            )
+            req_sprite.raise_for_status()
+            spr = list(req_sprite.content)
+        #Verify ZSPR by checking first four characters, SPR <> ZSPR!
+        if spr[:4] == [90, 83, 80, 82]:
+            #stolen from VT's code
+            gfx_offset = spr[12] << 24 | spr[11] << 16 | spr[10] << 8 | spr[9]
+            palette_offset = spr[18] << 24 | spr[17] << 16 | spr[16] << 8 | spr[15]
+            patch = [
+                {'524288': spr[gfx_offset:gfx_offset+28671]},
+                {'905992': spr[palette_offset:palette_offset+120]},
+                {'912885': spr[palette_offset+120:palette_offset+120+3]}
+            ]
+        #Else treat it like a SPR file instead
+        else:
+            patch = [
+                {'524288': spr[0:28671]},
+                {'905992': spr[28672:28791]},
+                {
+                    '912885': [
+                        spr[28726],
+                        spr[28727],
+                        spr[28756],
+                        spr[28757],
+                    ]
+                }
+            ]
+        return patch
+
 
     def read_rom(self, srcfilepath):
         expected_rom_sha256='794e040b02c7591b59ad8843b51e7c619b88f87cddc6083a8e7a4027b96a2271'
@@ -194,6 +273,7 @@ class alttpr():
         fr.close()
         return baserom_array
 
+
     def write_rom(self, rom, dstfilepath):
         fw = open(dstfilepath,"wb")
         patchrom = bytes()
@@ -202,24 +282,31 @@ class alttpr():
         fw.write(patchrom)
         fw.close
 
-    def expand_rom(self, lst, newlen):
-        if len(lst) > newlen:
+
+    def expand_rom(self, rom, newlenmb=None):
+        if newlenmb:
+            newlen = newlenmb * 1024 * 1024
+        else:
+            newlen = self.seed_data['size'] * 1024 * 1024
+        if len(rom) > newlen:
             raise alttprException('ROM is already larger than {bytes}'.format(
                 bytes=newlen
             ))
-        diff = len(lst) - newlen
+        diff = len(rom) - newlen
         if diff > 0:
-            lst[newlen] = 0
+            rom[newlen] = 0
         else:
-            lst.extend(itertools.repeat(0, -diff))
-            lst.append(0)
-            
+            rom.extend(itertools.repeat(0, -diff))
+            rom.append(0)
+
+
     def _chunk(self, iterator, count):
         itr = iter(iterator)
         while True:
             yield tuple([next(itr) for i in range(count)])
 
-    def _checksum_patch(self, rom):
+
+    def checksum_patch(self, rom):
         sum_of_bytes = sum(rom[:32731]) + sum(rom[32736:])
         checksum = (sum_of_bytes + 510) & 65535
         inverse = checksum ^ 65535

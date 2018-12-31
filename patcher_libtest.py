@@ -1,18 +1,47 @@
 import pyz3r
 
-data = {
-        "difficulty": "hard",
-        "enemizer": False,
-        "logic": "NoGlitches",
-        "mode": "open",
-        "spoilers": False,
-        "tournament": True,
-        "variation": "key-sanity",
-        "weapons": "uncle",
-        "lang": "en"
-    }
-# seed = pyz3r.alttpr(settings=data)
-seed = pyz3r.alttpr(hash='xry04EgKy5')
+# get settings without generating a game
+# print(pyz3r.alttpr(randomizer='entrance').settings())
+
+# print(pyz3r.alttpr(randomizer='item').get_patch_sprite(name='Eggplant'))
+
+#generate a new game
+# seed = pyz3r.alttpr(
+#     randomizer='item', # optional, defaults to item
+#     settings={
+#         "difficulty": "hard",
+#         "enemizer": False,
+#         "logic": "NoGlitches",
+#         "mode": "open",
+#         "spoilers": False,
+#         "tournament": True,
+#         "variation": "key-sanity",
+#         "weapons": "uncle",
+#         "lang": "en"
+#     }
+# )
+#generate an entrance shuffle game
+# seed = pyz3r.alttpr(
+#     randomizer='entrance',
+#     settings={
+#         "logic":"NoGlitches",
+#         "difficulty":"normal",
+#         "variation":"retro",
+#         "mode":"open",
+#         "goal":"ganon",
+#         "shuffle":"restricted",
+#         "tournament":True,
+#         "spoilers":False,
+#         "enemizer":False,
+#         "lang":"en"
+#     }
+# )
+# seed = pyz3r.alttpr(
+#     randomizer='entrance',
+#     hash='nYMD64wKyA'
+# )
+seed = pyz3r.alttpr()
+
 
 print("Permalink: {url}".format(
     url = seed.url()
@@ -23,7 +52,8 @@ print("Hash: [{hash}]".format(
 base_rom = seed.read_rom("base_rom/Zelda no Densetsu - Kamigami no Triforce (Japan).sfc")
 patched_rom = seed.create_patched_game(
     base_rom,
-    heartspeed=None,
-    heartcolor='red'
+    heartspeed=None, #can be off, quarter, half, double or None.  None would default to normal speed.
+    heartcolor='red', #can be red, 
+    spritename='Link',
     )
 seed.write_rom(patched_rom, "outputs/patched_rom.sfc")
