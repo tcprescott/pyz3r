@@ -169,7 +169,14 @@ class alttpr():
         return rom
 
 
-    def create_patched_game(self, patchrom_array, heartspeed='half', heartcolor='red', spritename='Link'):
+    def create_patched_game(
+            self,
+            patchrom_array,
+            heartspeed='half',
+            heartcolor='red',
+            spritename='Link',
+            music=True
+        ):
         if not self.seed_data:
             raise alttprException('Please specify a seed or hash first to generate or retrieve a game.')
 
@@ -204,6 +211,12 @@ class alttpr():
         patchrom_array = self.patch(
             rom=patchrom_array,
             patches=self.get_patch_sprite(name=spritename)
+        )
+
+        #apply the sprite
+        patchrom_array = self.patch(
+            rom=patchrom_array,
+            patches=self.get_patch_music(music=music)
         )
 
         #calculate the SNES checksum and apply it to the ROM
@@ -260,6 +273,18 @@ class alttpr():
                 }
             ]
         return patch
+
+    def get_patch_music(self, music=True):
+        if music:
+            return []
+        else:
+            patch = [
+                {'851480': [0]},
+                {'851649': [0]},
+                {'851968': [0, 0]},
+                {'852199': [196, 88]}
+            ]
+            return patch
 
 
     def read_rom(self, srcfilepath):

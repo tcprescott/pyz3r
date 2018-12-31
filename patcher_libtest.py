@@ -37,8 +37,8 @@ import pyz3r
 #     }
 # )
 seed = pyz3r.alttpr(
-    randomizer='entrance',
-    hash='nYMD64wKyA'
+    randomizer='item',
+    hash='zDvxWLLEMa'
 )
 # seed = pyz3r.alttpr()
 
@@ -54,6 +54,7 @@ patched_rom = seed.create_patched_game(
     base_rom,
     heartspeed=None, #can be off, quarter, half, double or None.  None would default to normal speed.
     heartcolor='red', #can be red, 
-    spritename='Valeera',
+    spritename='Link',
+    music=False
     )
 seed.write_rom(patched_rom, "outputs/patched_rom.sfc")
