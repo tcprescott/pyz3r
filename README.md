@@ -1,4 +1,4 @@
-# pyz3r for Python!
+# pyz3r for Python 3.6!
 Pyz3r is an unofficial python abstraction library for interacting with the [alttpr.com](https://alttpr.com) API.
 
 This allows developers to create applications that not only generate games on [alttpr.com](https://alttpr.com),
@@ -147,7 +147,8 @@ patched_rom = seed.create_patched_game(
     )
 ```
 
-Here you can customize the following
+Here you can customize the following:
+
 0. `patchrom_array` - Required.  This is an array of bits that have your original Japan 1.0 ROM.  The `read_rom` function in the `pyz3r.alttpr()` class will create this for you.
 1. `heartspeed` - Optional. The low health beep speed.  Acceptable values are `'off'`, `'quarter'`, `'half'`, `'double'`, or `'normal'`.  Defaults is `'normal'`.
 2. `heartcolor` - Optional. The color of your hearts.  Acceptable values are `'red'`, `'blue'`, `'green'`, or `'yellow'`.  Default is `'red'`.
