@@ -4,7 +4,7 @@ import itertools
 import hashlib
 from time import sleep
 
-class alttprException():
+class alttprException(Exception):
     pass
 
 class alttpr():
@@ -225,9 +225,14 @@ class alttpr():
                 if sprite['name'] == name:
                     fileurl = sprite['file']
                     break
-            req_sprite = requests.get(
-                url=fileurl
-            )
+            try:
+                req_sprite = requests.get(
+                    url=fileurl
+                )
+            except UnboundLocalError:
+                raise alttprException('Sprite \"{name}\" is not available.'.format(
+                    name=name
+                ))
             req_sprite.raise_for_status()
             spr = list(req_sprite.content)
         #Verify ZSPR by checking first four characters, SPR <> ZSPR!
