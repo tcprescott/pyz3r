@@ -15,27 +15,36 @@ class alttpr():
             randomizer='item',
             baseurl='https://alttpr.com',
             seed_baseurl='https://s3.us-east-2.amazonaws.com/alttpr-patches',
+            username='',
+            password='',
         ):
         self.baseurl = baseurl
         self.seed_baseurl = seed_baseurl
         self.randomizer = randomizer
 
+        if not username==None:
+            self.auth = (username,password)
+        else:
+            self.auth = None
+
         if randomizer not in ['item','entrance']:
             raise alttprException("randomizer must be \"item\" or \"entrance\"")
 
         if settings == None and hash==None:
-            self.seed_data=None
+            self.data=None
         else:
             if settings:
                 if randomizer == 'item':
                     req_gen = requests.post(
                         url=self.baseurl + "/seed",
-                        json=settings
+                        json=settings,
+                        auth=self.auth
                     )
                 elif randomizer == 'entrance':
                     req_gen = requests.post(
                         url=self.baseurl + "/entrance/seed",
-                        json=settings
+                        json=settings,
+                        auth=self.auth
                     )
                 req_gen.raise_for_status()
                 #override whatever hash was provided and instead use what was gen'd
@@ -46,24 +55,26 @@ class alttpr():
                 url=self.seed_baseurl + '/' + hash + '.json'
             )
             req.raise_for_status()
-            self.seed_data = json.loads(req.text)
+            self.data = json.loads(req.text)
 
 
     def settings(self):
         if self.randomizer == 'item':
             req = requests.get(
                 url=self.baseurl + "/randomizer/settings",
+                auth=self.auth
             )
         elif self.randomizer == 'entrance':
             req = requests.get(
                 url=self.baseurl + "/entrance/randomizer/settings",
+                auth=self.auth
             )
         req.raise_for_status()
         return json.loads(req.text)
 
 
-    def get_code(self):
-        if not self.seed_data:
+    def code(self):
+        if not self.data:
             raise alttprException('Please specify a seed or hash first to generate or retrieve a game.')
         
         code_map = {
@@ -77,7 +88,7 @@ class alttpr():
             29: 'Map', 30: 'Compass', 31: 'Big Key'
         }
 
-        for patch in self.seed_data['patch']:
+        for patch in self.data['patch']:
             seek = '1573395'
             if seek in patch:
                 p=list(map(lambda x: code_map[x], patch[seek][2:]))
@@ -85,30 +96,32 @@ class alttpr():
 
 
     def url(self):
-        if not self.seed_data:
+        if not self.data:
             raise alttprException('Please specify a seed or hash first to generate or retrieve a game.')
 
         return '{baseurl}/h/{hash}'.format(
             baseurl = self.baseurl,
-            hash = self.seed_data['hash']
+            hash = self.data['hash']
         )
 
 
     def get_hash(self):
-        if not self.seed_data:
+        if not self.data:
             raise alttprException('Please specify a seed or hash first to generate or retrieve a game.')
 
-        return self.seed_data['hash']
+        return self.data['hash']
 
 
     def get_patch_base(self):
         req = requests.get(
-            url=self.baseurl + "/base_rom/settings"
+            url=self.baseurl + "/base_rom/settings",
+            auth=self.auth
         )
         req.raise_for_status()
         base_file = json.loads(req.text)['base_file']
         req_patch = requests.get(
-            url=self.baseurl + base_file
+            url=self.baseurl + base_file,
+            auth=self.auth
         )
         req_patch.raise_for_status()
         return json.loads(req_patch.text)
@@ -177,7 +190,7 @@ class alttpr():
             spritename='Link',
             music=True
         ):
-        if not self.seed_data:
+        if not self.data:
             raise alttprException('Please specify a seed or hash first to generate or retrieve a game.')
 
         #expand the ROM to size requested in seed_data
@@ -192,7 +205,7 @@ class alttpr():
         #apply the seed-specific changes
         patchrom_array = self.patch(
             rom=patchrom_array,
-            patches=self.seed_data['patch']
+            patches=self.data['patch']
         )
 
         #apply the heart speed change
@@ -230,7 +243,8 @@ class alttpr():
     def get_patch_sprite(self, name, spr=None):
         if spr==None:
             req = requests.get(
-                url=self.baseurl + '/sprites'
+                url=self.baseurl + '/sprites',
+                auth=self.auth
             )
             req.raise_for_status()
             sprites = json.loads(req.text)
@@ -317,7 +331,7 @@ class alttpr():
         if newlenmb:
             newlen = newlenmb * 1024 * 1024
         else:
-            newlen = self.seed_data['size'] * 1024 * 1024
+            newlen = self.data['size'] * 1024 * 1024
         if len(rom) > newlen:
             raise alttprException('ROM is already larger than {bytes}'.format(
                 bytes=newlen

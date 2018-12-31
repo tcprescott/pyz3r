@@ -47,11 +47,14 @@ print("Permalink: {url}".format(
     url = seed.url()
 ))
 print("Hash: [{hash}]".format(
-    hash = ' | '.join(seed.get_code())
+    hash = ' | '.join(seed.code())
 ))
+
+print(seed.data['spoiler'])
+
 base_rom = seed.read_rom("base_rom/Zelda no Densetsu - Kamigami no Triforce (Japan).sfc")
 patched_rom = seed.create_patched_game(
-    base_rom,
+    patchrom_array = base_rom,  
     heartspeed=None, #can be off, quarter, half, double or None.  None would default to normal speed.
     heartcolor='red', #can be red, 
     spritename='Link', #can be any sprite listed at https://alttpr.com/sprites
