@@ -168,7 +168,7 @@ Check out the `read_rom`, `write_rom`, and `create_patched_game` in the [library
 
 ## To do
 
-0. Right now Quickswap and Menu Speed options are not available. If they were, the behavior of this library would be for them **not** to function on race seeds.  I figure few people use these features, so they won't be in the intial release of pyz3r.
+0. Right now Quickswap and Menu Speed options are not available. If they were, the behavior of this library would be for them **not** to function on race seeds.  I figure few people use these features, so they won't be in the initial release of pyz3r.
 1. When bringing in an already-generated game, automatically detect if its an item randomizer or entrance shuffle seed.
 2. Release an version of this library that uses asyncio (useful for discord/irc bots)
 
