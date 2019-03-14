@@ -51,4 +51,6 @@ coverage.xml
 
 # Sphinx documentation
 docs/_build/
-pyz3r/__pycache__/__init__.cpython-36.pyc
+**/__pycache__/
+env/
+.vscode/

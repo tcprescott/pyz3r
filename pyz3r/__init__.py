@@ -35,27 +35,35 @@ class alttpr():
         else:
             if settings:
                 if randomizer == 'item':
-                    req_gen = requests.post(
-                        url=self.baseurl + "/seed",
-                        json=settings,
-                        auth=self.auth
-                    )
+                    url = self.baseurl + "/seed"
                 elif randomizer == 'entrance':
-                    req_gen = requests.post(
-                        url=self.baseurl + "/entrance/seed",
-                        json=settings,
-                        auth=self.auth
-                    )
+                    url=self.baseurl + "/entrance/seed"
+                for i in range(0,100):
+                    try:
+                        req_gen = requests.post(
+                            url=url,
+                            json=settings,
+                            auth=self.auth
+                        )
+                    except requests.exceptions.ConnectionError:
+                        continue
+                    break
+                
                 req_gen.raise_for_status()
                 #override whatever hash was provided and instead use what was gen'd
                 hash=json.loads(req_gen.text)['hash']
-                sleep(3)
 
             req = requests.get(
                 url=self.seed_baseurl + '/' + hash + '.json'
             )
-            req.raise_for_status()
-            self.data = json.loads(req.text)
+            if not req.status_code == requests.codes.ok:
+                req2 = requests.get(
+                    url=self.baseurl + '/hash/' + hash
+                )
+                req2.raise_for_status()
+                self.data = json.loads(req2.text)
+            else:
+                self.data = json.loads(req.text)
 
 
     def settings(self):
@@ -347,7 +355,10 @@ class alttpr():
     def _chunk(self, iterator, count):
         itr = iter(iterator)
         while True:
-            yield tuple([next(itr) for i in range(count)])
+            try:
+                yield tuple([next(itr) for i in range(count)])
+            except StopIteration:
+                return
 
 
     def checksum_patch(self, rom):

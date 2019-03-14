@@ -6,20 +6,20 @@ import pyz3r
 # print(pyz3r.alttpr(randomizer='item').get_patch_sprite(name='Eggplant'))
 
 #generate a new game
-# seed = pyz3r.alttpr(
-#     randomizer='item', # optional, defaults to item
-#     settings={
-#         "difficulty": "hard",
-#         "enemizer": False,
-#         "logic": "NoGlitches",
-#         "mode": "open",
-#         "spoilers": False,
-#         "tournament": True,
-#         "variation": "key-sanity",
-#         "weapons": "uncle",
-#         "lang": "en"
-#     }
-# )
+seed = pyz3r.alttpr(
+    randomizer='item', # optional, defaults to item
+    settings={
+        "difficulty": "hard",
+        "enemizer": False,
+        "logic": "NoGlitches",
+        "mode": "inverted",
+        "spoilers": False,
+        "tournament": True,
+        "variation": "key-sanity",
+        "weapons": "uncle",
+        "lang": "en"
+    }
+)
 #generate an entrance shuffle game
 # seed = pyz3r.alttpr(
 #     randomizer='entrance',
@@ -36,10 +36,10 @@ import pyz3r
 #         "lang":"en"
 #     }
 # )
-seed = pyz3r.alttpr(
-    randomizer='item',
-    hash='zDvxWLLEMa'
-)
+# seed = pyz3r.alttpr(
+#     randomizer='item',
+#     hash='zDvxWLLEMa'
+# )
 # seed = pyz3r.alttpr()
 
 

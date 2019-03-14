@@ -1,4 +1,4 @@
-# pyz3r for Python 3.6!
+# pyz3r for Python 3.6/3.7!
 Pyz3r is an unofficial python abstraction library for interacting with the [alttpr.com](https://alttpr.com) API.
 
 This allows developers to create applications that not only generate games on [alttpr.com](https://alttpr.com),
@@ -164,7 +164,7 @@ seed.write_rom(patched_rom, "path/to/patched_rom.sfc")
 
 #### Advanced patching
 
-Check out the `read_rom`, `write_rom`, and `create_patched_game` in the [library's init file](src/pyz3r/__init__.py) to see how you can stitch together the patch generator commands.  Maybe I'll write more documentation on these functions at a later time.
+Check out the `read_rom`, `write_rom`, and `create_patched_game` in the [library's init file](pyz3r/__init__.py) to see how you can stitch together the patch generator commands.  Maybe I'll write more documentation on these functions at a later time.
 
 ## To do
 
