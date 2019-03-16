@@ -1,6 +1,4 @@
-# import pyz3r.alttpr as alttpr
 import pyz3r
-from pyz3r.rom import romfile
 
 # get settings without generating a game
 # print(pyz3r.alttpr(randomizer='entrance').settings())
@@ -14,7 +12,7 @@ seed = pyz3r.alttpr(
         "difficulty": "hard",
         "enemizer": False,
         "logic": "NoGlitches",
-        "mode": "inverted",
+        "mode": "open",
         "spoilers": False,
         "tournament": True,
         "variation": "key-sanity",
@@ -54,11 +52,13 @@ print("Hash: [{hash}]".format(
 
 print(seed.data['spoiler'])
 
+jpn10rom = pyz3r.romfile.read("base_rom/Zelda no Densetsu - Kamigami no Triforce (Japan).sfc"),
+
 patched_rom = seed.create_patched_game(
-    patchrom_array = romfile.read("base_rom/Zelda no Densetsu - Kamigami no Triforce (Japan).sfc"),  
+    patchrom_array = jpn10rom,  
     heartspeed=None, #can be off, quarter, half, double or None.  None would default to normal speed.
     heartcolor='red', #can be red, 
     spritename='Link', #can be any sprite listed at https://alttpr.com/sprites
     music=False # true or false, defaults true
     )
-romfile.write(patched_rom, "outputs/patched_rom.sfc")
+pyz3r.romfile.write(patched_rom, "outputs/patched_rom.sfc")

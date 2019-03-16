@@ -35,7 +35,7 @@ class alttpr():
                     url = self.baseurl + "/seed"
                 elif randomizer == 'entrance':
                     url=self.baseurl + "/entrance/seed"
-                for i in range(0,100):
+                for i in range(0,5):
                     try:
                         req_gen = requests.post(
                             url=url,
@@ -43,6 +43,8 @@ class alttpr():
                             auth=self.auth
                         )
                     except requests.exceptions.ConnectionError:
+                        continue
+                    if not req_gen.status_code == requests.codes.ok:
                         continue
                     break
                 

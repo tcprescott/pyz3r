@@ -11,3 +11,4 @@ __copyright__ = 'Copyright 2018-2019 Thomas Prescott'
 __version__ = '2.0.2'
 
 from .__main__ import alttpr
+from .rom import romfile
