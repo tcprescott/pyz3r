@@ -190,10 +190,3 @@ class alttprClass():
             raise alttprException('Please specify a seed or hash first to generate or retrieve a game.', DeprecationWarning)
 
         return self.data['hash']
-
-    def url(self):
-        warnings.warn('This has been deprecated.  Use pyz3r.alttpr().hash instead.', DeprecationWarning)
-        if not self.url:
-            raise alttprException('Please specify a seed or hash first to generate or retrieve a game.')
-
-        return self.url
