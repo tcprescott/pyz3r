@@ -8,6 +8,6 @@ __title__ = 'pyz3r'
 __author__ = 'Thomas Prescott'
 __license__ = 'Apache 2.0'
 __copyright__ = 'Copyright 2018-2019 Thomas Prescott'
-__version__ = '2.0.1'
+__version__ = '2.0.2'
 
 from .__main__ import alttpr
