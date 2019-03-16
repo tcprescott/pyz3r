@@ -207,7 +207,7 @@ class alttpr():
         spr = list(req_sprite.content)
         return spr
 
-    # leave these here for backwards compatibility, we'll eventually deprecate these
+    # leave these here for backwards compatibility, we'll eventually remove these
     def read_rom(self, srcfilepath):
         warnings.warn('This has been deprecated.  Use pyz3r.romfile.read() instead.', DeprecationWarning)
         return romfile.read(srcfilepath)
