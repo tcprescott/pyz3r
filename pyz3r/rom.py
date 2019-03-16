@@ -13,35 +13,32 @@ class patch:
                 rom[offset+idx] = value
         return rom
 
-    def heart_speed(speed=''):
-        if speed == 'off':
-            sbyte=0
-        elif speed == 'half':
-            sbyte=64
-        elif speed == 'quarter':
-            sbyte=128
-        elif speed == 'double':
-            sbyte=16
-        else:
-            sbyte=32 #vanilla speed
+    def heart_speed(speed='half'):
+        if speed==None:
+            speed='normal'
+        sbyte = {
+            'off': 0,
+            'double': 16,
+            'normal': 32,
+            'half': 64,
+            'quarter': 128,
+        }
         patch = [{
-            '1572915': [sbyte]
+            '1572915': [sbyte[speed]]
         }]
         return patch
 
     def heart_color(color='red'):
-        if color=='blue':
-            byte=44
-            file_byte=13
-        elif color=='green':
-            byte=60
-            file_byte=25
-        elif color=='yellow':
-            byte=40
-            file_byte=9
-        else:
-            byte=36
-            file_byte=5
+        if speed==None:
+            speed='red'
+        cbyte = {
+            'blue': [44, 13],
+            'green': [60, 25],
+            'yellow': [40, 9],
+            'red': [36, 5],
+        }
+        byte =  cbyte[color][0]
+        file_byte =  cbyte[color][1]
         patch = [
             {'457246': [byte]},
             {'457248': [byte]},

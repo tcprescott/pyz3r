@@ -56,7 +56,7 @@ jpn10rom = pyz3r.romfile.read("base_rom/Zelda no Densetsu - Kamigami no Triforce
 
 patched_rom = seed.create_patched_game(
     patchrom_array = jpn10rom,  
-    heartspeed=None, #can be off, quarter, half, double or None.  None would default to normal speed.
+    heartspeed=None, #can be off, quarter, half, double or normal.
     heartcolor='red', #can be red, 
     spritename='Link', #can be any sprite listed at https://alttpr.com/sprites
     music=False # true or false, defaults true
