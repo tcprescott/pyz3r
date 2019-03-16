@@ -1,5 +1,7 @@
 from .exceptions import alttprException
-from .rom import patch
+from .rom import patch, romfile
+
+import warnings
 
 import requests
 import json
@@ -204,3 +206,26 @@ class alttpr():
         req_sprite.raise_for_status()
         spr = list(req_sprite.content)
         return spr
+
+    # leave these here for backwards compatibility, we'll eventually deprecate these
+    def read_rom(self, srcfilepath):
+        warnings.warn('This has been deprecated.  Use pyz3r.romfile.read() instead.', DeprecationWarning)
+        return romfile.read(srcfilepath)
+
+    def write_rom(self, rom, dstfilepath):
+        warnings.warn('This has been deprecated.  Use pyz3r.romfile.write() instead.', DeprecationWarning)
+        return romfile.write(rom, dstfilepath)
+
+    def get_hash(self):
+        warnings.warn('This has been deprecated.  Use pyz3r.alttpr().hash instead.', DeprecationWarning)
+        if not self.data:
+            raise alttprException('Please specify a seed or hash first to generate or retrieve a game.', DeprecationWarning)
+
+        return self.data['hash']
+
+    def url(self):
+        warnings.warn('This has been deprecated.  Use pyz3r.alttpr().hash instead.', DeprecationWarning)
+        if not self.url:
+            raise alttprException('Please specify a seed or hash first to generate or retrieve a game.')
+
+        return self.url
