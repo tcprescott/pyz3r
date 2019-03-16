@@ -1,7 +1,6 @@
 language: python
 python:
   - "3.6"
-  - "3.7"
 deploy:
   provider: pypi
   on:
@@ -9,3 +8,5 @@ deploy:
   user: tcprescott
   password:
     secure: HRFrw8uHEYrEaxu+MaNTQ9Un4b5qvYKscy1JxA6/r/ypFHRV/PeuOgwmlKQXYDtBHZ1V1QlrliaNWjdwGQoQbGMHyFZc7xm+J4SsPpsLLN/1t/Vlmz3JdR3uKXnG40eVhH/ew43omKmHgLS3zmf7p8aeDkYMOj37GpbEY9kqwinN/MBVUKqvnJqK61iki96tPK1WHODcRk9zU160mJPVgQeEn6j6eNWfMaIBknF0NezTQjFbwgg79yFgXKZKJnUc9BqnbFbgWVanqHlnYZAJwFGvwHWOZppNiGuJdaAocy5Iy7ZLXzVXcmL5nx8KjIcHA1Mdd+cJIjgmeBw5ek6DLC22vZRsYN/q6oi70K91dtTD2b5bUJhn/a7LvdXsrwnfTaj9XJA1mIRPUabtlTcijZO+3PGIv1wl53q0HDWiGGaHt/em5hQ0JP2bH1CN3mCuFsbHqtKzgsrSPpMIZGwqHXyOsfXFVb3wQwuNfSj+Z3AcctY21vA4LQJ/hSzyKOs2KWr9sUPMEssmQH0LT/GckTrCa8m5/+lVrOoinW2Ayvb8bSwM/XLNpak0Cn3N/geAIGbMLx6/mV5EB32sDmnZEnn8q9hrTrajVwZd7vuw2DSfLrziw9i5z9N2kuRcZf39+CpxS+0+DV/wJFVQ7PR3mvtfCLhH6vhREAjgFzp1ITU=
+install:
+  - pip install -r requirements.txt
