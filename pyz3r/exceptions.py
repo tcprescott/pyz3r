@@ -1,0 +1,2 @@
+class alttprException(Exception):
+    pass

@@ -131,7 +131,7 @@ This is the meat and potatoes of the library.  There are two ways, the easy and 
 You'll first want to read your unmodified Japan 1.0 ROM of Link to the Past.  `read_rom()` will checksum the file to ensure its the correct ROM.
 
 ```python
-base_rom = seed.read_rom("path/to/Zelda no Densetsu - Kamigami no Triforce (Japan).sfc")
+base_rom = pyz3r.romfile.read("path/to/Zelda no Densetsu - Kamigami no Triforce (Japan).sfc")
 ```
 
 `base_rom` will be an array of integers representing the bytes of the original ROM.
@@ -149,7 +149,7 @@ patched_rom = seed.create_patched_game(
 
 Here you can customize the following:
 
-0. `patchrom_array` - Required.  This is an array of bits that have your original Japan 1.0 ROM.  The `read_rom` function in the `pyz3r.alttpr()` class will create this for you.
+0. `patchrom_array` - Required.  This is an array of bits that have your original Japan 1.0 ROM.  The `pyz3r.romfile.read()` function.
 1. `heartspeed` - Optional. The low health beep speed.  Acceptable values are `'off'`, `'quarter'`, `'half'`, `'double'`, or `'normal'`.  Defaults is `'normal'`.
 2. `heartcolor` - Optional. The color of your hearts.  Acceptable values are `'red'`, `'blue'`, `'green'`, or `'yellow'`.  Default is `'red'`.
 3. `spritename` - Optional. The sprite to use.  Acceptable values are the `name` keys in the json file at https://alttpr.com/sprites.  Default is `'Link'`.
@@ -159,12 +159,12 @@ The result of `create_patched_game` is an array of integers representing the ful
 
 Finally, you can write the ROM to a new file:
 ```python
-seed.write_rom(patched_rom, "path/to/patched_rom.sfc")
+pyz3r.romfile.write(patched_rom, "path/to/patched_rom.sfc")
 ```
 
 #### Advanced patching
 
-Check out the `read_rom`, `write_rom`, and `create_patched_game` in the [library's init file](pyz3r/__init__.py) to see how you can stitch together the patch generator commands.  Maybe I'll write more documentation on these functions at a later time.
+
 
 ## To do
 

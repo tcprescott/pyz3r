@@ -8,7 +8,7 @@ README = (HERE / "README.md").read_text()
 
 setup(
     name="pyz3r",
-    version="1.0.1",
+    version="2.0.6",
     author="Thomas Prescott",
     author_email="tcprescott@gmail.com",
     description="A python module for interacting with alttpr.com, such as generating new z3r games, and patching existing games.",
@@ -19,7 +19,9 @@ setup(
     classifiers=[
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.6",
-        "License :: OSI Approved :: MIT License",
+        "Programming Language :: Python :: 3.7",
+        "License :: OSI Approved :: Apache Software License",
+        "Development Status :: 5 - Production/Stable",
         "Operating System :: OS Independent",
     ],
     install_requires=['requests'],
