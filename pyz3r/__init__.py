@@ -12,3 +12,6 @@ __version__ = '2.0.6'
 
 from .alttpr import alttpr
 from .rom import romfile
+
+from .async_alttpr import alttpr as async_alttpr
+from .async_rom import romfile as async_romfile

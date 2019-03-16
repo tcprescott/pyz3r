@@ -1,11 +1,8 @@
 from .exceptions import alttprException
-from .rom import romfile
 from .patch import patch
-from .http import http
+from .async_http import http
 
-import warnings
-
-def alttpr(
+async def alttpr(
             settings=None,
             hash=None,
             randomizer='item',
@@ -15,7 +12,7 @@ def alttpr(
             password=None,
         ):
     seed = alttprClass(settings, hash, randomizer, baseurl, seed_baseurl, username, password)
-    seed._init()
+    await seed._init()
     return seed
 
 class alttprClass():
@@ -38,7 +35,7 @@ class alttprClass():
         self.username = username
         self.password = password
 
-    def _init(self):
+    async def _init(self):
 
         self.site = http(
             site_baseurl=self.baseurl,
@@ -57,24 +54,24 @@ class alttprClass():
                     'item': '/seed',
                     'entrance': '/entrance/seed',
                 }
-                game = self.site.generate_game(endpoint[self.randomizer], self.settings)
+                game = await self.site.generate_game(endpoint[self.randomizer], self.settings)
                 self.hash = game['hash']
             self.url = '{baseurl}/h/{hash}'.format(
                 baseurl = self.baseurl,
                 hash = self.hash
             )
-            self.data = self.site.retrieve_game(self.hash)
+            self.data = await self.site.retrieve_game(self.hash)
 
 
-    def settings(self):
+    async def settings(self):
         endpoint = {
             'item': '/seed',
             'entrance': '/entrance/seed',
         }
-        return self.site.retrieve_json(endpoint[self.randomizer])
+        return await self.site.retrieve_json(endpoint[self.randomizer])
 
 
-    def code(self):
+    async def code(self):
         if not self.data:
             raise alttprException('Please specify a seed or hash first to generate or retrieve a game.')
         
@@ -95,12 +92,12 @@ class alttprClass():
                 p=list(map(lambda x: code_map[x], patch[seek][2:]))
                 return [p[0], p[1], p[2], p[3], p[4]]
 
-    def get_patch_base(self):
-        baserom_settings = self.site.retrieve_json("/base_rom/settings")
-        req_patch = self.site.retrieve_json(baserom_settings['base_file'])
+    async def get_patch_base(self):
+        baserom_settings = await self.site.retrieve_json("/base_rom/settings")
+        req_patch = await self.site.retrieve_json(baserom_settings['base_file'])
         return req_patch
 
-    def create_patched_game(
+    async def create_patched_game(
             self,
             patchrom_array,
             heartspeed='half',
@@ -117,7 +114,7 @@ class alttprClass():
         # apply the base modifications
         patchrom_array = patch.apply(
             rom=patchrom_array,
-            patches=self.get_patch_base()
+            patches=await self.get_patch_base()
         )
 
         #apply the seed-specific changes
@@ -142,7 +139,7 @@ class alttprClass():
         patchrom_array = patch.apply(
             rom=patchrom_array,
             patches=patch.sprite(
-                spr=self.get_sprite(spritename)
+                spr=await self.get_sprite(spritename)
             )
         )
 
@@ -160,40 +157,17 @@ class alttprClass():
 
         return patchrom_array
 
-    def get_sprite(self, name):
-        sprites = self.site.retrieve_json('/sprites')
+    async def get_sprite(self, name):
+        sprites = await self.site.retrieve_json('/sprites')
         for sprite in sprites:
             if sprite['name'] == name:
                 fileurl = sprite['file']
                 break
         try:
-            sprite = self.site.retrieve_url_raw_content(fileurl)
+            sprite = await self.site.retrieve_url_raw_content(fileurl)
         except:
             raise alttprException('Sprite \"{name}\" is not available.'.format(
                 name=name
             ))
         spr = list(sprite)
         return spr
-
-    # leave these here for backwards compatibility, we'll eventually remove these
-    def read_rom(self, srcfilepath):
-        warnings.warn('This has been deprecated.  Use pyz3r.romfile.read() instead.', DeprecationWarning)
-        return romfile.read(srcfilepath)
-
-    def write_rom(self, rom, dstfilepath):
-        warnings.warn('This has been deprecated.  Use pyz3r.romfile.write() instead.', DeprecationWarning)
-        return romfile.write(rom, dstfilepath)
-
-    def get_hash(self):
-        warnings.warn('This has been deprecated.  Use pyz3r.alttpr().hash instead.', DeprecationWarning)
-        if not self.data:
-            raise alttprException('Please specify a seed or hash first to generate or retrieve a game.', DeprecationWarning)
-
-        return self.data['hash']
-
-    def url(self):
-        warnings.warn('This has been deprecated.  Use pyz3r.alttpr().hash instead.', DeprecationWarning)
-        if not self.url:
-            raise alttprException('Please specify a seed or hash first to generate or retrieve a game.')
-
-        return self.url

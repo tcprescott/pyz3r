@@ -2,12 +2,13 @@ from .misc import misc
 from .exceptions import alttprException
 
 import hashlib
+import aiofiles
 
 class romfile:
-    def read(srcfilepath):
+    async def read(srcfilepath):
         expected_rom_sha256='794e040b02c7591b59ad8843b51e7c619b88f87cddc6083a8e7a4027b96a2271'
         sha256_hash = hashlib.sha256()
-        with open(srcfilepath,"rb") as f:
+        with open(srcfilepath,"rb") as f: # 
             for byte_block in iter(lambda: f.read(4096),b""):
                 sha256_hash.update(byte_block)
         if not sha256_hash.hexdigest() == expected_rom_sha256:
@@ -15,16 +16,16 @@ class romfile:
                 expected_rom_sha256=expected_rom_sha256,
                 actual_checksum=sha256_hash.hexdigest()
             ))
-        fr = open(srcfilepath,"rb")
-        baserom_array = list(fr.read())
-        fr.close()
+        fr = await aiofiles.open(srcfilepath,"rb")
+        baserom_array = list(await fr.read())
+        await fr.close()
         return baserom_array
 
-    def write(rom, dstfilepath):
-        fw = open(dstfilepath,"wb")
+    async def write(rom, dstfilepath):
+        fw = await aiofiles.open(dstfilepath,"wb")
         patchrom = bytes()
         for idx, chunk_array in enumerate(misc.chunk(rom,256)):
             patchrom += bytes(chunk_array)
-        fw.write(patchrom)
+        await fw.write(patchrom)
         fw.close
 

@@ -24,5 +24,5 @@ setup(
         "Development Status :: 5 - Production/Stable",
         "Operating System :: OS Independent",
     ],
-    install_requires=['requests'],
+    install_requires=['requests','aiofiles','aiohttp'],
 )
