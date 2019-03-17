@@ -2,6 +2,7 @@ from .exceptions import alttprException
 from .rom import romfile
 from .patch import patch
 from .http import http
+from .misc import misc
 
 import warnings
 
@@ -118,13 +119,9 @@ class alttprClass():
             29: 'Map', 30: 'Compass', 31: 'Big Key'
         }
 
-        for patch in self.data['patch']:
-            if '1573395' in patch:
-                p=list(map(lambda x: code_map[x], patch['1573395'][2:]))
-                return [p[0], p[1], p[2], p[3], p[4]]
-            elif '1573376' in patch:
-                p=list(map(lambda x: code_map[x], patch['1573376'][21:]))
-                return [p[0], p[1], p[2], p[3], p[4]]
+        
+        p=list(map(lambda x: code_map[x], misc.seek_patch_data(self.data['patch'], 1573397, 5)))
+        return [p[0], p[1], p[2], p[3], p[4]]
 
     def get_patch_base(self):
         """Gets the base_rom from the website.  This is the first set of patches that must be applied to the ROM.
