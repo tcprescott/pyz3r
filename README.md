@@ -271,10 +271,11 @@ The most notable changes are using asyncio's await syntax and using `pyz3r.async
 
 ## To do
 
-0. Right now Quickswap and Menu Speed options are not available. If they were, the behavior of this library would be for them **not** to function on race seeds.  I figure few people use these features, so they won't be in the initial release of pyz3r.
-1. Add a shortcut for pulling the data for the daily game.  This would likely have to be scraped since it doesn't appear to be any API endpoint for this.
-2. Improve logging.  Right now this library does zero logging on its own, which should be fixed.
-3. Add unit tests.
+0. Add a feature to verify a settings dictionary before attempting to generate a game.  This may become the default behavior, with the ability to override it.  This could also just be a separate function that could be invoked as well.
+1. Right now Quickswap and Menu Speed options are not available. If they were, the behavior of this library would be for them **not** to function on race seeds.  I figure few people use these features, so they won't be in the initial release of pyz3r.
+2. Add a shortcut for pulling the data for the daily game.  This would likely have to be scraped since it doesn't appear to be any API endpoint for this.
+3. Improve logging.  Right now this library does zero logging on its own, which should be fixed.
+4. Add unit tests.
 
 ## Credits and shoutouts
 
