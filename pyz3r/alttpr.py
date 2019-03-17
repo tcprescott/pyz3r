@@ -14,6 +14,21 @@ def alttpr(
             username=None,
             password=None,
         ):
+    """Generates, or retrieves, an ALttPR game.
+    
+    Keyword Arguments:
+        settings {dict} -- Dictionary of settings to use for generating a game. (default: {None})
+        hash {str} -- The 10 character string that identifies an already generated game. (default: {None})
+        randomizer {str} -- The randomizer to use for generating a game ('item' or 'entrance') (default: {'item'})
+        baseurl {str} -- URL of the ALTTPR Website to use. (default: {'https://alttpr.com'})
+        seed_baseurl {str} -- URL of the S3 bucket or web location that has already generated games. (default: {'https://s3.us-east-2.amazonaws.com/alttpr-patches'})
+        username {str} -- A basic auth username (not typically needed) (default: {None})
+        password {str} -- A basic auth password (not typically needed) (default: {None})
+    
+    Returns:
+        [type] -- [description]
+    """
+
     seed = alttprClass(settings, hash, randomizer, baseurl, seed_baseurl, username, password)
     seed._init()
     return seed
@@ -39,7 +54,6 @@ class alttprClass():
         self.password = password
 
     def _init(self):
-
         self.site = http(
             site_baseurl=self.baseurl,
             patch_baseurl=self.seed_baseurl,
@@ -67,6 +81,12 @@ class alttprClass():
 
 
     def settings(self):
+        """Returns a dictonary of valid settings, based on the randomizer in use (item or entrance).
+        
+        Returns:
+            dict -- dictonary of valid settings that can be used
+        """
+
         endpoint = {
             'item': '/seed',
             'entrance': '/entrance/seed',
@@ -75,6 +95,15 @@ class alttprClass():
 
 
     def code(self):
+        """An list of strings that represents the 
+        
+        Raises:
+            alttprException -- Raised if no game has been generated or retrieved.
+        
+        Returns:
+            list -- List of strings depicting the code on the in-game file select screen.
+        """
+
         if not self.data:
             raise alttprException('Please specify a seed or hash first to generate or retrieve a game.')
         
@@ -96,6 +125,12 @@ class alttprClass():
                 return [p[0], p[1], p[2], p[3], p[4]]
 
     def get_patch_base(self):
+        """Gets the base_rom from the website.  This is the first set of patches that must be applied to the ROM.
+        
+        Returns:
+            list -- a list of dictionaries that represent a rom patch
+        """
+
         baserom_settings = self.site.retrieve_json("/base_rom/settings")
         req_patch = self.site.retrieve_json(baserom_settings['base_file'])
         return req_patch
@@ -108,6 +143,25 @@ class alttprClass():
             spritename='Link',
             music=True
         ):
+        """Creates a list of bytes depicting a fully patched A Link to the Past Randomizer rom.
+        
+        Arguments:
+            patchrom_array {list} -- a list of dictionaries that represent a Japan 1.0 ROM of A Link to the Past.
+        
+        Keyword Arguments:
+            heartspeed {str} -- Chose the speed at which the low health warning beeps.
+                Options are 'off', 'double', 'normal', 'half', and 'quarter'. (default: {'half'})
+            color {str} -- The heart color.  Options are 'red', 'blue', 'green', and 'yellow' (default: {'red'})
+            spritename {str} -- The name of the sprite, as shown on https://alttpr.com/en/sprite_preview (default: {'Link'})
+            music {bool} -- If true, music is enabled.  If false, the music id disabled. (default: {True})
+        
+        Raises:
+            alttprException -- Raised if no game has been generated or retrieved.
+        
+        Returns:
+            list -- a list of bytes depecting a fully patched ALTTPR game
+        """
+
         if not self.data:
             raise alttprException('Please specify a seed or hash first to generate or retrieve a game.')
 
@@ -161,6 +215,18 @@ class alttprClass():
         return patchrom_array
 
     def get_sprite(self, name):
+        """Retrieve the ZSPR file for the named sprite.
+        
+        Arguments:
+            name {str} -- The name of the sprite, as listed at https://alttpr.com/en/sprite_preview
+        
+        Raises:
+            alttprException -- Raised if no game has been generated or retrieved.
+        
+        Returns:
+            list -- a list of bytes depicting a SPR or ZSPR file
+        """
+
         sprites = self.site.retrieve_json('/sprites')
         for sprite in sprites:
             if sprite['name'] == name:
