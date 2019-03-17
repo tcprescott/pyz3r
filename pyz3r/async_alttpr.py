@@ -114,9 +114,13 @@ class alttprClass():
         }
 
         for patch in self.data['patch']:
-            seek = '1573395'
-            if seek in patch:
-                p=list(map(lambda x: code_map[x], patch[seek][2:]))
+            # non-glitched modes
+            if '1573395' in patch:
+                p=list(map(lambda x: code_map[x], patch['1573395'][2:]))
+                return [p[0], p[1], p[2], p[3], p[4]]
+            # glitched modes
+            elif '1573376' in patch:
+                p=list(map(lambda x: code_map[x], patch['1573376'][21:]))
                 return [p[0], p[1], p[2], p[3], p[4]]
 
     async def get_patch_base(self):

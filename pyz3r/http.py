@@ -26,9 +26,11 @@ class http():
             except requests.exceptions.ConnectionError:
                 continue
             if not req.status_code == requests.codes.ok:
-                continue
+                raise alttprFailedToGenerate('failed to generate game - {resp}'.format(
+                    resp = req.text
+                ))
             return json.loads(req.text)
-        raise alttprFailedToGenerate('failed to generate game')
+        raise alttprFailedToGenerate('failed to generate game - {resp}')
 
     def retrieve_game(self, hash):
         for i in range(0,5):

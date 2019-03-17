@@ -54,3 +54,4 @@ docs/_build/
 **/__pycache__/
 env/
 .vscode/
+input/
