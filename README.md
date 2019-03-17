@@ -4,6 +4,14 @@ Pyz3r is an unofficial python abstraction library for interacting with the [altt
 This allows developers to create applications that not only generate games on [alttpr.com](https://alttpr.com),
 but also create the ROM as well using the patch data provided by the website.
 
+## Installation
+This module is available on PyPI.  It can be installed via pip:
+
+`pip install pyz3r`
+
+## Compatiblity
+This library has been tested on both Linux (Centos 7) and Windows on Python 3.6.  Python 3.7 should also work, though it hasn't been as extensively tested.  An internet connection is required so it can communicate with alttpr.com.
+
 ## Disclaimer(s)
 This is an unofficial tool.  Please do not submit bug reports on the official ALTTPR repository Github for issues that
 are related to the use of this library!
@@ -81,13 +89,9 @@ If the game you want to work with has already been generated, you can load the h
 
 ```python
 seed = pyz3r.alttpr(
-    randomizer='item',
     hash='zDvxWLLEMa'
 )
 ```
-
-The `randomizer` argument will no longer be required once randomizer-type discovery is added.
-For now you'll need to specify `item` (default) or `entrance`.
 
 ### Getting the code display and URL
 
@@ -105,7 +109,7 @@ Output:
 You can also get the url quickly as well:
 
 ```python
-url = seed.url()
+url = seed.url
 print("Permalink: {url}".format(
     url = url
 ))
@@ -144,7 +148,7 @@ patched_rom = seed.create_patched_game(
     heartcolor='red',
     spritename='Link', #can be any sprite listed at https://alttpr.com/sprites
     music=False # true or false, defaults true
-    )
+)
 ```
 
 Here you can customize the following:
@@ -163,19 +167,120 @@ pyz3r.romfile.write(patched_rom, "path/to/patched_rom.sfc")
 ```
 
 #### Advanced patching
+If you have a patched game, and just want to customize the already patched game, this library lets you do that too.
 
+The following example will let you bring in an already patched game and let you customize the heart speed, heart color, sprite, and music.
 
+```python
+import pyz3r
+from pyz3r.patch import patch
+
+rom = pyz3r.romfile.read('path/to/rom.sfc',verify_checksum=False)
+
+#apply the heart speed change
+rom = patch.apply(
+    rom=rom,
+    patches=patch.heart_speed('half')
+)
+
+#apply the heart color change
+rom = patch.apply(
+    rom=rom,
+    patches=patch.heart_color('blue')
+)
+
+#apply the sprite, retrieves a sprite from the alttpr website
+rom = patch.apply(
+    rom=rom,
+    patches=patch.sprite(
+        spr=pyz3r.alttpr().get_sprite('Negative Link')
+    )
+)
+
+#apply the music
+rom = patch.apply(
+    rom=rom,
+    patches=patch.music(True)
+)
+
+pyz3r.romfile.write(rom,'path/to/patched_rom.sfc')
+```
+
+### Using the customizer
+The ALttPR website has a feature where may customize a game, including choosing starting equipment, item locations, game settings, drops and prizepack customization.  This library has a feature that allows you to generate games using the settings saved on alttpr.com's customizer.
+
+To use it,  you'll want to read a `customizer-settings.json` file that was saved from alttpr.com, then use the provided function `customizer.convert2settings()` to convert the json file to something that can be be used for game generation.
+
+`tournament` can be set to True to generate the game as a race rom.  This will cause the spoiler log to be unavailable,
+along with scrambling the item table within the ROM.
+
+```python
+import json
+import pyz3r
+from pyz3r.customizer import customizer
+
+f = open('customizer-settings.json', "r")
+customizer_settings = json.loads(f.read())
+f.close()
+
+seed = pyz3r.alttpr(
+    randomizer='item',
+    settings=customizer.convert2settings(customizer_save=customizer_settings, tournament=False)
+)
+```
+
+As of v30, the customizer only works with the item randomizer.  There may be unexpected results if you try this with the entrance randomizer.
+
+### Async Support
+This library can also be used using asyncio (via the aiofiles and aiohttp library), which may be useful for bots that use asyncio (such as discord.py).  The syntax is very similar, with a two notable differences.
+
+```python
+import pyz3r
+import asyncio
+
+async def test_retrieve_game():
+    seed = await pyz3r.async_alttpr(
+        hash='zDvxWLLEMa'
+    )
+
+    print("Permalink: {url}".format(
+        url = seed.url
+    ))
+    print("Hash: [{hash}]".format(
+        hash = ' | '.join(await seed.code())
+    ))
+
+    print(seed.data['spoiler'])
+
+    jpn10rom = await pyz3r.async_romfile.read("base_rom/Zelda no Densetsu - Kamigami no Triforce (Japan).sfc")
+    patched_rom = await seed.create_patched_game(
+        patchrom_array = jpn10rom,  
+        heartspeed=None, #can be off, quarter, half, double or normal.
+        heartcolor='red', #can be red, 
+        spritename='Negative Link', #can be any sprite listed at https://alttpr.com/sprites
+        music=False # true or false, defaults true
+        )
+    await pyz3r.async_romfile.write(patched_rom, "outputs/patched_rom.sfc")
+
+if __name__ == '__main__':
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(test_retrieve_game())
+```
+
+The most notable changes are using asyncio's await syntax and using `pyz3r.async_alttpr()` and `pyz3r.async_romfile` instead.
 
 ## To do
 
 0. Right now Quickswap and Menu Speed options are not available. If they were, the behavior of this library would be for them **not** to function on race seeds.  I figure few people use these features, so they won't be in the initial release of pyz3r.
-1. When bringing in an already-generated game, automatically detect if its an item randomizer or entrance shuffle seed.
-2. Release an version of this library that uses asyncio (useful for discord/irc bots)
+1. Add a shortcut for pulling the data for the daily game.  This would likely have to be scraped since it doesn't appear to be any API endpoint for this.
+2. Improve logging.  Right now this library does zero logging on its own, which should be fixed.
+3. Add unit tests.
 
 ## Credits and shoutouts
 
 0. Veetorp, Karkat, ChristosOwen, Smallhacker, and Dessyreqt for making an incredible randomizer.
-1. The mods at the ALTTPR discord (https://discord.gg/alttprandomizer) for their hard work for the community.
+1. The mods at the ALTTPR discord (https://discord.gg/alttprandomizer).
 2. This work is dedicated to my father.  May he rest in peace.
+3. Jaysee87 for his input into specific functionality, and suggesting asyncio support for usage with discord bots.
 
 Github for alttp_vt_randomizer: https://github.com/sporchia/alttp_vt_randomizer
