@@ -1,14 +1,14 @@
 language: python
 python:
-  - "3.6"
+- '3.6'
 deploy:
   provider: pypi
   on:
     tags: true
   user: tcprescott
   password:
-    secure: HRFrw8uHEYrEaxu+MaNTQ9Un4b5qvYKscy1JxA6/r/ypFHRV/PeuOgwmlKQXYDtBHZ1V1QlrliaNWjdwGQoQbGMHyFZc7xm+J4SsPpsLLN/1t/Vlmz3JdR3uKXnG40eVhH/ew43omKmHgLS3zmf7p8aeDkYMOj37GpbEY9kqwinN/MBVUKqvnJqK61iki96tPK1WHODcRk9zU160mJPVgQeEn6j6eNWfMaIBknF0NezTQjFbwgg79yFgXKZKJnUc9BqnbFbgWVanqHlnYZAJwFGvwHWOZppNiGuJdaAocy5Iy7ZLXzVXcmL5nx8KjIcHA1Mdd+cJIjgmeBw5ek6DLC22vZRsYN/q6oi70K91dtTD2b5bUJhn/a7LvdXsrwnfTaj9XJA1mIRPUabtlTcijZO+3PGIv1wl53q0HDWiGGaHt/em5hQ0JP2bH1CN3mCuFsbHqtKzgsrSPpMIZGwqHXyOsfXFVb3wQwuNfSj+Z3AcctY21vA4LQJ/hSzyKOs2KWr9sUPMEssmQH0LT/GckTrCa8m5/+lVrOoinW2Ayvb8bSwM/XLNpak0Cn3N/geAIGbMLx6/mV5EB32sDmnZEnn8q9hrTrajVwZd7vuw2DSfLrziw9i5z9N2kuRcZf39+CpxS+0+DV/wJFVQ7PR3mvtfCLhH6vhREAjgFzp1ITU=
+    secure: ne1AdPw7wiEvvdV1FB0rKBoOG5cPTVFcUfAUM2pVVwNeQksCe7FZpXdS9UToSeatC6ypidjMiTcgTM4LyBa0JfoV9mZv8/UJiJp0/8WfLO6/NrdOByQu/AVlbsh2Z3MRKh7WnqxnL8T3QtMeojIag4+0dPO0bL96hn1dn7R6szpKrKxL6j7khYS4Gau8mU7jaH9UYxweZrE9Hi+2XK+VUhlrhwJJhb/ScTZEg2XprGvIpN+3hsChUhYwmXtN4h5XQq6mUH76da9+x+GuIKPGG0TjAYgEI/bOwopGRSFSStE2fOPMY/hp8SLR2DOL7lZNbfRM9+B+uXEUcprYoVnUqQAA6JXnu3ts2RzzQONHRAvjUVSdSQ5kY/SxZGYDs7ioTk18pgGWMhwwEB+yL4EDPBAE3AnSh2JbyVIFWpblQlZlfPY8fZg1VpRQTixZZdWot8pltWsDb1kAxK1qS4zAygmywiXHhQv+k2793QckJ+i0YcA0jtUnY2u+9Ez9Ql2VJxnKP9E3WusowSswUDAeemRXv6fggKiw+xrSjfRiV+Qbhs8gFusinFmBxCzhQSKlVoGLH4ij4riEi9hQhlQHMUUwfZPwk8KEIUPSjTL1E2YTsVgfWKbV+np6KK17mdTLs6bU9jyf/uzeA1m6oK+OgUQClQHOVJn5GwvniJKhJ/w=
 install:
-  - pip install -r requirements.txt
+- pip install -r requirements.txt
 script:
-  - echo "skipping tests"
+- echo "skipping tests"
