@@ -207,7 +207,7 @@ pyz3r.romfile.write(rom,'path/to/patched_rom.sfc')
 ```
 
 ### Using the customizer
-The ALttPR website has a feature where may customize a game, including choosing starting equipment, item locations, game settings, drops and prizepack customization.  This library has a feature that allows you to generate games using the settings saved on alttpr.com's customizer.
+The ALttPR website has a feature where a player may customize a game, including choosing starting equipment, item locations, game settings, drops and prizepack customization.  This library has a feature that allows you to generate games using the settings saved on alttpr.com's customizer.
 
 To use it,  you'll want to read a `customizer-settings.json` file that was saved from alttpr.com, then use the provided function `customizer.convert2settings()` to convert the json file to something that can be be used for game generation.
 
