@@ -32,9 +32,15 @@ class misc:
         offsetlist_sorted = sorted(offsetlist)
         i = bisect.bisect_left(offsetlist_sorted, offset)
         if i:
-            left_slice = offset - offsetlist_sorted[i-1]
-            for patch in patches:
-                seek = str(offsetlist_sorted[i-1])
-                if seek in patch:
-                    return patch[seek][left_slice:left_slice + bytes]
+            if offsetlist_sorted[i] == offset:
+                seek = str(offset)
+                for patch in patches:
+                    if seek in patch:
+                        return patch[seek][:bytes]
+            else:
+                left_slice = offset - offsetlist_sorted[i-1]
+                for patch in patches:
+                    seek = str(offsetlist_sorted[i-1])
+                    if seek in patch:
+                        return patch[seek][left_slice:left_slice + bytes]
         raise ValueError
