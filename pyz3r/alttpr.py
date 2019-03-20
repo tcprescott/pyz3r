@@ -120,8 +120,12 @@ class alttprClass():
         }
 
         
-        p=list(map(lambda x: code_map[x], misc.seek_patch_data(self.data['patch'], 1573397, 5)))
-        return [p[0], p[1], p[2], p[3], p[4]]
+        codebytes = misc.seek_patch_data(self.data['patch'], 1573397, 5)
+        if len(codebytes) != 5:
+            return ["Bow","Boomerang","Hookshot","Bombs","Mushroom"]
+        else:
+            p=list(map(lambda x: code_map[x], codebytes))
+            return [p[0], p[1], p[2], p[3], p[4]]
 
     def get_patch_base(self):
         """Gets the base_rom from the website.  This is the first set of patches that must be applied to the ROM.
