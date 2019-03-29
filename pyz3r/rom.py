@@ -18,12 +18,10 @@ class romfile:
             list -- A list of bytes depicting the read ROM file.
         """
 
-        headered = False
         fr = open(srcfilepath,"rb").read()
         expected_rom_sha256='794e040b02c7591b59ad8843b51e7c619b88f87cddc6083a8e7a4027b96a2271'
         if verify_checksum and len(list(fr)) == 1049088:
             fr = bytes(list(fr[512:]))
-            headered = True
         if verify_checksum:
             sha256_hash = hashlib.sha256()
             sha256_hash.update(fr)
@@ -33,7 +31,7 @@ class romfile:
                     actual_checksum=sha256_hash.hexdigest()
                 ))
         baserom_array = list(fr)
-        return baserom_array #headered
+        return baserom_array 
 
     def write(rom, dstfilepath):
         """Writes a list of bytes to a file on the filesystem.
