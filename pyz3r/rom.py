@@ -19,18 +19,17 @@ class romfile:
         """
 
         fr = open(srcfilepath,"rb").read()
-        expected_rom_sha256='794e040b02c7591b59ad8843b51e7c619b88f87cddc6083a8e7a4027b96a2271'
-        if verify_checksum and len(list(fr)) == 1049088:
-            fr = bytes(list(fr[512:]))
+        baserom_array = list(fr)
+        if verify_checksum and len(baserom_array) == 1049088:
+            baserom_array = baserom_array[512:]
         if verify_checksum:
             sha256_hash = hashlib.sha256()
-            sha256_hash.update(fr)
+            sha256_hash.update(bytes(baserom_array))
             if not sha256_hash.hexdigest() == expected_rom_sha256:
                 raise alttprException('Expected checksum "{expected_rom_sha256}", got "{actual_checksum}" instead.  Verify the source ROM is an unheadered Japan 1.0 Link to the Past ROM.'.format(
                     expected_rom_sha256=expected_rom_sha256,
                     actual_checksum=sha256_hash.hexdigest()
                 ))
-        baserom_array = list(fr)
         return baserom_array 
 
     def write(rom, dstfilepath):
