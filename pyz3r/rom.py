@@ -23,6 +23,7 @@ class romfile:
         if verify_checksum and len(baserom_array) == 1049088:
             baserom_array = baserom_array[512:]
         if verify_checksum:
+            expected_rom_sha256='794e040b02c7591b59ad8843b51e7c619b88f87cddc6083a8e7a4027b96a2271'
             sha256_hash = hashlib.sha256()
             sha256_hash.update(bytes(baserom_array))
             if not sha256_hash.hexdigest() == expected_rom_sha256:
