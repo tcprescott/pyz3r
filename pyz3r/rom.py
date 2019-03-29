@@ -18,21 +18,20 @@ class romfile:
             list -- A list of bytes depicting the read ROM file.
         """
 
+        fr = open(srcfilepath,"rb").read()
+        expected_rom_sha256='794e040b02c7591b59ad8843b51e7c619b88f87cddc6083a8e7a4027b96a2271'
+        if verify_checksum and len(list(fr)) == 1049088:
+            fr = bytes(list(fr[512:]))
         if verify_checksum:
-            expected_rom_sha256='794e040b02c7591b59ad8843b51e7c619b88f87cddc6083a8e7a4027b96a2271'
             sha256_hash = hashlib.sha256()
-            with open(srcfilepath,"rb") as f:
-                for byte_block in iter(lambda: f.read(4096),b""):
-                    sha256_hash.update(byte_block)
+            sha256_hash.update(fr)
             if not sha256_hash.hexdigest() == expected_rom_sha256:
                 raise alttprException('Expected checksum "{expected_rom_sha256}", got "{actual_checksum}" instead.  Verify the source ROM is an unheadered Japan 1.0 Link to the Past ROM.'.format(
                     expected_rom_sha256=expected_rom_sha256,
                     actual_checksum=sha256_hash.hexdigest()
                 ))
-        fr = open(srcfilepath,"rb")
-        baserom_array = list(fr.read())
-        fr.close()
-        return baserom_array
+        baserom_array = list(fr)
+        return baserom_array 
 
     def write(rom, dstfilepath):
         """Writes a list of bytes to a file on the filesystem.
