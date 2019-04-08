@@ -51,13 +51,13 @@ print("Hash: [{hash}]".format(
 
 print(seed.data['spoiler'])
 
-# jpn10rom = pyz3r.romfile.read("base_rom/Zelda no Densetsu - Kamigami no Triforce (Japan).sfc")
+jpn10rom = pyz3r.romfile.read("base_rom/Zelda no Densetsu - Kamigami no Triforce (Japan).sfc")
 
-# patched_rom = seed.create_patched_game(
-#     patchrom_array = jpn10rom,  
-#     heartspeed=None, #can be off, quarter, half, double or normal.
-#     heartcolor='red', #can be red, 
-#     spritename='Link', #can be any sprite listed at https://alttpr.com/sprites
-#     music=False # true or false, defaults true
-#     )
-# pyz3r.romfile.write(patched_rom, "outputs/patched_rom.sfc")
+patched_rom = seed.create_patched_game(
+    patchrom_array = jpn10rom,  
+    heartspeed=None, #can be off, quarter, half, double or normal.
+    heartcolor='red', #can be red, 
+    spritename='Link', #can be any sprite listed at https://alttpr.com/sprites
+    music=False # true or false, defaults true
+    )
+pyz3r.romfile.write(patched_rom, "outputs/patched_rom.sfc")
