@@ -17,8 +17,8 @@ class romfile:
         Returns:
             list -- A list of bytes depicting the read ROM file.
         """
-
-        fr = open(srcfilepath,"rb").read()
+        with open(srcfilepath,"rb") as f:
+            fr = f.read()
         baserom_array = list(fr)
         if verify_checksum:
             if len(baserom_array) == 1049088:
