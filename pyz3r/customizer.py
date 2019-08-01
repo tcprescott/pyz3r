@@ -322,11 +322,40 @@ class customizer:
             if not customizer_save['vt.custom.equipment'] == None:
                 eq = []
                 for key, value in customizer_save['vt.custom.equipment'].items():
-                    if key not in ['Rupees','empty']:
-                            if key in ['Bottle1','Bottle2','Bottle3','Bottle4']:
-                                eq += int(value) * ['Bottle']
-                            else:
-                                eq += int(value) * [key]
+                    if key in ['Bottle1','Bottle2','Bottle3','Bottle4']:
+                        if value == 1:
+                            eq += ['Bottle']
+                        elif value == 2:
+                            eq += ['BottleWithRedPotion']
+                        elif value == 3:
+                            eq += ['BottleWithGreenPotion']
+                        elif value == 4:
+                            eq += ['BottleWithBluePotion']
+                        elif value == 5:
+                            eq += ['BottleWithBee']
+                        elif value == 6:
+                            eq += ['BottleWithGoldBee']
+                        elif value == 7:
+                            eq += ['BottleWithFairy']
+                    elif key == 'ProgressiveBow':
+                        if value == 1:
+                            eq += ['SilverArrowUpgrade']
+                        elif value == 2:
+                            eq += ['Bow']
+                        elif value == 3:
+                            eq += ['BowAndSilverArrows']
+                    elif key == 'Boomerang':
+                        if value == 1:
+                            eq += ['Boomerang']
+                        elif value == 2:
+                            eq += ['RedBoomerang']
+                        elif value == 3:
+                            eq += ['Boomerang', 'RedBoomerang']
+                    elif key == 'Ocarina':
+                        if value == 1:
+                            eq += ['OcarinaInactive']
+                        elif value == 2:
+                            eq += ['OcarinaActive']
                     elif key == "Rupees":
                         value = int(customizer_save['vt.custom.equipment']['Rupees'])
 
@@ -346,6 +375,8 @@ class customizer:
                         value %= 5
 
                         eq +=  math.floor(value/1) * ['OneRupee']
+                    else:
+                        eq += int(value) * [key]
 
                 settings['eq'] = eq    
 
