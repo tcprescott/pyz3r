@@ -35,7 +35,7 @@ class alttprClass():
             self,
             settings=None,
             hash=None,
-            randomizer='item',
+            randomizer=None,
             baseurl='https://alttpr.com',
             seed_baseurl='https://s3.us-east-2.amazonaws.com/alttpr-patches',
             username=None,
@@ -44,7 +44,6 @@ class alttprClass():
         self.settings = settings
         self.hash = hash
         self.seed_baseurl = seed_baseurl
-        self.randomizer = randomizer
         self.baseurl = baseurl
         self.seed_baseurl = seed_baseurl
         self.username = username
@@ -63,13 +62,7 @@ class alttprClass():
             self.data=None
         else:
             if self.settings:
-                if self.randomizer not in ['item','entrance']:
-                    raise alttprException("randomizer must be \"item\" or \"entrance\"")
-                endpoint = {
-                    'item': '/seed',
-                    'entrance': '/entrance/seed',
-                }
-                game = await self.site.generate_game(endpoint[self.randomizer], self.settings)
+                game = await self.site.generate_game('/api/randomizer', self.settings)
                 self.hash = game['hash']
             self.url = '{baseurl}/h/{hash}'.format(
                 baseurl = self.baseurl,
@@ -78,17 +71,13 @@ class alttprClass():
             self.data = await self.site.retrieve_game(self.hash)
 
 
-    async def settings(self):
+    async def randomizer_settings(self):
         """Returns a dictonary of valid settings, based on the randomizer in use (item or entrance).
         
         Returns:
             dict -- dictonary of valid settings that can be used
         """
-        endpoint = {
-            'item': '/seed',
-            'entrance': '/entrance/seed',
-        }
-        return await self.site.retrieve_json(endpoint[self.randomizer])
+        return await self.site.retrieve_json('/randomizer/settings')
 
 
     async def code(self):

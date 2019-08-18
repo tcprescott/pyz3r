@@ -7,37 +7,42 @@ import pyz3r
 
 #generate a new game
 # seed = pyz3r.alttpr(
-#     randomizer='item', # optional, defaults to item
+#     baseurl='http://localhost:8000',
+#     seed_baseurl=None,
 #     settings={
-#         "difficulty": "hard",
-#         "enemizer": False,
-#         "logic": "None",
+#         "glitches": "none",
+#         "item_placement": "advanced",
+#         "dungeon_items": "standard",
+#         "accessibility": "items",
+#         "goal": "ganon",
+#         "crystals": {
+#             "ganon": "7",
+#             "tower": "4"
+#         },
 #         "mode": "open",
-#         "spoilers": False,
+#         "entrances": "none",
+#         "hints": "on",
+#         "weapons": "randomized",
+#         "item": {
+#             "pool": "normal",
+#             "functionality": "normal"
+#         },
 #         "tournament": True,
-#         "variation": "key-sanity",
-#         "weapons": "uncle",
-#         "lang": "en"
+#         "spoilers": False,
+#         "lang":"en",
+#         "enemizer": {
+#             "boss_shuffle":"none",
+#             "enemy_shuffle":"none",
+#             "enemy_damage":"normal",
+#             "enemy_health":"normal"
+#         }
 #     }
 # )
-#generate an entrance shuffle game
-# seed = pyz3r.alttpr(
-#     randomizer='entrance',
-#     settings={
-#         "logic":"NoGlitches",
-#         "difficulty":"normal",
-#         "variation":"retro",
-#         "mode":"open",
-#         "goal":"ganon",
-#         "shuffle":"restricted",
-#         "tournament":True,
-#         "spoilers":False,
-#         "enemizer":False,
-#         "lang":"en"
-#     }
-# )
+
 seed = pyz3r.alttpr(
-    hash='YlMjAgApGo'
+    baseurl='http://localhost:8000',
+    seed_baseurl=None,
+    hash='aO4v56yqwQ'
 )
 # seed = pyz3r.alttpr()
 
@@ -49,15 +54,15 @@ print("Hash: [{hash}]".format(
     hash = ' | '.join(seed.code())
 ))
 
-print(seed.data['spoiler'])
+# print(seed.data['spoiler'])
 
 jpn10rom = pyz3r.romfile.read("base_rom/Zelda no Densetsu - Kamigami no Triforce (Japan).sfc")
 
 patched_rom = seed.create_patched_game(
     patchrom_array = jpn10rom,  
-    heartspeed=None, #can be off, quarter, half, double or normal.
+    heartspeed='half', #can be off, quarter, half, double or normal.
     heartcolor='red', #can be red, 
     spritename='Link', #can be any sprite listed at https://alttpr.com/sprites
-    music=False # true or false, defaults true
+    music=True # true or false, defaults true
     )
 pyz3r.romfile.write(patched_rom, "outputs/patched_rom.sfc")
