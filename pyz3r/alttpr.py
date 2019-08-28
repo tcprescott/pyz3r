@@ -1,15 +1,12 @@
 from .exceptions import alttprException
-from .rom import romfile
 from .patch import patch
-from .http import http
+from .async_http import http
 from .misc import misc
 
-import warnings
-
-def alttpr(
+async def alttpr(
             settings=None,
             hash=None,
-            randomizer=None,
+            randomizer='item',
             baseurl='https://alttpr.com',
             seed_baseurl='https://s3.us-east-2.amazonaws.com/alttpr-patches',
             username=None,
@@ -29,9 +26,8 @@ def alttpr(
     Returns:
         [type] -- [description]
     """
-
     seed = alttprClass(settings, hash, randomizer, baseurl, seed_baseurl, username, password)
-    seed._init()
+    await seed._init()
     return seed
 
 class alttprClass():
@@ -39,7 +35,8 @@ class alttprClass():
             self,
             settings=None,
             hash=None,
-            randomizer='item',
+            randomizer=None,
+            customizer=False,
             baseurl='https://alttpr.com',
             seed_baseurl='https://s3.us-east-2.amazonaws.com/alttpr-patches',
             username=None,
@@ -50,10 +47,12 @@ class alttprClass():
         self.seed_baseurl = seed_baseurl
         self.baseurl = baseurl
         self.seed_baseurl = seed_baseurl
+        self.customizer = customizer
         self.username = username
         self.password = password
 
-    def _init(self):
+    async def _init(self):
+
         self.site = http(
             site_baseurl=self.baseurl,
             patch_baseurl=self.seed_baseurl,
@@ -61,14 +60,19 @@ class alttprClass():
             password=self.password,
         )
 
+        if self.customizer:
+            endpoint='/api/customizer'
+        else:
+            endpoint='/api/randomizer'
+
         if self.settings == None and self.hash==None:
             self.data=None
         else:
             if self.settings:
-                self.data = self.site.generate_game('/api/randomizer', self.settings)
+                self.data = await self.site.generate_game(endpoint, self.settings)
                 self.hash = self.data['hash']
             else:
-                self.data = self.site.retrieve_game(self.hash)
+                self.data = await self.site.retrieve_game(self.hash)
 
             self.url = '{baseurl}/h/{hash}'.format(
                 baseurl = self.baseurl,
@@ -76,16 +80,16 @@ class alttprClass():
             )
 
 
-    def randomizer_settings(self):
+    async def randomizer_settings(self):
         """Returns a dictonary of valid settings, based on the randomizer in use (item or entrance).
         
         Returns:
             dict -- dictonary of valid settings that can be used
         """
-        return self.site.retrieve_json('/randomizer/settings')
+        return await self.site.retrieve_json('/randomizer/settings')
 
 
-    def code(self):
+    async def code(self):
         """An list of strings that represents the 
         
         Raises:
@@ -94,7 +98,6 @@ class alttprClass():
         Returns:
             list -- List of strings depicting the code on the in-game file select screen.
         """
-
         if not self.data:
             raise alttprException('Please specify a seed or hash first to generate or retrieve a game.')
         
@@ -109,7 +112,6 @@ class alttprClass():
             29: 'Map', 30: 'Compass', 31: 'Big Key'
         }
 
-        
         codebytes = misc.seek_patch_data(self.data['patch'], 1573397, 5)
         if len(codebytes) != 5:
             return ["Bow","Boomerang","Hookshot","Bombs","Mushroom"]
@@ -117,18 +119,17 @@ class alttprClass():
             p=list(map(lambda x: code_map[x], codebytes))
             return [p[0], p[1], p[2], p[3], p[4]]
 
-    def get_patch_base(self):
+    async def get_patch_base(self):
         """Gets the base_rom from the website.  This is the first set of patches that must be applied to the ROM.
         
         Returns:
             list -- a list of dictionaries that represent a rom patch
         """
-
-        baserom_settings = self.site.retrieve_json("/base_rom/settings")
-        req_patch = self.site.retrieve_json(baserom_settings['base_file'])
+        baserom_settings = await self.site.retrieve_json("/base_rom/settings")
+        req_patch = await self.site.retrieve_json(baserom_settings['base_file'])
         return req_patch
 
-    def create_patched_game(
+    async def create_patched_game(
             self,
             patchrom_array,
             heartspeed='half',
@@ -154,7 +155,6 @@ class alttprClass():
         Returns:
             list -- a list of bytes depecting a fully patched ALTTPR game
         """
-
         if not self.data:
             raise alttprException('Please specify a seed or hash first to generate or retrieve a game.')
 
@@ -164,7 +164,7 @@ class alttprClass():
         # apply the base modifications
         patchrom_array = patch.apply(
             rom=patchrom_array,
-            patches=self.get_patch_base()
+            patches=await self.get_patch_base()
         )
 
         #apply the seed-specific changes
@@ -189,7 +189,7 @@ class alttprClass():
         patchrom_array = patch.apply(
             rom=patchrom_array,
             patches=patch.sprite(
-                spr=self.get_sprite(spritename)
+                spr=await self.get_sprite(spritename)
             )
         )
 
@@ -207,7 +207,7 @@ class alttprClass():
 
         return patchrom_array
 
-    def get_sprite(self, name):
+    async def get_sprite(self, name):
         """Retrieve the ZSPR file for the named sprite.
         
         Arguments:
@@ -219,33 +219,16 @@ class alttprClass():
         Returns:
             list -- a list of bytes depicting a SPR or ZSPR file
         """
-
-        sprites = self.site.retrieve_json('/sprites')
+        sprites = await self.site.retrieve_json('/sprites')
         for sprite in sprites:
             if sprite['name'] == name:
                 fileurl = sprite['file']
                 break
         try:
-            sprite = self.site.retrieve_url_raw_content(fileurl)
+            sprite = await self.site.retrieve_url_raw_content(fileurl)
         except:
             raise alttprException('Sprite \"{name}\" is not available.'.format(
                 name=name
             ))
         spr = list(sprite)
         return spr
-
-    # leave these here for backwards compatibility, we'll eventually remove these
-    def read_rom(self, srcfilepath):
-        warnings.warn('This has been deprecated.  Use pyz3r.romfile.read() instead.', DeprecationWarning)
-        return romfile.read(srcfilepath)
-
-    def write_rom(self, rom, dstfilepath):
-        warnings.warn('This has been deprecated.  Use pyz3r.romfile.write() instead.', DeprecationWarning)
-        return romfile.write(rom, dstfilepath)
-
-    def get_hash(self):
-        warnings.warn('This has been deprecated.  Use pyz3r.alttpr().hash instead.', DeprecationWarning)
-        if not self.data:
-            raise alttprException('Please specify a seed or hash first to generate or retrieve a game.', DeprecationWarning)
-
-        return self.data['hash']

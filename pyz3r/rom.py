@@ -2,9 +2,10 @@ from .misc import misc
 from .exceptions import alttprException
 
 import hashlib
+import aiofiles
 
 class romfile:
-    def read(srcfilepath, verify_checksum=True):
+    async def read(srcfilepath, verify_checksum=True):
         """Reads a ROM and converts it to a list of bytes, preparing it for patching.
         
         Arguments:
@@ -17,8 +18,8 @@ class romfile:
         Returns:
             list -- A list of bytes depicting the read ROM file.
         """
-        with open(srcfilepath,"rb") as f:
-            baserom_array = list(f.read())
+        async with aiofiles.open(srcfilepath,"rb") as f:
+            baserom_array = list(await f.read())
         if verify_checksum:
             if len(baserom_array) == 1049088:
                 baserom_array = baserom_array[512:]
@@ -30,20 +31,13 @@ class romfile:
                     expected_rom_sha256=expected_rom_sha256,
                     actual_checksum=sha256_hash.hexdigest()
                 ))
-        return baserom_array 
+        return baserom_array
 
-    def write(rom, dstfilepath):
-        """Writes a list of bytes to a file on the filesystem.
-        
-        Arguments:
-            rom {list} -- a list of bytes depicitng the rom
-            dstfilepath {str} -- A path (either relative or absolute) to a file on the filesystem to be written.
-        """
-
-        fw = open(dstfilepath,"wb")
+    async def write(rom, dstfilepath):
+        fw = await aiofiles.open(dstfilepath,"wb")
         patchrom = bytes()
         for idx, chunk_array in enumerate(misc.chunk(rom,256)):
             patchrom += bytes(chunk_array)
-        fw.write(patchrom)
+        await fw.write(patchrom)
         fw.close
 
