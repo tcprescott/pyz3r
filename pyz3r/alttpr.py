@@ -1,12 +1,13 @@
 from .exceptions import alttprException
 from .patch import patch
-from .async_http import http
+from .http import http
 from .misc import misc
 
 async def alttpr(
             settings=None,
             hash=None,
             randomizer='item',
+            customizer=False,
             baseurl='https://alttpr.com',
             seed_baseurl='https://s3.us-east-2.amazonaws.com/alttpr-patches',
             username=None,
@@ -26,7 +27,7 @@ async def alttpr(
     Returns:
         [type] -- [description]
     """
-    seed = alttprClass(settings, hash, randomizer, baseurl, seed_baseurl, username, password)
+    seed = alttprClass(settings, hash, randomizer, customizer, baseurl, seed_baseurl, username, password)
     await seed._init()
     return seed
 
@@ -88,6 +89,13 @@ class alttprClass():
         """
         return await self.site.retrieve_json('/randomizer/settings')
 
+    async def customizer_settings(self):
+        """Returns a dictonary of valid settings, based on the randomizer in use (item or entrance).
+        
+        Returns:
+            dict -- dictonary of valid settings that can be used
+        """
+        return await self.site.retrieve_json('/customizer/settings')
 
     async def code(self):
         """An list of strings that represents the 

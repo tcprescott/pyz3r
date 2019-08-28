@@ -2,6 +2,8 @@ import pyz3r
 import asyncio
 import json
 
+import config
+
 # get settings without generating a game
 # print(pyz3r.alttpr(randomizer='entrance').settings())
 
@@ -10,9 +12,11 @@ import json
 async def generation_test(num):
     #generate a new game
     if num==1:
-        seed = await pyz3r.async_alttpr(
-            baseurl='http://localhost:8000',
-            seed_baseurl=None,
+        seed = await pyz3r.alttpr(
+            baseurl=config.baseurl,
+            seed_baseurl=config.seed_baseurl,
+            username=config.username,
+            password=config.password,
             settings={
                 "glitches": "none",
                 "item_placement": "advanced",
@@ -20,7 +24,7 @@ async def generation_test(num):
                 "accessibility": "items",
                 "goal": "ganon",
                 "crystals": {
-                    "ganon": "7",
+                    "ganon": "random",
                     "tower": "4"
                 },
                 "mode": "open",
@@ -32,7 +36,7 @@ async def generation_test(num):
                     "functionality": "normal"
                 },
                 "tournament": True,
-                "spoilers": False,
+                "spoilers_ongen": True,
                 "lang":"en",
                 "enemizer": {
                     "boss_shuffle":"none",
@@ -43,13 +47,15 @@ async def generation_test(num):
             }
         )
     elif num==3:
-        seed = await pyz3r.async_alttpr(
-            baseurl='http://localhost:8000',
-            seed_baseurl=None,
-            hash='abYMNdy0qK'
+        seed = await pyz3r.alttpr(
+            baseurl=config.baseurl,
+            seed_baseurl=config.seed_baseurl,
+            username=config.username,
+            password=config.password,
+            hash='ObGbbxeGPL'
         )
 
-    print(json.dumps(await seed.randomizer_settings(), indent=4))
+    # print(json.dumps(await seed.customizer_settings(), indent=4))
 
     print("Permalink: {url}".format(
         url = seed.url
@@ -73,4 +79,4 @@ async def generation_test(num):
 
 if __name__ == '__main__':
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(generation_test(1))
+    loop.run_until_complete(generation_test(3))

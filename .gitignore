@@ -56,3 +56,4 @@ docs/_build/
 env/
 .vscode/
 input/
+/config.py
