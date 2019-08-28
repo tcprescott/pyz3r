@@ -62,13 +62,15 @@ class alttprClass():
             self.data=None
         else:
             if self.settings:
-                game = await self.site.generate_game('/api/randomizer', self.settings)
-                self.hash = game['hash']
+                self.data = await self.site.generate_game('/api/randomizer', self.settings)
+                self.hash = self.data['hash']
+            else:
+                self.data = await self.site.retrieve_game(self.hash)
+
             self.url = '{baseurl}/h/{hash}'.format(
                 baseurl = self.baseurl,
                 hash = self.hash
             )
-            self.data = await self.site.retrieve_game(self.hash)
 
 
     async def randomizer_settings(self):
