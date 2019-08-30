@@ -97,6 +97,14 @@ class alttprClass():
         """
         return await self.site.retrieve_json('/customizer/settings')
 
+    async def find_daily_hash(self):
+        import bs4
+
+        text = await self.site.retrieve_url_raw_content(self.baseurl + '/daily', useauth=True)
+
+        html = bs4.BeautifulSoup(text.decode('utf-8'), 'html5lib')
+        return html.find('hashloader')['hash']
+        
     async def code(self):
         """An list of strings that represents the 
         

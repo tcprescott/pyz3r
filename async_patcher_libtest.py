@@ -46,6 +46,21 @@ async def generation_test(num):
                 }
             }
         )
+    elif num==2:
+        website = await pyz3r.alttpr(
+            baseurl=config.baseurl,
+            seed_baseurl=config.seed_baseurl,
+            username=config.username,
+            password=config.password
+        )
+        dailyhash = await website.find_daily_hash()
+        seed = await pyz3r.alttpr(
+            baseurl=config.baseurl,
+            seed_baseurl=config.seed_baseurl,
+            username=config.username,
+            password=config.password,
+            hash=dailyhash
+        )
     elif num==3:
         seed = await pyz3r.alttpr(
             baseurl=config.baseurl,
@@ -79,4 +94,4 @@ async def generation_test(num):
 
 if __name__ == '__main__':
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(generation_test(3))
+    loop.run_until_complete(generation_test(2))
