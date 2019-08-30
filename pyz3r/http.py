@@ -61,15 +61,25 @@ class http():
             hash=hash
         ))
 
-    async def retrieve_json(self, endpoint):
+    async def retrieve_json(self, endpoint, useauth=True):
+        if useauth:
+            auth=self.auth
+        else:
+            auth=None
+
         req = await request_generic(
             url=self.site_baseurl + endpoint,
-            auth=self.auth,
+            auth=auth,
             returntype='json'
         )
         return req
 
-    async def retrieve_url_raw_content(self, url, auth):
+    async def retrieve_url_raw_content(self, url, useauth=True):
+        if useauth:
+            auth=self.auth
+        else:
+            auth=None
+
         req = await request_generic(
             url=url,
             auth=auth,

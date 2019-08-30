@@ -233,7 +233,7 @@ class alttprClass():
                 fileurl = sprite['file']
                 break
         try:
-            sprite = await self.site.retrieve_url_raw_content(fileurl)
+            sprite = await self.site.retrieve_url_raw_content(fileurl, useauth=False)
         except:
             raise alttprException('Sprite \"{name}\" is not available.'.format(
                 name=name

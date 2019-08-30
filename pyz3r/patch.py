@@ -89,15 +89,9 @@ class patch:
         """
 
         if music:
-            return []
+            return [{'1573402': [0]}]
         else:
-            patch = [
-                {'851480': [0]},
-                {'851649': [0]},
-                {'851968': [0, 0]},
-                {'852199': [196, 88]}
-            ]
-            return patch
+            return [{'1573402': [1]}]
 
     def sprite(spr):
         """Creates a patch for to replace Link's sprite with the contents of a XSPR or SPR file.

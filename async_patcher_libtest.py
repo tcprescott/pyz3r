@@ -52,7 +52,7 @@ async def generation_test(num):
             seed_baseurl=config.seed_baseurl,
             username=config.username,
             password=config.password,
-            hash='ObGbbxeGPL'
+            hash='NYMrE8VG9d'
         )
 
     # print(json.dumps(await seed.customizer_settings(), indent=4))
@@ -66,16 +66,16 @@ async def generation_test(num):
 
     # print(seed.data['spoiler'])
 
-    # jpn10rom = await pyz3r.async_romfile.read("base_rom/Zelda no Densetsu - Kamigami no Triforce (Japan).sfc")
+    jpn10rom = await pyz3r.async_romfile.read("base_rom/Zelda no Densetsu - Kamigami no Triforce (Japan).sfc")
 
-    # patched_rom = await seed.create_patched_game(
-    #     patchrom_array = jpn10rom,  
-    #     heartspeed=None, #can be off, quarter, half, double or normal.
-    #     heartcolor='red', #can be red, 
-    #     spritename='Negative Link', #can be any sprite listed at https://alttpr.com/sprites
-    #     music=False # true or false, defaults true
-    #     )
-    # await pyz3r.async_romfile.write(patched_rom, "outputs/patched_rom.sfc")
+    patched_rom = await seed.create_patched_game(
+        patchrom_array = jpn10rom,  
+        heartspeed='double', #can be off, quarter, half, double or normal.
+        heartcolor='yellow', #can be red, 
+        spritename='Cadence', #can be any sprite listed at https://alttpr.com/sprites
+        music=True # true or false, defaults true
+        )
+    await pyz3r.async_romfile.write(patched_rom, "outputs/patched_rom.sfc")
 
 if __name__ == '__main__':
     loop = asyncio.get_event_loop()
