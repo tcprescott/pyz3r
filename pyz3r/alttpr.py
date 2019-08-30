@@ -69,7 +69,7 @@ class alttprClass():
         else:
             endpoint = '/api/randomizer'
 
-        if self.settings == None and self.hash == None:
+        if self.settings is None and self.hash is None:
             self.data = None
         else:
             if self.settings:
@@ -108,7 +108,7 @@ class alttprClass():
         return html.find('hashloader')['hash']
 
     async def code(self):
-        """An list of strings that represents the 
+        """An list of strings that represents the
 
         Raises:
             alttprException -- Raised if no game has been generated or retrieved.
@@ -122,7 +122,7 @@ class alttprClass():
 
         code_map = {
             0: 'Bow', 1: 'Boomerang', 2: 'Hookshot', 3: 'Bombs',
-            4: 'Mushroom',  5: 'Magic Powder', 6: 'Ice Rod', 7: 'Pendant',
+            4: 'Mushroom', 5: 'Magic Powder', 6: 'Ice Rod', 7: 'Pendant',
             8: 'Bombos', 9: 'Ether', 10: 'Quake', 11: 'Lamp',
             12: 'Hammer', 13: 'Shovel', 14: 'Flute', 15: 'Bugnet', 16: 'Book',
             17: 'Empty Bottle', 18: 'Green Potion', 19: 'Somaria', 20: 'Cape',
@@ -247,7 +247,7 @@ class alttprClass():
                 break
         try:
             sprite = await self.site.retrieve_url_raw_content(fileurl, useauth=False)
-        except:
+        except BaseException:
             raise alttprException('Sprite \"{name}\" is not available.'.format(
                 name=name
             ))

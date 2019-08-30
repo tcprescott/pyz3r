@@ -2,7 +2,10 @@ import math
 
 
 class customizer:
-    def convert2settings(customizer_save, tournament=False, spoilers_ongen=False):
+    def convert2settings(
+            customizer_save,
+            tournament=False,
+            spoilers_ongen=False):
         """Converts a customizer-settings.json file from alttpr.com to a settings dictionary that can be used for generating a game.
 
         Arguments:
@@ -22,34 +25,95 @@ class customizer:
             "goal": "ganon",
             "crystals": {
                 "ganon": "7",
-                "tower": "7"
-            },
+                "tower": "7"},
             "mode": "standard",
             "weapons": "randomized",
             "item": {
                 "pool": "normal",
-                "functionality": "normal"
-            },
+                "functionality": "normal"},
             "tournament": tournament,
             "spoilers_ongen": spoilers_ongen,
             "lang": "en",
             "name": "",
             "notes": "",
             "l": {},
-            "eq": ["BossHeartContainer", "BossHeartContainer", "BossHeartContainer"],
+            "eq": [
+                "BossHeartContainer",
+                "BossHeartContainer",
+                "BossHeartContainer"],
             "drops": {
-                "0": ["auto_fill", "auto_fill", "auto_fill", "auto_fill", "auto_fill", "auto_fill", "auto_fill", "auto_fill"],
-                "1": ["auto_fill", "auto_fill", "auto_fill", "auto_fill", "auto_fill", "auto_fill", "auto_fill", "auto_fill"],
-                "2": ["auto_fill", "auto_fill", "auto_fill", "auto_fill", "auto_fill", "auto_fill", "auto_fill", "auto_fill"],
-                "3": ["auto_fill", "auto_fill", "auto_fill", "auto_fill", "auto_fill", "auto_fill", "auto_fill", "auto_fill"],
-                "4": ["auto_fill", "auto_fill", "auto_fill", "auto_fill", "auto_fill", "auto_fill", "auto_fill", "auto_fill"],
-                "5": ["auto_fill", "auto_fill", "auto_fill", "auto_fill", "auto_fill", "auto_fill", "auto_fill", "auto_fill"],
-                "6": ["auto_fill", "auto_fill", "auto_fill", "auto_fill", "auto_fill", "auto_fill", "auto_fill", "auto_fill"],
-                "pull": ["auto_fill", "auto_fill", "auto_fill"],
-                "crab": ["auto_fill", "auto_fill"],
+                "0": [
+                    "auto_fill",
+                    "auto_fill",
+                    "auto_fill",
+                    "auto_fill",
+                    "auto_fill",
+                    "auto_fill",
+                    "auto_fill",
+                    "auto_fill"],
+                "1": [
+                    "auto_fill",
+                    "auto_fill",
+                    "auto_fill",
+                    "auto_fill",
+                    "auto_fill",
+                    "auto_fill",
+                    "auto_fill",
+                    "auto_fill"],
+                "2": [
+                    "auto_fill",
+                    "auto_fill",
+                    "auto_fill",
+                    "auto_fill",
+                    "auto_fill",
+                    "auto_fill",
+                    "auto_fill",
+                    "auto_fill"],
+                "3": [
+                    "auto_fill",
+                    "auto_fill",
+                    "auto_fill",
+                    "auto_fill",
+                    "auto_fill",
+                    "auto_fill",
+                    "auto_fill",
+                    "auto_fill"],
+                "4": [
+                    "auto_fill",
+                    "auto_fill",
+                    "auto_fill",
+                    "auto_fill",
+                    "auto_fill",
+                    "auto_fill",
+                    "auto_fill",
+                    "auto_fill"],
+                "5": [
+                    "auto_fill",
+                    "auto_fill",
+                    "auto_fill",
+                    "auto_fill",
+                    "auto_fill",
+                    "auto_fill",
+                    "auto_fill",
+                    "auto_fill"],
+                "6": [
+                    "auto_fill",
+                    "auto_fill",
+                    "auto_fill",
+                    "auto_fill",
+                    "auto_fill",
+                    "auto_fill",
+                    "auto_fill",
+                    "auto_fill"],
+                "pull": [
+                    "auto_fill",
+                    "auto_fill",
+                    "auto_fill"],
+                "crab": [
+                    "auto_fill",
+                    "auto_fill"],
                 "stun": ["auto_fill"],
-                "fish": ["auto_fill"]
-            },
+                "fish": ["auto_fill"]},
             "custom": {
                 "item.Goal.Required": "",
                 "item.require.Lamp": False,
@@ -228,9 +292,7 @@ class customizer:
                         "KeyP3": 1,
                         "KeyD4": 1,
                         "KeyD7": 4,
-                        "KeyA2": 4
-                    }
-                },
+                        "KeyA2": 4}},
                 "drop": {
                     "count": {
                         "Bee": 0,
@@ -246,97 +308,95 @@ class customizer:
                         "MagicRefillFull": 3,
                         "ArrowRefill5": 5,
                         "ArrowRefill10": 3,
-                        "Fairy": 1
-                    }
-                }
-            }
-        }
+                        "Fairy": 1}}}}
 
         # vt.custom.prizepacks
         try:
-            if not customizer_save['vt.custom.prizepacks'] == None:
+            if not customizer_save['vt.custom.prizepacks'] is None:
                 settings['drops'] = customizer_save['vt.custom.prizepacks']
         except KeyError:
             pass
 
         # vt.custom.drops
         try:
-            if not customizer_save['vt.custom.drops'] == None:
+            if not customizer_save['vt.custom.drops'] is None:
                 settings['data']['alttp']['custom']['drop']['count'] = customizer_save['vt.custom.drops']
         except KeyError:
             pass
 
         try:
-            if not customizer_save['vt.custom.settings'] == None:
-                for key, value in customizer_save['vt.custom.settings'].items():
+            if not customizer_save['vt.custom.settings'] is None:
+                for key, value in customizer_save['vt.custom.settings'].items(
+                ):
                     settings['data']['alttp']['custom'][key] = value
         except KeyError:
             pass
 
         try:
-            if not customizer_save['vt.custom.items'] == None:
+            if not customizer_save['vt.custom.items'] is None:
                 settings['data']['alttp']['custom']['item']['count'] = customizer_save['vt.custom.items']
         except KeyError:
             pass
 
         try:
-            if not customizer_save['vt.custom.locations'] == None:
+            if not customizer_save['vt.custom.locations'] is None:
                 settings['l'] = customizer_save['vt.custom.locations']
         except KeyError:
             pass
 
         try:
-            if not customizer_save['vt.custom.rom-logic'] == None:
+            if not customizer_save['vt.custom.rom-logic'] is None:
                 settings['data']['alttp']['custom']['rom']['logicMode'] = customizer_save['vt.custom.rom-logic']
         except KeyError:
             pass
 
         try:
-            if not customizer_save['vt.custom.HardMode'] == None:
+            if not customizer_save['vt.custom.HardMode'] is None:
                 settings['data']['alttp']['custom']['rom']['HardMode'] = customizer_save['vt.custom.HardMode']
         except KeyError:
             pass
 
         try:
-            if not customizer_save['vt.custom.logic'] == None:
+            if not customizer_save['vt.custom.logic'] is None:
                 settings['logic'] = customizer_save['vt.custom.logic']
         except KeyError:
             pass
 
         try:
-            if not customizer_save['vt.custom.weapons'] == None:
+            if not customizer_save['vt.custom.weapons'] is None:
                 settings['weapons'] = customizer_save['vt.custom.weapons']
         except KeyError:
             pass
 
         try:
-            if not customizer_save['vt.custom.goal'] == None:
+            if not customizer_save['vt.custom.goal'] is None:
                 settings['goal'] = customizer_save['vt.custom.goal']
         except KeyError:
             pass
 
         try:
-            if not customizer_save['vt.custom.state'] == None:
+            if not customizer_save['vt.custom.state'] is None:
                 settings['mode'] = customizer_save['vt.custom.state']
         except KeyError:
             pass
 
         try:
-            if not customizer_save['vt.custom.notes'] == None:
+            if not customizer_save['vt.custom.notes'] is None:
                 settings['notes'] = customizer_save['vt.custom.notes']
         except KeyError:
             pass
 
         try:
-            if not customizer_save['vt.custom.name'] == None:
+            if not customizer_save['vt.custom.name'] is None:
                 settings['name'] = customizer_save['vt.custom.name']
         except KeyError:
             pass
 
         try:
-            if not customizer_save['vt.custom.equipment'] == None:
+            if not customizer_save['vt.custom.equipment'] is None:
                 eq = []
-                for key, value in customizer_save['vt.custom.equipment'].items():
+                for key, value in customizer_save['vt.custom.equipment'].items(
+                ):
                     if key in ['Bottle1', 'Bottle2', 'Bottle3', 'Bottle4']:
                         if value == 1:
                             eq += ['Bottle']
@@ -375,22 +435,22 @@ class customizer:
                         value = int(
                             customizer_save['vt.custom.equipment']['Rupees'])
 
-                        eq += math.floor(value/300) * ['ThreeHundredRupees']
+                        eq += math.floor(value / 300) * ['ThreeHundredRupees']
                         value %= 300
 
-                        eq += math.floor(value/100) * ['OneHundredRupees']
+                        eq += math.floor(value / 100) * ['OneHundredRupees']
                         value %= 100
 
-                        eq += math.floor(value/50) * ['FiftyRupees']
+                        eq += math.floor(value / 50) * ['FiftyRupees']
                         value %= 50
 
-                        eq += math.floor(value/20) * ['TwentyRupees']
+                        eq += math.floor(value / 20) * ['TwentyRupees']
                         value %= 20
 
-                        eq += math.floor(value/5) * ['FiveRupees']
+                        eq += math.floor(value / 5) * ['FiveRupees']
                         value %= 5
 
-                        eq += math.floor(value/1) * ['OneRupee']
+                        eq += math.floor(value / 1) * ['OneRupee']
                     else:
                         eq += int(value) * [key]
 

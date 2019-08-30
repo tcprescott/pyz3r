@@ -39,9 +39,9 @@ class misc:
                     if seek in patch:
                         return patch[seek][:bytes]
             else:
-                left_slice = offset - offsetlist_sorted[i-1]
+                left_slice = offset - offsetlist_sorted[i - 1]
                 for patch in patches:
-                    seek = str(offsetlist_sorted[i-1])
+                    seek = str(offsetlist_sorted[i - 1])
                     if seek in patch:
                         return patch[seek][left_slice:left_slice + bytes]
         raise ValueError

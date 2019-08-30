@@ -6,11 +6,16 @@ import json as jsonlib
 
 
 class http():
-    def __init__(self, site_baseurl, patch_baseurl=None, username=None, password=None):
+    def __init__(
+            self,
+            site_baseurl,
+            patch_baseurl=None,
+            username=None,
+            password=None):
         self.site_baseurl = site_baseurl
         self.patch_baseurl = patch_baseurl
 
-        if not username == None:
+        if username is not None:
             self.auth = aiohttp.BasicAuth(login=username, password=password)
         else:
             self.auth = None
@@ -34,7 +39,7 @@ class http():
     async def retrieve_game(self, hash):
         for i in range(0, 5):
             try:
-                if not self.patch_baseurl == None:
+                if self.patch_baseurl is not None:
                     s3patch = await request_generic(
                         url=self.patch_baseurl + '/' + hash + '.json',
                         returntype='json'
@@ -58,9 +63,9 @@ class http():
                 return localpatch
             except aiohttp.client_exceptions.ServerDisconnectedError:
                 continue
-        raise alttprFailedToRetrieve('failed to retrieve game {hash}, the game is likely not found'.format(
-            hash=hash
-        ))
+        raise alttprFailedToRetrieve(
+            'failed to retrieve game {hash}, the game is likely not found'.format(
+                hash=hash))
 
     async def retrieve_json(self, endpoint, useauth=True):
         if useauth:

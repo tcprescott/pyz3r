@@ -28,10 +28,9 @@ class romfile:
             sha256_hash = hashlib.sha256()
             sha256_hash.update(bytes(baserom_array))
             if not sha256_hash.hexdigest() == expected_rom_sha256:
-                raise alttprException('Expected checksum "{expected_rom_sha256}", got "{actual_checksum}" instead.  Verify the source ROM is an unheadered Japan 1.0 Link to the Past ROM.'.format(
-                    expected_rom_sha256=expected_rom_sha256,
-                    actual_checksum=sha256_hash.hexdigest()
-                ))
+                raise alttprException(
+                    'Expected checksum "{expected_rom_sha256}", got "{actual_checksum}" instead.  Verify the source ROM is an unheadered Japan 1.0 Link to the Past ROM.'.format(
+                        expected_rom_sha256=expected_rom_sha256, actual_checksum=sha256_hash.hexdigest()))
         return baserom_array
 
     async def write(rom, dstfilepath):

@@ -17,7 +17,7 @@ class patch:
             offset = int(list(patch.keys())[0])
             patch_values = list(patch.values())[0]
             for idx, value in enumerate(patch_values):
-                rom[offset+idx] = value
+                rom[offset + idx] = value
         return rom
 
     def heart_speed(speed='half'):
@@ -30,7 +30,7 @@ class patch:
         Returns:
             list -- a list of dictionaries indicating which ROM address offsets to write and what to write to them
         """
-        if speed == None:
+        if speed is None:
             speed = 'normal'
         sbyte = {
             'off': 0,
@@ -54,7 +54,7 @@ class patch:
             list -- a list of dictionaries indicating which ROM address offsets to write and what to write to them
         """
 
-        if color == None:
+        if color is None:
             color = 'red'
         cbyte = {
             'blue': [44, 13],
@@ -109,9 +109,9 @@ class patch:
             gfx_offset = spr[12] << 24 | spr[11] << 16 | spr[10] << 8 | spr[9]
             palette_offset = spr[18] << 24 | spr[17] << 16 | spr[16] << 8 | spr[15]
             patch = [
-                {'524288': spr[gfx_offset:gfx_offset+28671]},
-                {'905992': spr[palette_offset:palette_offset+120]},
-                {'912885': spr[palette_offset+120:palette_offset+120+3]}
+                {'524288': spr[gfx_offset:gfx_offset + 28671]},
+                {'905992': spr[palette_offset:palette_offset + 120]},
+                {'912885': spr[palette_offset + 120:palette_offset + 120 + 3]}
             ]
         # Else treat it like a SPR file instead
         else:
