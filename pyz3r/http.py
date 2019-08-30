@@ -4,18 +4,19 @@ from .exceptions import *
 import aiohttp
 import json as jsonlib
 
+
 class http():
     def __init__(self, site_baseurl, patch_baseurl=None, username=None, password=None):
         self.site_baseurl = site_baseurl
         self.patch_baseurl = patch_baseurl
 
-        if not username==None:
-            self.auth=aiohttp.BasicAuth(login=username, password=password)
+        if not username == None:
+            self.auth = aiohttp.BasicAuth(login=username, password=password)
         else:
-            self.auth=None
+            self.auth = None
 
     async def generate_game(self, endpoint, settings):
-        for i in range(0,5):
+        for i in range(0, 5):
             try:
                 req = await request_json_post(
                     url=self.site_baseurl + endpoint,
@@ -31,9 +32,9 @@ class http():
         raise alttprFailedToGenerate('failed to generate game')
 
     async def retrieve_game(self, hash):
-        for i in range(0,5):
+        for i in range(0, 5):
             try:
-                if not self.patch_baseurl==None:
+                if not self.patch_baseurl == None:
                     s3patch = await request_generic(
                         url=self.patch_baseurl + '/' + hash + '.json',
                         returntype='json'
@@ -63,9 +64,9 @@ class http():
 
     async def retrieve_json(self, endpoint, useauth=True):
         if useauth:
-            auth=self.auth
+            auth = self.auth
         else:
-            auth=None
+            auth = None
 
         req = await request_generic(
             url=self.site_baseurl + endpoint,
@@ -76,9 +77,9 @@ class http():
 
     async def retrieve_url_raw_content(self, url, useauth=True):
         if useauth:
-            auth=self.auth
+            auth = self.auth
         else:
-            auth=None
+            auth = None
 
         req = await request_generic(
             url=url,
@@ -87,22 +88,24 @@ class http():
         )
         return req
 
+
 async def request_generic(url, method='get', reqparams=None, data=None, header={}, auth=None, returntype='text'):
     async with aiohttp.ClientSession(auth=None, raise_for_status=True) as session:
         async with session.request(method.upper(), url, params=reqparams, data=data, headers=header, auth=auth) as resp:
-            if returntype=='text':
+            if returntype == 'text':
                 return await resp.text()
-            elif returntype=='json':
+            elif returntype == 'json':
                 return jsonlib.loads(await resp.text())
-            elif returntype=='binary':
+            elif returntype == 'binary':
                 return await resp.read()
+
 
 async def request_json_post(url, json, auth=None, returntype='text'):
     async with aiohttp.ClientSession(auth=auth, raise_for_status=True) as session:
         async with session.post(url=url, json=json, auth=auth) as resp:
-            if returntype=='text':
+            if returntype == 'text':
                 return await resp.text()
-            elif returntype=='json':
+            elif returntype == 'json':
                 return jsonlib.loads(await resp.text())
-            elif returntype=='binary':
+            elif returntype == 'binary':
                 return await resp.read()

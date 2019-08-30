@@ -10,7 +10,7 @@ __license__ = 'Apache 2.0'
 __copyright__ = 'Copyright 2018-2019 Thomas Prescott'
 __version__ = '4.0.0'
 
-from .alttpr import alttpr 
+from .alttpr import alttpr
 from .rom import romfile
 
 from .alttpr import alttpr as async_alttpr

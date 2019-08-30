@@ -1,6 +1,7 @@
 import json
 import bisect
 
+
 class misc:
     def chunk(iterator, count):
         itr = iter(iterator)
@@ -12,15 +13,15 @@ class misc:
 
     def seek_patch_data(patches, offset, bytes):
         """[summary]
-        
+
         Arguments:
             patches {list} -- a list of dictionaries depicting raw patch data
             offset {int} -- a decimal integer of the offset to look for
             bytes {int} -- the number of bytes to retrieve
-        
+
         Raises:
             ValueError -- raised if the offset could not be found
-        
+
         Returns:
             list -- a list of bytes of the requested offset
         """
