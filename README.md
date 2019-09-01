@@ -239,7 +239,7 @@ import pyz3r
 import asyncio
 
 async def test_retrieve_game():
-    seed = await pyz3r.async_alttpr(
+    seed = await pyz3r.alttpr(
         hash='zDvxWLLEMa'
     )
 
@@ -252,7 +252,7 @@ async def test_retrieve_game():
 
     print(seed.data['spoiler'])
 
-    jpn10rom = await pyz3r.async_romfile.read("base_rom/Zelda no Densetsu - Kamigami no Triforce (Japan).sfc")
+    jpn10rom = await pyz3r.romfile.read("base_rom/Zelda no Densetsu - Kamigami no Triforce (Japan).sfc")
     patched_rom = await seed.create_patched_game(
         patchrom_array = jpn10rom,  
         heartspeed=None, #can be off, quarter, half, double or normal.
@@ -260,14 +260,14 @@ async def test_retrieve_game():
         spritename='Negative Link', #can be any sprite listed at https://alttpr.com/sprites
         music=False # true or false, defaults true
         )
-    await pyz3r.async_romfile.write(patched_rom, "outputs/patched_rom.sfc")
+    await pyz3r.romfile.write(patched_rom, "outputs/patched_rom.sfc")
 
 if __name__ == '__main__':
     loop = asyncio.get_event_loop()
     loop.run_until_complete(test_retrieve_game())
 ```
 
-The most notable changes are using asyncio's await syntax and using `pyz3r.async_alttpr()` and `pyz3r.async_romfile` instead.
+The most notable changes are using asyncio's await syntax and using `pyz3r.alttpr()` and `pyz3r.romfile` instead.
 
 ## To do
 

@@ -41,8 +41,8 @@ async def generation_test(num):
                 "enemizer": {
                     "boss_shuffle":"none",
                     "enemy_shuffle":"none",
-                    "enemy_damage":"normal",
-                    "enemy_health":"normal"
+                    "enemy_damage":"default",
+                    "enemy_health":"default"
                 }
             }
         )
@@ -81,7 +81,7 @@ async def generation_test(num):
 
     # print(seed.data['spoiler'])
 
-    jpn10rom = await pyz3r.async_romfile.read("base_rom/Zelda no Densetsu - Kamigami no Triforce (Japan).sfc")
+    jpn10rom = await pyz3r.romfile.read("base_rom/Zelda no Densetsu - Kamigami no Triforce (Japan).sfc")
 
     patched_rom = await seed.create_patched_game(
         patchrom_array = jpn10rom,  
@@ -90,7 +90,7 @@ async def generation_test(num):
         spritename='Cadence', #can be any sprite listed at https://alttpr.com/sprites
         music=True # true or false, defaults true
         )
-    await pyz3r.async_romfile.write(patched_rom, "outputs/patched_rom.sfc")
+    await pyz3r.romfile.write(patched_rom, "outputs/patched_rom.sfc")
 
 if __name__ == '__main__':
     loop = asyncio.get_event_loop()
