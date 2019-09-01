@@ -19,101 +19,41 @@ class customizer:
         """
         # the settings defaults, hopefully this is accurate
         settings = {
+            "glitches": "none",
             "item_placement": "advanced",
             "dungeon_items": "standard",
             "accessibility": "items",
             "goal": "ganon",
             "crystals": {
                 "ganon": "7",
-                "tower": "7"},
-            "mode": "standard",
+                "tower": "7"
+            },
+            "mode": "open",
             "weapons": "randomized",
             "item": {
                 "pool": "normal",
-                "functionality": "normal"},
+                "functionality": "normal"
+            },
             "tournament": tournament,
             "spoilers_ongen": spoilers_ongen,
             "lang": "en",
             "name": "",
             "notes": "",
             "l": {},
-            "eq": [
-                "BossHeartContainer",
-                "BossHeartContainer",
-                "BossHeartContainer"],
+            "eq": ["BossHeartContainer", "BossHeartContainer", "BossHeartContainer"],
             "drops": {
-                "0": [
-                    "auto_fill",
-                    "auto_fill",
-                    "auto_fill",
-                    "auto_fill",
-                    "auto_fill",
-                    "auto_fill",
-                    "auto_fill",
-                    "auto_fill"],
-                "1": [
-                    "auto_fill",
-                    "auto_fill",
-                    "auto_fill",
-                    "auto_fill",
-                    "auto_fill",
-                    "auto_fill",
-                    "auto_fill",
-                    "auto_fill"],
-                "2": [
-                    "auto_fill",
-                    "auto_fill",
-                    "auto_fill",
-                    "auto_fill",
-                    "auto_fill",
-                    "auto_fill",
-                    "auto_fill",
-                    "auto_fill"],
-                "3": [
-                    "auto_fill",
-                    "auto_fill",
-                    "auto_fill",
-                    "auto_fill",
-                    "auto_fill",
-                    "auto_fill",
-                    "auto_fill",
-                    "auto_fill"],
-                "4": [
-                    "auto_fill",
-                    "auto_fill",
-                    "auto_fill",
-                    "auto_fill",
-                    "auto_fill",
-                    "auto_fill",
-                    "auto_fill",
-                    "auto_fill"],
-                "5": [
-                    "auto_fill",
-                    "auto_fill",
-                    "auto_fill",
-                    "auto_fill",
-                    "auto_fill",
-                    "auto_fill",
-                    "auto_fill",
-                    "auto_fill"],
-                "6": [
-                    "auto_fill",
-                    "auto_fill",
-                    "auto_fill",
-                    "auto_fill",
-                    "auto_fill",
-                    "auto_fill",
-                    "auto_fill",
-                    "auto_fill"],
-                "pull": [
-                    "auto_fill",
-                    "auto_fill",
-                    "auto_fill"],
-                "crab": [
-                    "auto_fill",
-                    "auto_fill"],
+                "0": ["auto_fill", "auto_fill", "auto_fill", "auto_fill", "auto_fill", "auto_fill", "auto_fill", "auto_fill"],
+                "1": ["auto_fill", "auto_fill", "auto_fill", "auto_fill", "auto_fill", "auto_fill", "auto_fill", "auto_fill"],
+                "2": ["auto_fill", "auto_fill", "auto_fill", "auto_fill", "auto_fill", "auto_fill", "auto_fill", "auto_fill"],
+                "3": ["auto_fill", "auto_fill", "auto_fill", "auto_fill", "auto_fill", "auto_fill", "auto_fill", "auto_fill"],
+                "4": ["auto_fill", "auto_fill", "auto_fill", "auto_fill", "auto_fill", "auto_fill", "auto_fill", "auto_fill"],
+                "5": ["auto_fill", "auto_fill", "auto_fill", "auto_fill", "auto_fill", "auto_fill", "auto_fill", "auto_fill"],
+                "6": ["auto_fill", "auto_fill", "auto_fill", "auto_fill", "auto_fill", "auto_fill", "auto_fill", "auto_fill"],
+                "pull": ["auto_fill", "auto_fill", "auto_fill"],
+                "crab": ["auto_fill", "auto_fill"],
                 "stun": ["auto_fill"],
-                "fish": ["auto_fill"]},
+                "fish": ["auto_fill"]
+            },
             "custom": {
                 "item.Goal.Required": "",
                 "item.require.Lamp": False,
@@ -232,7 +172,7 @@ class customizer:
                         "GreenClock": 0,
                         "ProgressiveSword": 4,
                         "ProgressiveShield": 3,
-                        "ProgressiveArmor": 1,
+                        "ProgressiveArmor": 2,
                         "ProgressiveGlove": 2,
                         "ProgressiveBow": 2,
                         "Triforce": 0,
@@ -287,12 +227,14 @@ class customizer:
                         "KeyD2": 1,
                         "KeyD1": 6,
                         "KeyD6": 3,
-                        "KeyD3": 4,
+                        "KeyD3": 3,
                         "KeyD5": 2,
                         "KeyP3": 1,
                         "KeyD4": 1,
                         "KeyD7": 4,
-                        "KeyA2": 4}},
+                        "KeyA2": 4
+                    }
+                },
                 "drop": {
                     "count": {
                         "Bee": 0,
@@ -308,7 +250,83 @@ class customizer:
                         "MagicRefillFull": 3,
                         "ArrowRefill5": 5,
                         "ArrowRefill10": 3,
-                        "Fairy": 1}}}}
+                        "Fairy": 1
+                    }
+                }
+            }
+        }
+
+        try:
+            if not customizer_save['randomizer.glitches_required'] is None:
+                settings['glitches'] = customizer_save['randomizer.glitches_required']
+        except KeyError:
+            pass
+
+        try:
+            if not customizer_save['randomizer.accessibility'] is None:
+                settings['accessibility'] = customizer_save['randomizer.accessibility']
+        except KeyError:
+            pass
+
+        try:
+            if not customizer_save['randomizer.goal'] is None:
+                settings['goal'] = customizer_save['randomizer.goal']
+        except KeyError:
+            pass
+
+        try:
+            if not customizer_save['randomizer.tower_open'] is None:
+                settings['crystals']['tower'] = customizer_save['randomizer.tower_open']
+        except KeyError:
+            pass
+
+        try:
+            if not customizer_save['randomizer.ganon_open'] is None:
+                settings['crystals']['ganon'] = customizer_save['randomizer.ganon_open']
+        except KeyError:
+            pass
+
+        try:
+            if not customizer_save['randomizer.dungeon_items'] is None:
+                settings['dungeon_items'] = customizer_save['randomizer.dungeon_items']
+        except KeyError:
+            pass
+
+        try:
+            if not customizer_save['randomizer.item_placement'] is None:
+                settings['item_placement'] = customizer_save['randomizer.item_placement']
+        except KeyError:
+            pass
+
+        try:
+            if not customizer_save['randomizer.world_state'] is None:
+                settings['mode'] = customizer_save['randomizer.world_state']
+        except KeyError:
+            pass
+
+        try:
+            if not customizer_save['randomizer.hints'] is None:
+                settings['custom']['spoil.Hints'] = customizer_save['randomizer.hints']
+        except KeyError:
+            pass
+
+        try:
+            if not customizer_save['randomizer.weapons'] is None:
+                settings['weapons'] = customizer_save['randomizer.weapons']
+        except KeyError:
+            pass
+
+        try:
+            if not customizer_save['randomizer.item_pool'] is None:
+                settings['item']['pool'] = customizer_save['randomizer.item_pool']
+        except KeyError:
+            pass
+
+        try:
+            if not customizer_save['randomizer.item_functionality'] is None:
+                settings['item']['functionality'] = customizer_save['randomizer.item_functionality']
+        except KeyError:
+            pass
 
         # vt.custom.prizepacks
         try:
@@ -320,7 +338,7 @@ class customizer:
         # vt.custom.drops
         try:
             if not customizer_save['vt.custom.drops'] is None:
-                settings['data']['alttp']['custom']['drop']['count'] = customizer_save['vt.custom.drops']
+                settings['drop']['count'] = customizer_save['vt.custom.drops']
         except KeyError:
             pass
 
@@ -328,9 +346,18 @@ class customizer:
             if not customizer_save['vt.custom.settings'] is None:
                 for key, value in customizer_save['vt.custom.settings'].items(
                 ):
-                    settings['data']['alttp']['custom'][key] = value
+                    settings['custom'][key] = value
         except KeyError:
             pass
+
+        try:
+            if not customizer_save['vt.custom.glitches'] is None:
+                for key, value in customizer_save['vt.custom.glitches'].items(
+                ):
+                    settings['custom'][key] = value
+        except KeyError:
+            pass
+
 
         try:
             if not customizer_save['vt.custom.items'] is None:
@@ -341,42 +368,6 @@ class customizer:
         try:
             if not customizer_save['vt.custom.locations'] is None:
                 settings['l'] = customizer_save['vt.custom.locations']
-        except KeyError:
-            pass
-
-        try:
-            if not customizer_save['vt.custom.rom-logic'] is None:
-                settings['data']['alttp']['custom']['rom']['logicMode'] = customizer_save['vt.custom.rom-logic']
-        except KeyError:
-            pass
-
-        try:
-            if not customizer_save['vt.custom.HardMode'] is None:
-                settings['data']['alttp']['custom']['rom']['HardMode'] = customizer_save['vt.custom.HardMode']
-        except KeyError:
-            pass
-
-        try:
-            if not customizer_save['vt.custom.logic'] is None:
-                settings['logic'] = customizer_save['vt.custom.logic']
-        except KeyError:
-            pass
-
-        try:
-            if not customizer_save['vt.custom.weapons'] is None:
-                settings['weapons'] = customizer_save['vt.custom.weapons']
-        except KeyError:
-            pass
-
-        try:
-            if not customizer_save['vt.custom.goal'] is None:
-                settings['goal'] = customizer_save['vt.custom.goal']
-        except KeyError:
-            pass
-
-        try:
-            if not customizer_save['vt.custom.state'] is None:
-                settings['mode'] = customizer_save['vt.custom.state']
         except KeyError:
             pass
 

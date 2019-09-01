@@ -2,6 +2,8 @@ import json
 from pyz3r import alttpr, romfile
 from pyz3r.customizer import customizer
 
+import asyncio
+
 import config
 
 async def generation_test():
@@ -30,13 +32,17 @@ async def generation_test():
         hash = ' | '.join(await seed.code())
     ))
 
-    jpn10rom = await romfile.read("base_rom/Zelda no Densetsu - Kamigami no Triforce (Japan).sfc")
+    # jpn10rom = await romfile.read("base_rom/Zelda no Densetsu - Kamigami no Triforce (Japan).sfc")
 
-    patched_rom = await seed.create_patched_game(
-        patchrom_array = jpn10rom,  
-        heartspeed=None, #can be off, quarter, half, double or normal.
-        heartcolor='red', #can be red, 
-        spritename='Link', #can be any sprite listed at https://alttpr.com/sprites
-        music=False # true or false, defaults true
-        )
-    await romfile.write(patched_rom, "outputs/patched_rom.sfc")
+    # patched_rom = await seed.create_patched_game(
+    #     patchrom_array = jpn10rom,  
+    #     heartspeed=None, #can be off, quarter, half, double or normal.
+    #     heartcolor='red', #can be red, 
+    #     spritename='Link', #can be any sprite listed at https://alttpr.com/sprites
+    #     music=False # true or false, defaults true
+    #     )
+    # await romfile.write(patched_rom, "outputs/patched_rom.sfc")
+
+if __name__ == '__main__':
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(generation_test())
