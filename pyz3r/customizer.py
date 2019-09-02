@@ -361,7 +361,7 @@ class customizer:
 
         try:
             if not customizer_save['vt.custom.items'] is None:
-                settings['data']['alttp']['custom']['item']['count'] = customizer_save['vt.custom.items']
+                settings['custom']['item']['count'] = customizer_save['vt.custom.items']
         except KeyError:
             pass
 
