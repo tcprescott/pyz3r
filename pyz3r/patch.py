@@ -1,14 +1,15 @@
 import itertools
 from .exceptions import alttprException
 
+
 class patch:
     def apply(rom, patches):
         """Applies a patch, which is a list of dictionaries
-        
+
         Arguments:
             rom {list} -- A list of bytes depicting the ROM data to be patched.
             patches {list} -- A list of dictionaries that depict of set of patches to be applied to the ROM.
-        
+
         Returns:
             list -- a list of bytes depicitng the patched rom
         """
@@ -16,21 +17,21 @@ class patch:
             offset = int(list(patch.keys())[0])
             patch_values = list(patch.values())[0]
             for idx, value in enumerate(patch_values):
-                rom[offset+idx] = value
+                rom[offset + idx] = value
         return rom
 
     def heart_speed(speed='half'):
         """Set the low-health warning beep interval.
-        
+
         Keyword Arguments:
             speed {str} -- Chose the speed at which the low health warning beeps.
                 Options are 'off', 'double', 'normal', 'half', and 'quarter'. (default: {'half'})
-        
+
         Returns:
             list -- a list of dictionaries indicating which ROM address offsets to write and what to write to them
         """
-        if speed==None:
-            speed='normal'
+        if speed is None:
+            speed = 'normal'
         sbyte = {
             'off': 0,
             'double': 16,
@@ -45,24 +46,24 @@ class patch:
 
     def heart_color(color='red'):
         """Set the color of the hearts on the player's HUD.
-        
+
         Keyword Arguments:
             color {str} -- The heart color.  Options are 'red', 'blue', 'green', and 'yellow' (default: {'red'})
-        
+
         Returns:
             list -- a list of dictionaries indicating which ROM address offsets to write and what to write to them
         """
 
-        if color==None:
-            color='red'
+        if color is None:
+            color = 'red'
         cbyte = {
             'blue': [44, 13],
             'green': [60, 25],
             'yellow': [40, 9],
             'red': [36, 5],
         }
-        byte =  cbyte[color][0]
-        file_byte =  cbyte[color][1]
+        byte = cbyte[color][0]
+        file_byte = cbyte[color][1]
         patch = [
             {'457246': [byte]},
             {'457248': [byte]},
@@ -80,45 +81,39 @@ class patch:
 
     def music(music=True):
         """Enables, or disables, the in-game music.  Useful if you want to use an MSU-1 soundtrack instead.
-        
+
         Keyword Arguments:
             music {bool} -- If true, music is enabled.  If false, the music id disabled. (default: {True})
-        
+
         Returns:
             list -- a list of dictionaries indicating which ROM address offsets to write and what to write to them
         """
 
         if music:
-            return []
+            return [{'1573402': [0]}]
         else:
-            patch = [
-                {'851480': [0]},
-                {'851649': [0]},
-                {'851968': [0, 0]},
-                {'852199': [196, 88]}
-            ]
-            return patch
+            return [{'1573402': [1]}]
 
     def sprite(spr):
         """Creates a patch for to replace Link's sprite with the contents of a XSPR or SPR file.
-        
+
         Arguments:
             spr {list} -- a list of bytes that depicts a ZSPR or SPR file
-        
+
         Returns:
             list -- a list of dictionaries indicating which ROM address offsets to write and what to write to them
         """
 
         if spr[:4] == [90, 83, 80, 82]:
-            #stolen from VT's code
+            # stolen from VT's code
             gfx_offset = spr[12] << 24 | spr[11] << 16 | spr[10] << 8 | spr[9]
             palette_offset = spr[18] << 24 | spr[17] << 16 | spr[16] << 8 | spr[15]
             patch = [
-                {'524288': spr[gfx_offset:gfx_offset+28671]},
-                {'905992': spr[palette_offset:palette_offset+120]},
-                {'912885': spr[palette_offset+120:palette_offset+120+3]}
+                {'524288': spr[gfx_offset:gfx_offset + 28671]},
+                {'905992': spr[palette_offset:palette_offset + 120]},
+                {'912885': spr[palette_offset + 120:palette_offset + 120 + 3]}
             ]
-        #Else treat it like a SPR file instead
+        # Else treat it like a SPR file instead
         else:
             patch = [
                 {'524288': spr[0:28671]},
@@ -136,10 +131,10 @@ class patch:
 
     def checksum(rom):
         """Writes a patch that fixes a ROM's checksum.  This should be the last patch applied to a ROM before it is written.
-        
+
         Arguments:
             rom {list} -- a list of bytes depicitng the rom
-        
+
         Returns:
              list -- a list of dictionaries indicating which ROM address offsets to write and what to write to them
         """
@@ -161,16 +156,16 @@ class patch:
 
     def expand(rom, newlenmb):
         """Expands the byte list of a ROM to the specified number of megabytes, filling in the new space with zeroes.
-        
+
         Arguments:
             rom {list} -- a list of bytes depicitng the rom
-        
+
         Keyword Arguments:
             newlenmb {int} -- The size of the ROM should be, in megabytes.
-        
+
         Raises:
             alttprException -- Raised if the new length is shorter than the current size of the byte list.
-        
+
         Returns:
             list -- a list of bytes depicitng the rom
         """
