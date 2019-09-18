@@ -23,7 +23,7 @@ Using this library to patch a ROM for racing may not be permitted.
 Its best to check with an official before using it for racing.
 
 Finally, this library may break when new versions of the Link to the Past Randomizer are released.  This version
-was tested with v30, however it may cease to function in later releases.  If it does, please submit a Github issue!
+was tested with v31, however it may cease to function in later releases.  If it does, please submit a Github issue!
 
 
 ## Usage
@@ -228,8 +228,6 @@ seed = pyz3r.alttpr(
     settings=customizer.convert2settings(customizer_save=customizer_settings, tournament=False)
 )
 ```
-
-As of v30, the customizer only works with the item randomizer.  There may be unexpected results if you try this with the entrance randomizer.
 
 ### Async Support
 This library can also be used using asyncio (via the aiofiles and aiohttp library), which may be useful for bots that use asyncio (such as discord.py).  The syntax is very similar, with a two notable differences.
