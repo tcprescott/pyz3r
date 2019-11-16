@@ -5,6 +5,7 @@ class customizer:
     def convert2settings(
             customizer_save,
             tournament=False,
+            spoilers="off",
             spoilers_ongen=False):
         """Converts a customizer-settings.json file from alttpr.com to a settings dictionary that can be used for generating a game.
 
@@ -13,11 +14,17 @@ class customizer:
 
         Keyword Arguments:
             tournament {bool} -- Setting to True generates a race rom, which excludes the spoiler log. (default: {False})
+            spoilers {str} -- Sets the spoiler mode. (default: {"off"})
+            spoielrs_ongen {bool} -- Sets spoiler mode to "generate".  This is deprecated. (default: {False})
 
         Returns:
             dict -- a dictionary of settings that can be used with pyz3r.alttpr()
         """
+
+        if spoilers_ongen: spoilers="generate"
+
         # the settings defaults, hopefully this is accurate
+
         settings = {
             "glitches": "none",
             "item_placement": "advanced",
@@ -35,7 +42,7 @@ class customizer:
                 "functionality": "normal"
             },
             "tournament": tournament,
-            "spoilers_ongen": spoilers_ongen,
+            "spoilers": spoilers,
             "lang": "en",
             "name": "",
             "notes": "",

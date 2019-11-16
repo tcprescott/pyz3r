@@ -8,7 +8,7 @@ README = (HERE / "README.md").read_text()
 
 setup(
     name="pyz3r",
-    version="4.1.0",
+    version="4.1.1",
     author="Thomas Prescott",
     author_email="tcprescott@gmail.com",
     description="A python module for interacting with alttpr.com, such as generating new z3r games, and patching existing games.",
@@ -24,5 +24,5 @@ setup(
         "Development Status :: 5 - Production/Stable",
         "Operating System :: OS Independent",
     ],
-    install_requires=['requests','aiofiles','aiohttp','bs4','html5lib'],
+    install_requires=['aiofiles','aiohttp','bs4','html5lib'],
 )
