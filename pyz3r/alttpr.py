@@ -1,7 +1,6 @@
 from .exceptions import alttprException
-from . import patch
+from . import patch, misc
 from .http import http
-from .misc import misc
 
 
 async def alttpr(
