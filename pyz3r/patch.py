@@ -89,10 +89,29 @@ class patch:
             list -- a list of dictionaries indicating which ROM address offsets to write and what to write to them
         """
 
-        if music:
-            return [{'1573402': [0]}]
-        else:
-            return [{'1573402': [1]}]
+        return [{'1573402': [1 if music else 0]}]
+
+
+    def quickswap(quickswap=False):
+        return [{'1572939': [1 if quickswap else 0]}]
+
+
+    def menu_speed(speed='normal'):
+        if speed is None:
+            speed = 'normal'
+        sbyte = {
+            'instant': 0xE8,
+            'fast': 0x10,
+            'normal': 0x08,
+            'slow': 0x04
+        }
+        patch = [
+            {'1572936': [sbyte[speed]]},
+            {'449946': [0x20 if menu_speed == 'instant' else 0x11]},
+            {'450346': [0x20 if menu_speed == 'instant' else 0x12]},
+            {'450793': [0x20 if menu_speed == 'instant' else 0x12]}
+            ]
+        return patch
 
     def sprite(spr):
         """Creates a patch for to replace Link's sprite with the contents of a XSPR or SPR file.
