@@ -1,5 +1,5 @@
 from .exceptions import alttprException
-from .patch import patch
+from . import patch
 from .http import http
 from .misc import misc
 
