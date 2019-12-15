@@ -1,5 +1,5 @@
 from .exceptions import alttprException
-from . import patch, misc
+from . import patch, misc, spoiler
 from .http import http
 
 
@@ -266,3 +266,6 @@ class alttprClass():
             ))
         spr = list(sprite)
         return spr
+
+    def get_formatted_spoiler(self):
+        return spoiler.create_filtered_spoiler(self)

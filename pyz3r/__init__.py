@@ -11,7 +11,5 @@ __copyright__ = 'Copyright 2018-2019 Thomas Prescott'
 __version__ = '4.2.0'
 
 from .alttpr import alttpr
-from .rom import romfile
-
-from .alttpr import alttpr as async_alttpr
-from .rom import romfile as async_romfile
+from .smz3 import smz3
+from . import rom, mystery, customizer, patch

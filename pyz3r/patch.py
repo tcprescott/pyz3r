@@ -88,7 +88,7 @@ def music(music=True):
         list -- a list of dictionaries indicating which ROM address offsets to write and what to write to them
     """
 
-    return [{'1573402': [1 if music else 0]}]
+    return [{'1573402': [0 if music else 1]}]
 
 
 def quickswap(quickswap=False):

@@ -36,61 +36,63 @@ The below example will generate an item randomizer game with a list of settings:
 ```python
 import pyz3r
 
-seed = pyz3r.alttpr(
-    randomizer='item', # optional, defaults to item
-    settings={
-        "difficulty": "hard",
-        "enemizer": False,
-        "logic": "NoGlitches",
-        "mode": "open",
-        "spoilers": False,
-        "tournament": True,
-        "variation": "key-sanity",
-        "weapons": "uncle",
-        "lang": "en"
-    }
-)
+async def main()
+    seed = await pyz3r.alttpr(
+        settings={
+            "glitches": "none",
+            "item_placement": "advanced",
+            "dungeon_items": "standard",
+            "accessibility": "items",
+            "goal": "ganon",
+            "crystals": {
+                "ganon": "random",
+                "tower": "4"
+            },
+            "mode": "open",
+            "entrances": "none",
+            "hints": "on",
+            "weapons": "randomized",
+            "item": {
+                "pool": "normal",
+                "functionality": "normal"
+            },
+            "tournament": True,
+            "spoilers": "off",
+            "lang":"en",
+            "enemizer": {
+                "boss_shuffle":"none",
+                "enemy_shuffle":"none",
+                "enemy_damage":"default",
+                "enemy_health":"default"
+            }
+        }
+    )
+
+if __name__ == '__main__':
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(main())
 ```
 
 This will give you a list of item randomizer options as a dictionary:
 ```python
-pyz3r.alttpr(randomizer='item').settings()
+pyz3r.alttpr().settings()
 ```
 
-### Intiating an Entrance Shuffle seed
-This will generate an entrance shuffle game:
-```python
-import pyz3r
-
-seed = pyz3r.alttpr(
-    randomizer='entrance',
-    settings={
-        "logic":"NoGlitches",
-        "difficulty":"normal",
-        "variation":"retro",
-        "mode":"open",
-        "goal":"ganon",
-        "shuffle":"restricted",
-        "tournament":True,
-        "spoilers":False,
-        "enemizer":False,
-        "lang":"en"
-    }
-)
-```
-
-This will give you a list of item randomizer options as a dictionary:
-```python
-pyz3r.alttpr(randomizer='entrance').settings()
-```
 
 ### Loading an already generated game
 If the game you want to work with has already been generated, you can load the hash like this:
 
 ```python
-seed = pyz3r.alttpr(
-    hash='zDvxWLLEMa'
-)
+import pyz3r
+
+async def main()
+    seed = await pyz3r.alttpr(
+        hash='zDvxWLLEMa'
+    )
+
+if __name__ == '__main__':
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(main())
 ```
 
 ### Getting the code display and URL
@@ -98,7 +100,7 @@ seed = pyz3r.alttpr(
 This will return to you a list of strings with the "code" that appears on the file select screen.
 
 ```python
-code = seed.code()
+code = await seed.code()
 print("Hash: [{hash}]".format(
     hash = ' | '.join(code)
 ))
@@ -135,19 +137,21 @@ This is the meat and potatoes of the library.  There are two ways, the easy and 
 You'll first want to read your unmodified Japan 1.0 ROM of Link to the Past.  `read_rom()` will checksum the file to ensure its the correct ROM.
 
 ```python
-base_rom = pyz3r.romfile.read("path/to/Zelda no Densetsu - Kamigami no Triforce (Japan).sfc")
+base_rom = await pyz3r.rom.read("path/to/Zelda no Densetsu - Kamigami no Triforce (Japan).sfc")
 ```
 
 `base_rom` will be an array of integers representing the bytes of the original ROM.
 
 You'll then want to use `create_patched_game` to apply all of the patches required to randomize and customize the ROM.
 ```python
-patched_rom = seed.create_patched_game(
+patched_rom = await seed.create_patched_game(
     base_rom,  
     heartspeed='normal',
     heartcolor='red',
     spritename='Link', #can be any sprite listed at https://alttpr.com/sprites
-    music=False # true or false, defaults true
+    music=False, # true or false, defaults true
+    quickswap=False,
+    menu_speed='normal'
 )
 ```
 
@@ -158,6 +162,8 @@ Here you can customize the following:
 2. `heartcolor` - Optional. The color of your hearts.  Acceptable values are `'red'`, `'blue'`, `'green'`, or `'yellow'`.  Default is `'red'`.
 3. `spritename` - Optional. The sprite to use.  Acceptable values are the `name` keys in the json file at https://alttpr.com/sprites.  Default is `'Link'`.
 4. `music` - Optional. Whether music should play.  Acceptable values are `True` and `False`. `False` allows MSU-1 music to work correctly.  Default is `True`.
+5. `quickswap` - Optional.  Enable quickswap.  Only works on non-tournament games or entrance shuffle.  Acceptable values are `True` and `False`.  Default is `False`.
+6. `menu_speed` - Optional.  This is the menu speed setting.  Only works on non-tournament games.  Acceptable values are `instant`, `fast`, `normal`, `slow`.  Default is `normal`.
 
 The result of `create_patched_game` is an array of integers representing the fully patched ROM.
 
@@ -203,6 +209,18 @@ rom = patch.apply(
     patches=patch.music(True)
 )
 
+# apply menu speed
+rom = patch.apply(
+    rom=patchrom_array,
+    patches=patch.menu_speed('normal')
+)
+
+# apply quickswap
+rom = patch.apply(
+    rom=patchrom_array,
+    patches=patch.quickswap(False)
+)
+
 pyz3r.romfile.write(rom,'path/to/patched_rom.sfc')
 ```
 
@@ -217,69 +235,161 @@ along with scrambling the item table within the ROM.
 ```python
 import json
 import pyz3r
-from pyz3r.customizer import customizer
 
 f = open('customizer-settings.json', "r")
 customizer_settings = json.loads(f.read())
 f.close()
 
 seed = pyz3r.alttpr(
-    randomizer='item',
-    settings=customizer.convert2settings(customizer_save=customizer_settings, tournament=False)
+    settings=pyz3r.customizer.convert2settings(customizer_save=customizer_settings, tournament=False)
 )
 ```
 
-### Async Support
-This library can also be used using asyncio (via the aiofiles and aiohttp library), which may be useful for bots that use asyncio (such as discord.py).  The syntax is very similar, with a two notable differences.
+### Mystery seeds
+
+Want to build your own mystery games without using SahasrahBot?  The pyz3r module now supports mystery games!
+
+Just use the new `pyz3r.mystery.generate_random_settings()` function and pass in the weights you wish to use.  It'll output a dictionary can be fed into a into `pyz3r.alttpr()`.
 
 ```python
-import pyz3r
-import asyncio
+settings=pyz3r.mystery.generate_random_settings(
+    weights={
+        "glitches_required": {
+            "none": 100,
+            "overworld_glitches": 0,
+            "major_glitches": 0,
+            "no_logic": 0
+        },
+        "item_placement": {
+            "basic": 25,
+            "advanced": 75
+        },
+        "dungeon_items": {
+            "standard": 60,
+            "mc": 10,
+            "mcs": 10,
+            "full": 20
+        },
+        "accessibility": {
+            "items": 60,
+            "locations": 10,
+            "none": 30
+        },
+        "goals": {
+            "ganon": 40,
+            "fast_ganon": 20,
+            "dungeons": 10,
+            "pedestal": 20,
+            "triforce-hunt": 10
+        },
+        "tower_open": {
+            "0": 5,
+            "1": 5,
+            "2": 5,
+            "3": 5,
+            "4": 5,
+            "5": 5,
+            "6": 5,
+            "7": 50,
+            "random": 15
+        },
+        "ganon_open": {
+            "0": 5,
+            "1": 5,
+            "2": 5,
+            "3": 5,
+            "4": 5,
+            "5": 5,
+            "6": 5,
+            "7": 50,
+            "random": 15
+        },
+        "world_state": {
+            "standard": 35,
+            "open": 35,
+            "inverted": 20,
+            "retro": 10
+        },
+        "entrance_shuffle": {
+            "none": 60,
+            "simple": 7,
+            "restricted": 10,
+            "full": 10,
+            "crossed": 10,
+            "insanity": 2
+        },
+        "boss_shuffle": {
+            "none": 60,
+            "simple": 10,
+            "full": 10,
+            "random": 20
+        },
+        "enemy_shuffle": {
+            "none": 60,
+            "shuffled": 20,
+            "random": 20
+        },
+        "hints": {
+            "on": 50,
+            "off": 50
+        },
+        "weapons": {
+            "randomized": 40,
+            "assured": 40,
+            "vanilla": 15,
+            "swordless": 5
+        },
+        "item_pool": {
+            "normal": 80,
+            "hard": 15,
+            "expert": 5,
+            "crowd_control": 0
+        },
+        "item_functionality": {
+            "normal": 80,
+            "hard": 15,
+            "expert": 5
+        },
+        "enemy_damage": {
+            "default": 80,
+            "shuffled": 10,
+            "random": 10
+        },
+        "enemy_health": {
+            "default": 80,
+            "easy": 5,
+            "hard": 10,
+            "expert": 5
+        }
+    }
+)
 
-async def test_retrieve_game():
-    seed = await pyz3r.alttpr(
-        hash='zDvxWLLEMa'
-    )
-
-    print("Permalink: {url}".format(
-        url = seed.url
-    ))
-    print("Hash: [{hash}]".format(
-        hash = ' | '.join(await seed.code())
-    ))
-
-    print(seed.data['spoiler'])
-
-    jpn10rom = await pyz3r.romfile.read("base_rom/Zelda no Densetsu - Kamigami no Triforce (Japan).sfc")
-    patched_rom = await seed.create_patched_game(
-        patchrom_array = jpn10rom,  
-        heartspeed=None, #can be off, quarter, half, double or normal.
-        heartcolor='red', #can be red, 
-        spritename='Negative Link', #can be any sprite listed at https://alttpr.com/sprites
-        music=False # true or false, defaults true
-        )
-    await pyz3r.romfile.write(patched_rom, "outputs/patched_rom.sfc")
-
-if __name__ == '__main__':
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(test_retrieve_game())
+seed = await pyz3r.alttpr(settings=settings)
+print(seed.url)
 ```
 
-The most notable changes are using asyncio's await syntax and using `pyz3r.alttpr()` and `pyz3r.romfile` instead.
+### Getting a formatted spoiler log
+
+If a game is generated where spoilers is set to `on` or `generate`, you may retrieve an Ordered Dictionary of the spoiler log with QOL enhancements used during the spoiler tournament.
+
+```python
+spoiler = seed.get_formatted_spoiler()
+```
+
+ You may then write this to whatever you see fit.
 
 ## To do
 
 0. Add a feature to verify a settings dictionary before attempting to generate a game.  This may become the default behavior, with the ability to override it.  This could also just be a separate function that could be invoked as well.
-1. Right now Quickswap and Menu Speed options are not available. If they were, the behavior of this library would be for them **not** to function on race seeds.  I figure few people use these features, so they won't be in the initial release of pyz3r.
-2. Add a shortcut for pulling the data for the daily game.  This would likely have to be scraped since it doesn't appear to be any API endpoint for this.
-3. Improve logging.  Right now this library does zero logging on its own, which should be fixed.
-4. Add unit tests.
+1. Improve logging.  Right now this library does zero logging on its own, which should be fixed.
+2. Add unit tests.
 
 ## Credits and shoutouts
 
 0. Veetorp, Karkat, ChristosOwen, Smallhacker, and Dessyreqt for making an incredible randomizer.
-1. The mods at the ALTTPR discord (https://discord.gg/alttprandomizer).
-2. This work is dedicated to my father.  May he rest in peace.
-3. Jaysee87 for his input into specific functionality, and suggesting asyncio support for usage with discord bots.
+1. This work is dedicated to my father.  May he rest in peace.
+2. Jaysee87 for his input into specific functionality, and suggesting asyncio support for usage with discord bots.
 
 Github for alttp_vt_randomizer: https://github.com/sporchia/alttp_vt_randomizer
+
+For a real-world usage of this library, check out SahasrahBot at https://github.com/tcprescott/sahasrahbot
