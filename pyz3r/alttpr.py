@@ -1,5 +1,5 @@
 from .exceptions import alttprException
-from .patch import patch
+from . import patch
 from .http import http
 from .misc import misc
 
@@ -153,6 +153,8 @@ class alttprClass():
         patchrom_array,
         heartspeed='half',
         heartcolor='red',
+        quickswap=False,
+        menu_speed='normal',
         spritename='Link',
         music=True
     ):
@@ -204,6 +206,18 @@ class alttprClass():
         patchrom_array = patch.apply(
             rom=patchrom_array,
             patches=patch.heart_color(heartcolor)
+        )
+
+        # apply menu speed
+        patchrom_array = patch.apply(
+            rom=patchrom_array,
+            patches=patch.menu_speed(menu_speed)
+        )
+
+        # apply quickswap
+        patchrom_array = patch.apply(
+            rom=patchrom_array,
+            patches=patch.quickswap(quickswap)
         )
 
         # apply the sprite
