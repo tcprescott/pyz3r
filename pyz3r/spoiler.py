@@ -74,12 +74,19 @@ def create_filtered_spoiler(seed):
             ['Misery Mire', 'Misery Mire - Prize'],
             ['Turtle Rock', 'Turtle Rock - Prize'],
         ]
+
     sorteddict['Prizes'] = {}
     for dungeon, prize in prizemap:
-        sorteddict['Prizes'][dungeon] = spoiler[dungeon][prize].replace(':1','')
+        try:
+            sorteddict['Prizes'][dungeon] = spoiler[dungeon][prize].replace(':1','')
+        except KeyError:
+            continue
 
     for section in sectionlist:
-        sorteddict[section] = mw_filter(spoiler[section])
+        try:
+            sorteddict[section] = mw_filter(spoiler[section])
+        except KeyError:
+            continue
 
     drops = get_seed_prizepacks(seed.data)
     sorteddict['Drops'] = {}

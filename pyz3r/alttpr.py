@@ -27,8 +27,8 @@ async def alttpr(
     Returns:
         [type] -- [description]
     """
-    seed = alttprClass(settings, hash, randomizer, customizer,
-                       baseurl, seed_baseurl, username, password)
+    seed = alttprClass(settings=settings, hash=hash, randomizer=randomizer, customizer=customizer,
+                       baseurl=baseurl, seed_baseurl=seed_baseurl, username=username, password=password, festive=False)
     await seed._init()
     return seed
 
@@ -44,6 +44,7 @@ class alttprClass():
         seed_baseurl='https://s3.us-east-2.amazonaws.com/alttpr-patches',
         username=None,
         password=None,
+        festive=False
     ):
         self.settings = settings
         self.hash = hash
@@ -53,6 +54,7 @@ class alttprClass():
         self.customizer = customizer
         self.username = username
         self.password = password
+        self.festive = festive
 
     async def _init(self):
 
@@ -65,6 +67,8 @@ class alttprClass():
 
         if self.customizer:
             endpoint = '/api/customizer'
+        elif self.festive:
+            endpoint = '/api/festive'
         else:
             endpoint = '/api/randomizer'
 
