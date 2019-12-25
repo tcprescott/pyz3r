@@ -8,7 +8,7 @@ README = (HERE / "README.md").read_text()
 
 setup(
     name="pyz3r",
-    version="4.2.1",
+    version="4.2.2",
     author="Thomas Prescott",
     author_email="tcprescott@gmail.com",
     description="A python module for interacting with alttpr.com, such as generating new z3r games, and patching existing games.",
