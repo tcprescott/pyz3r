@@ -36,6 +36,7 @@ def convert2settings(
         },
         "mode": "open",
         "weapons": "randomized",
+        "hints": "on",
         "item": {
             "pool": "normal",
             "functionality": "normal"
@@ -84,7 +85,6 @@ def convert2settings(
             "rom.rupeeBow": False,
             "rom.genericKeys": False,
             "spoil.BootsLocation": False,
-            "spoil.Hints": True,
             "canBombJump": False,
             "canBootsClip": False,
             "canBunnyRevive": False,
