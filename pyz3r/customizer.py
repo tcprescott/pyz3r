@@ -312,7 +312,7 @@ def convert2settings(
 
     try:
         if not customizer_save['randomizer.hints'] is None:
-            settings['custom']['spoil.Hints'] = customizer_save['randomizer.hints']
+            settings['hints'] = customizer_save['randomizer.hints']
     except KeyError:
         pass
 
