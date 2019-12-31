@@ -1,4 +1,4 @@
-import secrets
+import random
 
 
 def generate_random_settings(weights, tournament=True, spoilers="mystery"):
@@ -46,4 +46,4 @@ def generate_random_settings(weights, tournament=True, spoilers="mystery"):
 
 
 def get_random_option(optset):
-    return secrets.choice([k for k in optset for dummy in range(optset[k])])
+    return random.choices(population=list(optset.keys()),weights=list(optset.values()))[0]
