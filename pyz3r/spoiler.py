@@ -1,16 +1,18 @@
 from collections import OrderedDict
 from . import misc
 
-#creates an enhanced spoiler dictionary for spoiler log races
+# creates an enhanced spoiler dictionary for spoiler log races
+
 
 def create_filtered_spoiler(seed):
-    if not seed.data['spoiler']['meta'].get('spoilers') in ['on','generate']: return None
+    if not seed.data['spoiler']['meta'].get('spoilers') in ['on', 'generate']:
+        return None
 
     spoiler = seed.data['spoiler']
 
     sorteddict = OrderedDict()
 
-    if spoiler['meta'].get('shuffle','none') == 'none':
+    if spoiler['meta'].get('shuffle', 'none') == 'none':
         sectionlist = [
             'Special',
             'Hyrule Castle',
@@ -78,7 +80,8 @@ def create_filtered_spoiler(seed):
     sorteddict['Prizes'] = {}
     for dungeon, prize in prizemap:
         try:
-            sorteddict['Prizes'][dungeon] = spoiler[dungeon][prize].replace(':1','')
+            sorteddict['Prizes'][dungeon] = spoiler[dungeon][prize].replace(
+                ':1', '')
         except KeyError:
             continue
 
@@ -97,7 +100,8 @@ def create_filtered_spoiler(seed):
     sorteddict['Drops']['Stun'] = drops['Stun']
     sorteddict['Drops']['FishSave'] = drops['FishSave']
 
-    sorteddict['Special']['DiggingGameDigs'] = misc.seek_patch_data(seed.data['patch'], 982421, 1)[0]
+    sorteddict['Special']['DiggingGameDigs'] = misc.seek_patch_data(
+        seed.data['patch'], 982421, 1)[0]
 
     if spoiler['meta'].get('mode', 'open') == 'retro':
         sorteddict['Shops'] = spoiler['Shops']
@@ -105,17 +109,18 @@ def create_filtered_spoiler(seed):
     if not spoiler['meta'].get('enemizer.boss_shuffle', 'none') == 'none':
         sorteddict['Bosses'] = mw_filter(spoiler['Bosses'])
 
-    if not spoiler['meta'].get('shuffle','none') == 'none':
+    if not spoiler['meta'].get('shuffle', 'none') == 'none':
         sorteddict['Entrances'] = spoiler['Entrances']
 
-    sorteddict['meta']           = spoiler['meta']
-    sorteddict['meta']['hash']   = seed.hash
+    sorteddict['meta'] = spoiler['meta']
+    sorteddict['meta']['hash'] = seed.hash
     sorteddict['meta']['permalink'] = seed.url
 
     for dungeon, prize in prizemap:
-        del sorteddict[dungeon][prize.replace(':1','')]
+        del sorteddict[dungeon][prize.replace(':1', '')]
 
     return sorteddict
+
 
 def get_seed_prizepacks(data):
     d = {}
@@ -132,17 +137,23 @@ def get_seed_prizepacks(data):
         if stun_offset in patch:
             d['Stun'] = get_sprite_droppable(patch[stun_offset][0])
         if pulltree_offset in patch:
-            d['PullTree']['Tier1'] = get_sprite_droppable(patch[pulltree_offset][0])
-            d['PullTree']['Tier2'] = get_sprite_droppable(patch[pulltree_offset][1])
-            d['PullTree']['Tier3'] = get_sprite_droppable(patch[pulltree_offset][2])
+            d['PullTree']['Tier1'] = get_sprite_droppable(
+                patch[pulltree_offset][0])
+            d['PullTree']['Tier2'] = get_sprite_droppable(
+                patch[pulltree_offset][1])
+            d['PullTree']['Tier3'] = get_sprite_droppable(
+                patch[pulltree_offset][2])
         if rupeecrap_main_offset in patch:
-            d['RupeeCrab']['Main'] = get_sprite_droppable(patch[rupeecrap_main_offset][0])
+            d['RupeeCrab']['Main'] = get_sprite_droppable(
+                patch[rupeecrap_main_offset][0])
         if rupeecrab_final_offset in patch:
-            d['RupeeCrab']['Final'] = get_sprite_droppable(patch[rupeecrab_final_offset][0])
+            d['RupeeCrab']['Final'] = get_sprite_droppable(
+                patch[rupeecrab_final_offset][0])
         if fishsave_offset in patch:
             d['FishSave'] = get_sprite_droppable(patch[fishsave_offset][0])
-    
+
     return d
+
 
 def get_sprite_droppable(i):
     spritemap = {
@@ -153,8 +164,10 @@ def get_sprite_droppable(i):
         225: "ArrowRefill5", 226: "ArrowRefill10",
         227: "Fairy",
     }
-    try: return spritemap[i]
-    except KeyError: return 'ERR: UNKNOWN'
+    try:
+        return spritemap[i]
+    except KeyError:
+        return 'ERR: UNKNOWN'
 
 # def mw_filter(dict):
 #     sorteddict = {}
@@ -162,8 +175,9 @@ def get_sprite_droppable(i):
 #         sorteddict[key] = dict[key]
 #     return sorteddict
 
+
 def mw_filter(dict):
     sorteddict = {}
     for key, item in dict.items():
-        sorteddict[key.replace(':1','')] = dict[key].replace(':1','')
+        sorteddict[key.replace(':1', '')] = dict[key].replace(':1', '')
     return sorteddict

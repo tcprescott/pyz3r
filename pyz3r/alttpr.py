@@ -5,7 +5,7 @@ from .http import http
 
 async def alttpr(
     settings=None,
-    hash=None,
+    hash_id=None,
     randomizer='item',
     customizer=False,
     baseurl='https://alttpr.com',
@@ -13,21 +13,7 @@ async def alttpr(
     username=None,
     password=None,
 ):
-    """Generates, or retrieves, an ALttPR game.
-
-    Keyword Arguments:
-        settings {dict} -- Dictionary of settings to use for generating a game. (default: {None})
-        hash {str} -- The 10 character string that identifies an already generated game. (default: {None})
-        randomizer {str} -- The randomizer to use for generating a game ('item' or 'entrance') (default: {'item'})
-        baseurl {str} -- URL of the ALTTPR Website to use. (default: {'https://alttpr.com'})
-        seed_baseurl {str} -- URL of the S3 bucket or web location that has already generated games. (default: {'https://s3.us-east-2.amazonaws.com/alttpr-patches'})
-        username {str} -- A basic auth username (not typically needed) (default: {None})
-        password {str} -- A basic auth password (not typically needed) (default: {None})
-
-    Returns:
-        [type] -- [description]
-    """
-    seed = alttprClass(settings=settings, hash=hash, randomizer=randomizer, customizer=customizer,
+    seed = alttprClass(settings=settings, hash_id=hash_id, randomizer=randomizer, customizer=customizer,
                        baseurl=baseurl, seed_baseurl=seed_baseurl, username=username, password=password, festive=False)
     await seed._init()
     return seed
@@ -37,7 +23,7 @@ class alttprClass():
     def __init__(
         self,
         settings=None,
-        hash=None,
+        hash_id=None,
         randomizer=None,
         customizer=False,
         baseurl='https://alttpr.com',
@@ -47,7 +33,7 @@ class alttprClass():
         festive=False
     ):
         self.settings = settings
-        self.hash = hash
+        self.hash = hash_id
         self.seed_baseurl = seed_baseurl
         self.baseurl = baseurl
         self.seed_baseurl = seed_baseurl

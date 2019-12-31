@@ -1,17 +1,17 @@
-import pyz3r
 import asyncio
-import json
 
 import config
+import pyz3r
 
 # get settings without generating a game
 # print(pyz3r.alttpr(randomizer='entrance').settings())
 
 # print(pyz3r.alttpr(randomizer='item').get_patch_sprite(name='Eggplant'))
 
+
 async def generation_test(num):
-    #generate a new game
-    if num==1:
+    # generate a new game
+    if num == 1:
         seed = await pyz3r.alttpr(
             settings={
                 "glitches": "none",
@@ -33,24 +33,24 @@ async def generation_test(num):
                 },
                 "tournament": True,
                 "spoilers": "off",
-                "lang":"en",
+                "lang": "en",
                 "enemizer": {
-                    "boss_shuffle":"none",
-                    "enemy_shuffle":"none",
-                    "enemy_damage":"default",
-                    "enemy_health":"default"
+                    "boss_shuffle": "none",
+                    "enemy_shuffle": "none",
+                    "enemy_damage": "default",
+                    "enemy_health": "default"
                 }
             }
         )
-    elif num==2:
+    elif num == 2:
         website = await pyz3r.alttpr()
         dailyhash = await website.find_daily_hash()
-        seed = await pyz3r.alttpr(hash=dailyhash)
-    elif num==3:
+        seed = await pyz3r.alttpr(hash_id=dailyhash)
+    elif num == 3:
         seed = await pyz3r.alttpr(
-            hash='NYMrE8VG9d'
+            hash_id='NYMrE8VG9d'
         )
-    elif num==4:
+    elif num == 4:
         # generating a mystery game
         seed = await pyz3r.alttpr(
             settings=pyz3r.mystery.generate_random_settings(
@@ -166,27 +166,24 @@ async def generation_test(num):
             )
         )
 
-    # print(json.dumps(await seed.customizer_settings(), indent=4))
 
     print("Permalink: {url}".format(
-        url = seed.url
+        url=seed.url
     ))
     print("Hash: [{hash}]".format(
-        hash = ' | '.join(await seed.code())
+        hash=' | '.join(await seed.code())
     ))
-
-    print(json.dumps(seed.get_formatted_spoiler()))
 
     # print(seed.data['spoiler'])
 
     jpn10rom = await pyz3r.rom.read("base_rom/Zelda no Densetsu - Kamigami no Triforce (Japan).sfc")
 
     patched_rom = await seed.create_patched_game(
-        patchrom_array = jpn10rom,
-        heartspeed='double', #can be off, quarter, half, double or normal.
-        heartcolor='yellow', #can be red, 
-        spritename='Cadence', #can be any sprite listed at https://alttpr.com/sprites
-        music=True, # true or false, defaults true
+        patchrom_array=jpn10rom,
+        heartspeed='double',  # can be off, quarter, half, double or normal.
+        heartcolor='yellow',  # can be red,
+        spritename='Cadence',  # can be any sprite listed at https://alttpr.com/sprites
+        music=True,  # true or false, defaults true
         menu_speed="instant",
         quickswap=True
     )

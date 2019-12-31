@@ -1,5 +1,5 @@
 # far from done
-from .exceptions import *
+from . import exceptions
 
 import aiohttp
 import json as jsonlib
@@ -34,27 +34,27 @@ class http():
                 continue
             # except aiohttp.ClientResponseError:
             #     continue
-        raise alttprFailedToGenerate('failed to generate game')
+        raise exceptions.alttprFailedToGenerate('failed to generate game')
 
-    async def retrieve_game(self, hash):
+    async def retrieve_game(self, hash_id):
         for i in range(0, 5):
             try:
                 if self.patch_baseurl is not None:
                     s3patch = await request_generic(
-                        url=self.patch_baseurl + '/' + hash + '.json',
+                        url=self.patch_baseurl + '/' + hash_id + '.json',
                         returntype='json'
                     )
                     return s3patch
                 else:
                     localpatch = await request_generic(
-                        url=self.site_baseurl + '/hash/' + hash,
+                        url=self.site_baseurl + '/hash/' + hash_id,
                         auth=self.auth,
                         returntype='json'
                     )
                     return localpatch
             except aiohttp.ClientResponseError:
                 localpatch = await request_generic(
-                    url=self.site_baseurl + '/hash/' + hash,
+                    url=self.site_baseurl + '/hash/' + hash_id,
                     auth=self.auth,
                     returntype='json'
                 )
@@ -63,9 +63,9 @@ class http():
                 return localpatch
             except aiohttp.client_exceptions.ServerDisconnectedError:
                 continue
-        raise alttprFailedToRetrieve(
+        raise exceptions.alttprFailedToRetrieve(
             'failed to retrieve game {hash}, the game is likely not found'.format(
-                hash=hash))
+                hash=hash_id))
 
     async def retrieve_json(self, endpoint, useauth=True):
         if useauth:
@@ -94,7 +94,7 @@ class http():
         return req
 
 
-async def request_generic(url, method='get', reqparams=None, data=None, header={}, auth=None, returntype='text'):
+async def request_generic(url, method='get', reqparams=None, data=None, header=None, auth=None, returntype='text'):
     async with aiohttp.ClientSession(auth=None, raise_for_status=True) as session:
         async with session.request(method.upper(), url, params=reqparams, data=data, headers=header, auth=auth) as resp:
             if returntype == 'text':

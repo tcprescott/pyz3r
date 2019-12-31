@@ -4,24 +4,12 @@ from .http import http
 
 async def smz3(
     settings=None,
-    hash=None,
+    hash_id=None,
     baseurl='https://samus.link',
     username=None,
     password=None,
 ):
-    """Generates, or retrieves, an ALttPR game.
-
-    Keyword Arguments:
-        settings {dict} -- Dictionary of settings to use for generating a game. (default: {None})
-        hash {str} -- The 10 character string that identifies an already generated game. (default: {None})
-        baseurl {str} -- URL of the ALTTPR Website to use. (default: {'https://alttpr.com'})
-        username {str} -- A basic auth username (not typically needed) (default: {None})
-        password {str} -- A basic auth password (not typically needed) (default: {None})
-
-    Returns:
-        [type] -- [description]
-    """
-    seed = smz3Class(settings, hash, baseurl, username, password)
+    seed = smz3Class(settings, hash_id, baseurl, username, password)
     await seed._init()
     return seed
 
@@ -30,13 +18,13 @@ class smz3Class():
     def __init__(
         self,
         settings=None,
-        hash=None,
+        hash_id=None,
         baseurl='https://samus.link',
         username=None,
         password=None,
     ):
         self.settings = settings
-        self.hash = hash
+        self.hash = hash_id
         self.baseurl = baseurl
         self.username = username
         self.password = password
