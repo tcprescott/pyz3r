@@ -20,7 +20,8 @@ def convert2settings(
         dict -- a dictionary of settings that can be used with pyz3r.alttpr()
     """
 
-    if spoilers_ongen: spoilers="generate"
+    if spoilers_ongen:
+        spoilers = "generate"
 
     # the settings defaults, hopefully this is accurate
 
@@ -363,7 +364,6 @@ def convert2settings(
                 settings['custom'][key] = value
     except KeyError:
         pass
-
 
     try:
         if not customizer_save['vt.custom.items'] is None:

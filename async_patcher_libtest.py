@@ -174,6 +174,7 @@ async def generation_test(num):
         hash=' | '.join(await seed.code())
     ))
 
+
     # print(seed.data['spoiler'])
 
     jpn10rom = await pyz3r.rom.read("base_rom/Zelda no Densetsu - Kamigami no Triforce (Japan).sfc")

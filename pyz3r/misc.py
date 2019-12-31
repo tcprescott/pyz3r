@@ -9,6 +9,7 @@ def chunk(iterator, count):
         except StopIteration:
             return
 
+
 def seek_patch_data(patches, offset, num_bytes):
     offsetlist = []
     for patch in patches:

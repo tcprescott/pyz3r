@@ -1,7 +1,8 @@
-import random
+import secrets
+
 
 def generate_random_settings(weights, tournament=True, spoilers="mystery"):
-    settings={
+    settings = {
         "glitches": get_random_option(weights['glitches_required']),
         "item_placement": get_random_option(weights['item_placement']),
         "dungeon_items": get_random_option(weights['dungeon_items']),
@@ -31,13 +32,18 @@ def generate_random_settings(weights, tournament=True, spoilers="mystery"):
     }
 
     # This if statement is dedicated to the survivors of http://www.speedrunslive.com/races/result/#!/264658
-    if settings['weapons'] not in ['vanilla','assured'] and settings['mode'] == 'standard' and (
+    if settings['weapons'] not in ['vanilla', 'assured'] and settings['mode'] == 'standard' and (
             settings['enemizer']['enemy_shuffle'] != 'none'
             or settings['enemizer']['enemy_damage'] != 'default'
             or settings['enemizer']['enemy_health'] != 'default'):
         settings['weapons'] = 'assured'
 
+    # Stop gap measure until swordless entrance with a hard+ item pool is fixed
+    if settings.get('entrances', 'none') != 'none' and settings['item']['pool'] in ['hard', 'expert'] and settings['weapons'] == 'swordless':
+        settings['weapons'] = 'randomized'
+
     return settings
 
+
 def get_random_option(optset):
-    return random.choices(population=list(optset.keys()),weights=list(optset.values()))[0]
+    return secrets.choice([k for k in optset for dummy in range(optset[k])])
