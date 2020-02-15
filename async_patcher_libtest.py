@@ -2,6 +2,7 @@ import asyncio
 
 import config
 import pyz3r
+import json
 
 # get settings without generating a game
 # print(pyz3r.alttpr(randomizer='entrance').settings())
@@ -32,7 +33,7 @@ async def generation_test(num):
                     "functionality": "normal"
                 },
                 "tournament": True,
-                "spoilers": "off",
+                "spoilers": "generate",
                 "lang": "en",
                 "enemizer": {
                     "boss_shuffle": "none",
@@ -48,7 +49,7 @@ async def generation_test(num):
         seed = await pyz3r.alttpr(hash_id=dailyhash)
     elif num == 3:
         seed = await pyz3r.alttpr(
-            hash_id='NYMrE8VG9d'
+            hash_id='YlMjRe5AMo'
         )
     elif num == 4:
         # generating a mystery game
@@ -177,18 +178,20 @@ async def generation_test(num):
 
     # print(seed.data['spoiler'])
 
-    jpn10rom = await pyz3r.rom.read("base_rom/Zelda no Densetsu - Kamigami no Triforce (Japan).sfc")
+    # jpn10rom = await pyz3r.rom.read("base_rom/Zelda no Densetsu - Kamigami no Triforce (Japan).sfc")
 
-    patched_rom = await seed.create_patched_game(
-        patchrom_array=jpn10rom,
-        heartspeed='double',  # can be off, quarter, half, double or normal.
-        heartcolor='yellow',  # can be red,
-        spritename='Cadence',  # can be any sprite listed at https://alttpr.com/sprites
-        music=True,  # true or false, defaults true
-        menu_speed="instant",
-        quickswap=True
-    )
-    await pyz3r.rom.write(patched_rom, "outputs/patched_rom.sfc")
+    # patched_rom = await seed.create_patched_game(
+    #     patchrom_array=jpn10rom,
+    #     heartspeed='double',  # can be off, quarter, half, double or normal.
+    #     heartcolor='yellow',  # can be red,
+    #     spritename='Cadence',  # can be any sprite listed at https://alttpr.com/sprites
+    #     music=True,  # true or false, defaults true
+    #     menu_speed="instant",
+    #     quickswap=True
+    # )
+    # await pyz3r.rom.write(patched_rom, "outputs/patched_rom.sfc")
+
+    print(json.dumps(seed.get_formatted_spoiler(translate_dungeon_items=False), indent=4))
 
 if __name__ == '__main__':
     loop = asyncio.get_event_loop()

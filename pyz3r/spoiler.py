@@ -3,8 +3,56 @@ from . import misc
 
 # creates an enhanced spoiler dictionary for spoiler log races
 
+translation_map = {
+    'BigKeyP1':  'EasternPalace_BigKey',
+    'BigKeyP2':  'DesertPalace_BigKey',
+    'BigKeyP3':  'TowerOfHera_BigKey',
+    'BigKeyD1':  'PalaceOfDarkness_BigKey',
+    'BigKeyD2':  'SwampPalace_BigKey',
+    'BigKeyD3':  'SkullWoods_BigKey',
+    'BigKeyD4':  'ThievesTown_BigKey',
+    'BigKeyD5':  'IcePalace_BigKey',
+    'BigKeyD6':  'MiseryMire_BigKey',
+    'BigKeyD7':  'TurtleRock_BigKey',
+    'BigKeyA2':  'GanonsTower_BigKey',
+    'KeyH2':     'HyruleCastle_SmallKey',
+    'KeyP2':     'DesertPalace_SmallKey',
+    'KeyP3':     'TowerOfHera_SmallKey',
+    'KeyA1':     'CastleTower_SmallKey',
+    'KeyD1':     'PalaceOfDarkness_SmallKey',
+    'KeyD2':     'SwampPalace_SmallKey',
+    'KeyD3':     'SkullWoods_SmallKey',
+    'KeyD4':     'ThievesTown_SmallKey',
+    'KeyD5':     'IcePalace_SmallKey',
+    'KeyD6':     'MiseryMire_SmallKey',
+    'KeyD7':     'TurtleRock_SmallKey',
+    'KeyA2':     'GanonsTower_SmallKey',
+    'MapH2':     'HyruleCastle_Map',
+    'MapP1':     'EasternPalace_Map',
+    'MapP2':     'DesertPalace_Map',
+    'MapP3':     'TowerOfHera_Map',
+    'MapD1':     'PalaceOfDarkness_Map',
+    'MapD2':     'SwampPalace_Map',
+    'MapD3':     'SkullWoods_Map',
+    'MapD4':     'ThievesTown_Map',
+    'MapD5':     'IcePalace_Map',
+    'MapD6':     'MiseryMire_Map',
+    'MapD7':     'TurtleRock_Map',
+    'MapA2':     'GanonsTower_Map',
+    'CompassP1': 'EasternPalace_Compass',
+    'CompassP2': 'DesertPalace_Compass',
+    'CompassP3': 'TowerOfHera_Compass',
+    'CompassD1': 'PalaceOfDarkness_Compass',
+    'CompassD2': 'SwampPalace_Compass',
+    'CompassD3': 'SkullWoods_Compass',
+    'CompassD4': 'ThievesTown_Compass',
+    'CompassD5': 'IcePalace_Compass',
+    'CompassD6': 'MiseryMire_Compass',
+    'CompassD7': 'TurtleRock_Compass',
+    'CompassA2': 'GanonsTower_Compass',
+}
 
-def create_filtered_spoiler(seed):
+def create_filtered_spoiler(seed, translate_dungeon_items=False):
     if not seed.data['spoiler']['meta'].get('spoilers') in ['on', 'generate']:
         return None
 
@@ -88,6 +136,10 @@ def create_filtered_spoiler(seed):
     for section in sectionlist:
         try:
             sorteddict[section] = mw_filter(spoiler[section])
+            if translate_dungeon_items:
+                for key, value in sorteddict[section].items():
+                    if value in translation_map.keys():
+                        sorteddict[section][key] = translation_map[value]
         except KeyError:
             continue
 
@@ -168,12 +220,6 @@ def get_sprite_droppable(i):
         return spritemap[i]
     except KeyError:
         return 'ERR: UNKNOWN'
-
-# def mw_filter(dict):
-#     sorteddict = {}
-#     for key in sorted(dict):
-#         sorteddict[key] = dict[key]
-#     return sorteddict
 
 
 def mw_filter(dict):

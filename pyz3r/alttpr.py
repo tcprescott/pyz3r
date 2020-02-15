@@ -257,5 +257,5 @@ class alttprClass():
         spr = list(sprite)
         return spr
 
-    def get_formatted_spoiler(self):
-        return spoiler.create_filtered_spoiler(self)
+    def get_formatted_spoiler(self, translate_dungeon_items=False):
+        return spoiler.create_filtered_spoiler(self, translate_dungeon_items)
