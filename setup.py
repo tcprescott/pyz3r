@@ -11,7 +11,7 @@ setup(
     version="4.3.3",
     author="Thomas Prescott",
     author_email="tcprescott@gmail.com",
-    description="A python module for interacting with alttpr.com, such as generating new z3r games, and patching existing games.",
+    description="A python module for interacting with the web API of various randomizers, such as https://alttpr.com or https://samus.link.",
     long_description=README,
     long_description_content_type="text/markdown",
     url="https://github.com/tcprescott/pyz3r",
@@ -24,5 +24,5 @@ setup(
         "Development Status :: 5 - Production/Stable",
         "Operating System :: OS Independent",
     ],
-    install_requires=['aiofiles','aiohttp','bs4','html5lib'],
+    install_requires=['aiofiles','aiohttp','bs4','html5lib','slugid'],
 )
