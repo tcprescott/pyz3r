@@ -1,4 +1,3 @@
 aiohttp
 aiofiles
-bs4
-html5lib
+slugid

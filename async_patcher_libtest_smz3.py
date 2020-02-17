@@ -9,28 +9,52 @@ import pyz3r
 
 
 async def generation_test():
-    preset = 'hard'
-    seed = await pyz3r.smz3(
-        settings={
-            'logic': 'NoMajorGlitches',
-            'sm_logic': 'Casual' if preset == 'normal' else 'Tournament',
-            'difficulty': 'normal',
-            'variation': 'combo',
-            'mode': 'open',
-            'goal': 'ganon',
-            'weapons': '',
-            'morph': 'randomized',  # or vanilla
-            'heart_speed': 'half',
-            'sram_trace': 'false',
-            'menu_speed': 'normal',
-            'debug': False,
-            'tournament': True  # or False
-        }
+    # seed = await pyz3r.sm(
+    #     randomizer='sm',
+    #     settings={
+    #         "logic": "Tournament",
+    #         "goal": "defeatmb",
+    #         "placement": "split",
+    #         "seed": "",
+    #         "race": "true",
+    #         "gamemode": "normal"
+    #     }
+    # )
+    # seed = await pyz3r.sm(
+    #     randomizer='smz3',
+    #     settings={
+    #         "logic": "Hard",
+    #         "goal": "defeatboth",
+    #         "seed": "",
+    #         "race": "true",
+    #         "gamemode": "normal"
+    #     }
+    # )
+    seed = await pyz3r.sm(
+        guid_id='74a221fcff63453e8afe05a3d68c0f68'
     )
+    # preset = 'hard'
+    # seed = await pyz3r.smz3(
+    #     settings={
+    #         'logic': 'NoMajorGlitches',
+    #         'sm_logic': 'Casual' if preset == 'normal' else 'Tournament',
+    #         'difficulty': 'normal',
+    #         'variation': 'combo',
+    #         'mode': 'open',
+    #         'goal': 'ganon',
+    #         'weapons': '',
+    #         'morph': 'randomized',  # or vanilla
+    #         'heart_speed': 'half',
+    #         'sram_trace': 'false',
+    #         'menu_speed': 'normal',
+    #         'debug': False,
+    #         'tournament': True  # or False
+    #     }
+    # )
 
-    print("Permalink: {url}".format(
-        url=seed.url
-    ))
+
+    print(f"Permalink: {seed.url}")
+    print(f'Guid: {seed.guid.hex}')
 
 if __name__ == '__main__':
     loop = asyncio.get_event_loop()

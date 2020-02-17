@@ -1,5 +1,5 @@
 from .exceptions import alttprException
-from .http import http
+from . import http
 
 
 async def smz3(
@@ -30,7 +30,7 @@ class smz3Class():
         self.password = password
 
     async def _init(self):
-        self.site = http(
+        self.site = http.site(
             site_baseurl=self.baseurl,
             username=self.username,
             password=self.password,

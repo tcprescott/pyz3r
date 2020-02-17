@@ -1,6 +1,6 @@
 from .exceptions import alttprException
 from . import patch, misc, spoiler
-from .http import http
+from . import http
 
 
 async def alttpr(
@@ -43,13 +43,14 @@ class alttprClass():
         self.festive = festive
 
     async def _init(self):
-
-        self.site = http(
+        self.site = http.site(
             site_baseurl=self.baseurl,
             patch_baseurl=self.seed_baseurl,
             username=self.username,
             password=self.password,
         )
+
+        self.randomizer = 'alttpr'
 
         if self.customizer:
             endpoint = '/api/customizer'
@@ -89,12 +90,8 @@ class alttprClass():
         return await self.site.retrieve_json('/customizer/settings')
 
     async def find_daily_hash(self):
-        import bs4
-
-        text = await self.site.retrieve_url_raw_content(self.baseurl + '/daily', useauth=True)
-
-        html = bs4.BeautifulSoup(text.decode('utf-8'), 'html5lib')
-        return html.find('hashloader')['hash']
+        daily = await http.request_generic(f'{self.baseurl}/api/daily', returntype='json')
+        return daily['hash']
 
     async def code(self):
         """An list of strings that represents the

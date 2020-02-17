@@ -33,7 +33,7 @@ async def generation_test(num):
                     "functionality": "normal"
                 },
                 "tournament": True,
-                "spoilers": "generate",
+                "spoilers": "off",
                 "lang": "en",
                 "enemizer": {
                     "boss_shuffle": "none",
@@ -191,8 +191,8 @@ async def generation_test(num):
     # )
     # await pyz3r.rom.write(patched_rom, "outputs/patched_rom.sfc")
 
-    print(json.dumps(seed.get_formatted_spoiler(translate_dungeon_items=False), indent=4))
+    # print(json.dumps(seed.get_formatted_spoiler(translate_dungeon_items=False), indent=4))
 
 if __name__ == '__main__':
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(generation_test(1))
+    loop.run_until_complete(generation_test(3))

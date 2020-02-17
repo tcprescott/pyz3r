@@ -2,10 +2,10 @@
 from . import exceptions
 
 import aiohttp
-import json as jsonlib
+import json
 
 
-class http():
+class site():
     def __init__(
             self,
             site_baseurl,
@@ -15,17 +15,14 @@ class http():
         self.site_baseurl = site_baseurl
         self.patch_baseurl = patch_baseurl
 
-        if username is not None:
-            self.auth = aiohttp.BasicAuth(login=username, password=password)
-        else:
-            self.auth = None
+        self.auth = aiohttp.BasicAuth(login=username, password=password) if username else None
 
     async def generate_game(self, endpoint, settings):
         for i in range(0, 5):
             try:
                 req = await request_json_post(
                     url=self.site_baseurl + endpoint,
-                    json=settings,
+                    data=settings,
                     auth=self.auth,
                     returntype='json'
                 )
@@ -100,17 +97,26 @@ async def request_generic(url, method='get', reqparams=None, data=None, header=N
             if returntype == 'text':
                 return await resp.text()
             elif returntype == 'json':
-                return jsonlib.loads(await resp.text())
+                return json.loads(await resp.text())
             elif returntype == 'binary':
                 return await resp.read()
 
-
-async def request_json_post(url, json, auth=None, returntype='text'):
+async def request_json_put(url, data, auth=None, returntype='text'):
     async with aiohttp.ClientSession(auth=auth, raise_for_status=True) as session:
-        async with session.post(url=url, json=json, auth=auth) as resp:
+        async with session.put(url=url, json=data, auth=auth) as resp:
             if returntype == 'text':
                 return await resp.text()
             elif returntype == 'json':
-                return jsonlib.loads(await resp.text())
+                return json.loads(await resp.text())
+            elif returntype == 'binary':
+                return await resp.read()
+
+async def request_json_post(url, data, auth=None, returntype='text'):
+    async with aiohttp.ClientSession(auth=auth, raise_for_status=True) as session:
+        async with session.post(url=url, json=data, auth=auth) as resp:
+            if returntype == 'text':
+                return await resp.text()
+            elif returntype == 'json':
+                return json.loads(await resp.text())
             elif returntype == 'binary':
                 return await resp.read()
