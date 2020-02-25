@@ -56,6 +56,16 @@ async def generation_test(num):
         settings, customizer = pyz3r.mystery.generate_random_settings(
             weights={
                 "customizer": {
+                    "triforce-hunt": {
+                        "goal": {
+                            "min": 20,
+                            "max": 30,
+                        },
+                        "pool": {
+                            "min": 40,
+                            "max": 30,
+                        }
+                    },
                     "eq": {
                         "Bottle1": {
                             4: 1,
@@ -94,10 +104,10 @@ async def generation_test(num):
                     "none": 30
                 },
                 "goals": {
-                    "ganon": 40,
-                    "fast_ganon": 20,
-                    "dungeons": 10,
-                    "pedestal": 20,
+                    # "ganon": 40,
+                    # "fast_ganon": 20,
+                    # "dungeons": 10,
+                    # "pedestal": 20,
                     "triforce-hunt": 10
                 },
                 "tower_open": {
@@ -181,20 +191,20 @@ async def generation_test(num):
                 }
             }
         )
-        seed = await pyz3r.alttpr(
-            settings=settings,
-            customizer=customizer
-        )
+        # seed = await pyz3r.alttpr(
+        #     settings=settings,
+        #     customizer=customizer
+        # )
 
     with open('outputs/testout.json', 'w') as f:
         f.write(json.dumps(settings, indent=4))
 
-    print("Permalink: {url}".format(
-        url=seed.url
-    ))
-    print("Hash: [{hash}]".format(
-        hash=' | '.join(await seed.code())
-    ))
+    # print("Permalink: {url}".format(
+    #     url=seed.url
+    # ))
+    # print("Hash: [{hash}]".format(
+    #     hash=' | '.join(await seed.code())
+    # ))
 
 
     # print(seed.data['spoiler'])

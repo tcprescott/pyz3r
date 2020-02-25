@@ -78,6 +78,20 @@ def generate_random_settings(weights, tournament=True, spoilers="mystery"):
         settings['eq'] = eq
         for key, value in custom.items():
             settings["custom"][key] = value
+        
+        if settings['goal'] == 'triforce-hunt':
+            try:
+                settings['custom']['item.Goal.Required'] = random.randint(weights['customizer']['triforce-hunt']['goal']['min'], weights['customizer']['triforce-hunt']['goal']['max'])
+            except KeyError:
+                settings['custom']['item.Goal.Required'] = 20
+
+            try:
+                settings['custom']['item']['count']['TriforcePiece'] = random.randint(weights['customizer']['triforce-hunt']['pool']['min'], weights['customizer']['triforce-hunt']['pool']['max'])
+            except KeyError:
+                settings['custom']['item']['count']['TriforcePiece'] = 30
+            
+            if settings['custom']['item']['count']['TriforcePiece'] < settings['custom']['item.Goal.Required']:
+                settings['custom']['item']['count']['TriforcePiece'] = settings['custom']['item.Goal.Required']
 
     else:
         settings["entrances"] = entrances
