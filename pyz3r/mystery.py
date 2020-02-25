@@ -1,35 +1,86 @@
 import random
+from .customizer import BASE_CUSTOMIZER_PAYLOAD, get_starting_equipment
+
+BASE_RANDOMIZER_PAYLOAD = {
+    "glitches": "none",
+    "item_placement": "advanced",
+    "dungeon_items": "standard",
+    "accessibility": "items",
+    "goal": "ganon",
+    "crystals": {
+        "ganon": "7",
+        "tower": "7"
+    },
+    "mode": "open",
+    "entrances": "none",
+    "hints": "off",
+    "weapons": "randomized",
+    "item": {
+        "pool": "normal",
+        "functionality": "normal"
+    },
+    "tournament": False,
+    "spoilers": "on",
+    "lang": "en",
+    "enemizer": {
+        "boss_shuffle": "none",
+        "enemy_shuffle": "none",
+        "enemy_damage": "default",
+        "enemy_health": "default"
+    }
+}
 
 
 def generate_random_settings(weights, tournament=True, spoilers="mystery"):
-    settings = {
-        "glitches": get_random_option(weights['glitches_required']),
-        "item_placement": get_random_option(weights['item_placement']),
-        "dungeon_items": get_random_option(weights['dungeon_items']),
-        "accessibility": get_random_option(weights['accessibility']),
-        "goal": get_random_option(weights['goals']),
-        "crystals": {
-            "ganon": get_random_option(weights['tower_open']),
-            "tower": get_random_option(weights['ganon_open']),
-        },
-        "mode": get_random_option(weights['world_state']),
-        "entrances": get_random_option(weights['entrance_shuffle']),
-        "hints": get_random_option(weights['hints']),
-        "weapons": get_random_option(weights['weapons']),
-        "item": {
-            "pool": get_random_option(weights['item_pool']),
-            "functionality": get_random_option(weights['item_functionality']),
-        },
-        "tournament": tournament,
-        "spoilers": spoilers,
-        "lang": "en",
-        "enemizer": {
-            "boss_shuffle": get_random_option(weights['boss_shuffle']),
-            "enemy_shuffle": get_random_option(weights['enemy_shuffle']),
-            "enemy_damage": get_random_option(weights['enemy_damage']),
-            "enemy_health": get_random_option(weights['enemy_health']),
-        }
-    }
+    entrances =  get_random_option(weights['entrance_shuffle'])
+
+    if entrances == "none" and 'customizer' in weights:
+        custom = {}
+        eq = ['BossHeartContainer'] * 3
+
+        if 'eq' in weights['customizer']:
+            for key in weights['customizer']['eq'].keys():
+                value = get_random_option(weights['customizer']['eq'][key])
+                eq += get_starting_equipment(key=key, value=value)
+            customizer = False if eq == ['BossHeartContainer'] * 3 else True
+
+        if 'custom' in weights['customizer']:
+            for key in weights['customizer']['custom'].keys():
+                value = get_random_option(weights['customizer']['custom'][key])
+                custom[key] = value
+            customizer = True
+
+    else:
+        customizer = False
+
+    settings = BASE_CUSTOMIZER_PAYLOAD if customizer else BASE_RANDOMIZER_PAYLOAD
+    
+    settings["glitches"] = get_random_option(weights['glitches_required'])
+    settings["item_placement"] = get_random_option(weights['item_placement'])
+    settings["dungeon_items"] = get_random_option(weights['dungeon_items'])
+    settings["accessibility"] = get_random_option(weights['accessibility'])
+    settings["goal"] = get_random_option(weights['goals'])
+    settings["crystals"]["ganon"] = get_random_option(weights['tower_open'])
+    settings["crystals"]["tower"] = get_random_option(weights['ganon_open'])
+    settings["mode"] = get_random_option(weights['world_state'])
+    settings["hints"] = get_random_option(weights['hints'])
+    settings["weapons"] = get_random_option(weights['weapons'])
+    settings["item"]["pool"] = get_random_option(weights['item_pool'])
+    settings["item"]["functionality"] = get_random_option(weights['item_functionality'])
+    settings["tournament"] = tournament
+    settings["spoilers"] = spoilers
+    settings["enemizer"]["boss_shuffle"] = get_random_option(weights['boss_shuffle'])
+    settings["enemizer"]["enemy_shuffle"] = get_random_option(weights['enemy_shuffle'])
+    settings["enemizer"]["enemy_damage"] = get_random_option(weights['enemy_damage'])
+    settings["enemizer"]["enemy_health"] = get_random_option(weights['enemy_health'])
+
+    if customizer:
+        settings['eq'] = eq
+        for key, value in custom.items():
+            settings["custom"][key] = value
+
+    else:
+        settings["entrances"] = entrances
 
     # This if statement is dedicated to the survivors of http://www.speedrunslive.com/races/result/#!/264658
     if settings['weapons'] not in ['vanilla', 'assured'] and settings['mode'] == 'standard' and (
@@ -42,7 +93,7 @@ def generate_random_settings(weights, tournament=True, spoilers="mystery"):
     if settings.get('entrances', 'none') != 'none' and settings['item']['pool'] in ['hard', 'expert'] and settings['weapons'] == 'swordless':
         settings['weapons'] = 'randomized'
 
-    return settings
+    return settings, customizer
 
 
 def get_random_option(optset):

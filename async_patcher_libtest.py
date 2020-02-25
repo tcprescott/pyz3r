@@ -53,120 +53,141 @@ async def generation_test(num):
         )
     elif num == 4:
         # generating a mystery game
-        seed = await pyz3r.alttpr(
-            settings=pyz3r.mystery.generate_random_settings(
-                weights={
-                    "glitches_required": {
-                        "none": 100,
-                        "overworld_glitches": 0,
-                        "major_glitches": 0,
-                        "no_logic": 0
+        settings, customizer = pyz3r.mystery.generate_random_settings(
+            weights={
+                "customizer": {
+                    "eq": {
+                        "Bottle1": {
+                            4: 1,
+                        },
+                        "PegasusBoots": {
+                            0: 50,
+                            1: 50
+                        }
                     },
-                    "item_placement": {
-                        "basic": 25,
-                        "advanced": 75
-                    },
-                    "dungeon_items": {
-                        "standard": 60,
-                        "mc": 10,
-                        "mcs": 10,
-                        "full": 20
-                    },
-                    "accessibility": {
-                        "items": 60,
-                        "locations": 10,
-                        "none": 30
-                    },
-                    "goals": {
-                        "ganon": 40,
-                        "fast_ganon": 20,
-                        "dungeons": 10,
-                        "pedestal": 20,
-                        "triforce-hunt": 10
-                    },
-                    "tower_open": {
-                        "0": 5,
-                        "1": 5,
-                        "2": 5,
-                        "3": 5,
-                        "4": 5,
-                        "5": 5,
-                        "6": 5,
-                        "7": 50,
-                        "random": 15
-                    },
-                    "ganon_open": {
-                        "0": 5,
-                        "1": 5,
-                        "2": 5,
-                        "3": 5,
-                        "4": 5,
-                        "5": 5,
-                        "6": 5,
-                        "7": 50,
-                        "random": 15
-                    },
-                    "world_state": {
-                        "standard": 35,
-                        "open": 35,
-                        "inverted": 20,
-                        "retro": 10
-                    },
-                    "entrance_shuffle": {
-                        "none": 60,
-                        "simple": 7,
-                        "restricted": 10,
-                        "full": 10,
-                        "crossed": 10,
-                        "insanity": 2
-                    },
-                    "boss_shuffle": {
-                        "none": 60,
-                        "simple": 10,
-                        "full": 10,
-                        "random": 20
-                    },
-                    "enemy_shuffle": {
-                        "none": 60,
-                        "shuffled": 20,
-                        "random": 20
-                    },
-                    "hints": {
-                        "on": 50,
-                        "off": 50
-                    },
-                    "weapons": {
-                        "randomized": 40,
-                        "assured": 40,
-                        "vanilla": 15,
-                        "swordless": 5
-                    },
-                    "item_pool": {
-                        "normal": 80,
-                        "hard": 15,
-                        "expert": 5,
-                        "crowd_control": 0
-                    },
-                    "item_functionality": {
-                        "normal": 80,
-                        "hard": 15,
-                        "expert": 5
-                    },
-                    "enemy_damage": {
-                        "default": 80,
-                        "shuffled": 10,
-                        "random": 10
-                    },
-                    "enemy_health": {
-                        "default": 80,
-                        "easy": 5,
-                        "hard": 10,
-                        "expert": 5
+                    "custom": {
+                        "customPrizePacks": {
+                            True: 1,
+                            False: 0
+                        }
                     }
+                },
+                "glitches_required": {
+                    "none": 100,
+                    "overworld_glitches": 0,
+                    "major_glitches": 0,
+                    "no_logic": 0
+                },
+                "item_placement": {
+                    "basic": 25,
+                    "advanced": 75
+                },
+                "dungeon_items": {
+                    "standard": 60,
+                    "mc": 10,
+                    "mcs": 10,
+                    "full": 20
+                },
+                "accessibility": {
+                    "items": 60,
+                    "locations": 10,
+                    "none": 30
+                },
+                "goals": {
+                    "ganon": 40,
+                    "fast_ganon": 20,
+                    "dungeons": 10,
+                    "pedestal": 20,
+                    "triforce-hunt": 10
+                },
+                "tower_open": {
+                    "0": 5,
+                    "1": 5,
+                    "2": 5,
+                    "3": 5,
+                    "4": 5,
+                    "5": 5,
+                    "6": 5,
+                    "7": 50,
+                    "random": 15
+                },
+                "ganon_open": {
+                    "0": 5,
+                    "1": 5,
+                    "2": 5,
+                    "3": 5,
+                    "4": 5,
+                    "5": 5,
+                    "6": 5,
+                    "7": 50,
+                    "random": 15
+                },
+                "world_state": {
+                    "standard": 35,
+                    "open": 35,
+                    "inverted": 20,
+                    "retro": 10
+                },
+                "entrance_shuffle": {
+                    "none": 60,
+                    # "simple": 7,
+                    # "restricted": 10,
+                    # "full": 10,
+                    # "crossed": 10,
+                    # "insanity": 2
+                },
+                "boss_shuffle": {
+                    "none": 60,
+                    "simple": 10,
+                    "full": 10,
+                    "random": 20
+                },
+                "enemy_shuffle": {
+                    "none": 60,
+                    "shuffled": 20,
+                    "random": 20
+                },
+                "hints": {
+                    "on": 50,
+                    "off": 50
+                },
+                "weapons": {
+                    "randomized": 40,
+                    "assured": 40,
+                    "vanilla": 15,
+                    "swordless": 5
+                },
+                "item_pool": {
+                    "normal": 80,
+                    "hard": 15,
+                    "expert": 5,
+                    "crowd_control": 0
+                },
+                "item_functionality": {
+                    "normal": 80,
+                    "hard": 15,
+                    "expert": 5
+                },
+                "enemy_damage": {
+                    "default": 80,
+                    "shuffled": 10,
+                    "random": 10
+                },
+                "enemy_health": {
+                    "default": 80,
+                    "easy": 5,
+                    "hard": 10,
+                    "expert": 5
                 }
-            )
+            }
+        )
+        seed = await pyz3r.alttpr(
+            settings=settings,
+            customizer=customizer
         )
 
+    with open('outputs/testout.json', 'w') as f:
+        f.write(json.dumps(settings, indent=4))
 
     print("Permalink: {url}".format(
         url=seed.url
@@ -195,4 +216,4 @@ async def generation_test(num):
 
 if __name__ == '__main__':
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(generation_test(3))
+    loop.run_until_complete(generation_test(4))
