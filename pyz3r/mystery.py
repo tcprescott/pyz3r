@@ -76,6 +76,8 @@ def generate_random_settings(weights, tournament=True, spoilers="mystery"):
 
     if customizer:
         settings['eq'] = eq
+
+        settings['custom']['customPrizePacks'] = False
         for key, value in custom.items():
             settings["custom"][key] = value
         
