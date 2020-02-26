@@ -58,13 +58,14 @@ async def generation_test(num):
                 "customizer": {
                     "triforce-hunt": {
                         "goal": {
-                            "min": 20,
-                            "max": 30,
+                            "min": 30,
+                            "max": 60,
                         },
                         "pool": {
-                            "min": 40,
-                            "max": 30,
-                        }
+                            "min": 30,
+                            "max": 70,
+                        },
+                        "min_difference": 10
                     },
                     "eq": {
                         "Bottle1": {
@@ -104,10 +105,10 @@ async def generation_test(num):
                     "none": 30
                 },
                 "goals": {
-                    # "ganon": 40,
-                    # "fast_ganon": 20,
-                    # "dungeons": 10,
-                    # "pedestal": 20,
+                    "ganon": 40,
+                    "fast_ganon": 20,
+                    "dungeons": 10,
+                    "pedestal": 20,
                     "triforce-hunt": 10
                 },
                 "tower_open": {

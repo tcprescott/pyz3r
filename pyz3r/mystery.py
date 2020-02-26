@@ -82,18 +82,25 @@ def generate_random_settings(weights, tournament=True, spoilers="mystery"):
             settings["custom"][key] = value
         
         if settings['goal'] == 'triforce-hunt':
+            min_difference = get_random_option(weights['customizer']['triforce-hunt'].get('min_difference', 0))
             try:
-                settings['custom']['item.Goal.Required'] = random.randint(weights['customizer']['triforce-hunt']['goal']['min'], weights['customizer']['triforce-hunt']['goal']['max'])
+                goal_pieces = random.randint(weights['customizer']['triforce-hunt']['goal']['min'], weights['customizer']['triforce-hunt']['goal']['max'])
             except KeyError:
-                settings['custom']['item.Goal.Required'] = 20
+                goal_pieces = 20
 
             try:
-                settings['custom']['item']['count']['TriforcePiece'] = random.randint(weights['customizer']['triforce-hunt']['pool']['min'], weights['customizer']['triforce-hunt']['pool']['max'])
+                pool_pieces = random.randint(weights['customizer']['triforce-hunt']['pool']['min'], weights['customizer']['triforce-hunt']['pool']['max'])
             except KeyError:
-                settings['custom']['item']['count']['TriforcePiece'] = 30
+                pool_pieces = 30
             
-            if settings['custom']['item']['count']['TriforcePiece'] < settings['custom']['item.Goal.Required']:
-                settings['custom']['item']['count']['TriforcePiece'] = settings['custom']['item.Goal.Required']
+            if pool_pieces - goal_pieces < min_difference:
+                pool_pieces = goal_pieces + min_difference
+
+            pool_pieces = 100 if pool_pieces > 100 else pool_pieces
+            goal_pieces = 100 if goal_pieces > 100 else goal_pieces
+
+            settings['custom']['item.Goal.Required'] = goal_pieces
+            settings['custom']['item']['count']['TriforcePiece'] = pool_pieces
 
     else:
         settings["entrances"] = entrances
@@ -111,6 +118,5 @@ def generate_random_settings(weights, tournament=True, spoilers="mystery"):
 
     return settings, customizer
 
-
 def get_random_option(optset):
-    return random.choices(population=list(optset.keys()),weights=list(optset.values()))[0]
+    return optset if isinstance(optset, int) else random.choices(population=list(optset.keys()),weights=list(optset.values()))[0]
