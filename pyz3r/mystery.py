@@ -1,5 +1,6 @@
+import copy
 import random
-from .customizer import BASE_CUSTOMIZER_PAYLOAD, get_starting_equipment
+from .customizer import get_starting_equipment, BASE_CUSTOMIZER_PAYLOAD
 
 BASE_RANDOMIZER_PAYLOAD = {
     "glitches": "none",
@@ -30,7 +31,6 @@ BASE_RANDOMIZER_PAYLOAD = {
     }
 }
 
-
 def generate_random_settings(weights, tournament=True, spoilers="mystery"):
     entrances =  get_random_option(weights['entrance_shuffle'])
 
@@ -53,7 +53,10 @@ def generate_random_settings(weights, tournament=True, spoilers="mystery"):
     else:
         customizer = False
 
-    settings = BASE_CUSTOMIZER_PAYLOAD if customizer else BASE_RANDOMIZER_PAYLOAD
+    if customizer:
+        settings = copy.deepcopy(BASE_CUSTOMIZER_PAYLOAD)
+    else:
+        settings = copy.deepcopy(BASE_RANDOMIZER_PAYLOAD)
     
     settings["glitches"] = get_random_option(weights['glitches_required'])
     settings["item_placement"] = get_random_option(weights['item_placement'])
@@ -119,4 +122,4 @@ def generate_random_settings(weights, tournament=True, spoilers="mystery"):
     return settings, customizer
 
 def get_random_option(optset):
-    return optset if isinstance(optset, int) else random.choices(population=list(optset.keys()),weights=list(optset.values()))[0]
+    return random.choices(population=list(optset.keys()), weights=list(optset.values()))[0] if isinstance(optset, dict) else optset
