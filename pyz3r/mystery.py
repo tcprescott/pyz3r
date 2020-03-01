@@ -80,10 +80,25 @@ def generate_random_settings(weights, tournament=True, spoilers="mystery"):
     if customizer:
         settings['eq'] = eq
 
+        # default to v31 prize packs
         settings['custom']['customPrizePacks'] = False
+
+        # set custom settings that were rolled
         for key, value in custom.items():
             settings["custom"][key] = value
         
+        # if dark room navigation is enabled, then 
+        # oh and yes item.require.Lamp is mixed around for whatever reason
+        # False = dark room navigation isn't required
+        if settings['custom'].get('item.require.Lamp', False):
+            settings['enemizer']['enemy_shuffle'] = 'none'
+            settings['enemizer']['enemy_damage'] = 'default'
+
+        # set dungeon_items to standard if any region.wild* custom settings are present
+        if any(key in ['region.wildKeys', 'region.wildBigKeys', 'region.wildCompasses', 'region.wildMaps'] for key in custom):
+            settings['dungeon_items'] = 'standard'
+
+        # set custom triforce hunt settings if TFH is the goal
         if settings['goal'] == 'triforce-hunt':
             min_difference = get_random_option(weights['customizer']['triforce-hunt'].get('min_difference', 0))
             try:
