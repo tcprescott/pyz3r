@@ -32,26 +32,38 @@ BASE_RANDOMIZER_PAYLOAD = {
 }
 
 def generate_random_settings(weights, tournament=True, spoilers="mystery"):
+    # customizer isn't used until its used
+    customizer = False
+
+    # we need to figure out if entrance shuffle is a thing, since that tells us if we should even bother with rolling customizer things
     entrances =  get_random_option(weights['entrance_shuffle'])
 
+    # only roll customizer stuff if entrance shuffle isn't on, and we have a customizer section
     if entrances == "none" and 'customizer' in weights:
         custom = {}
-        eq = ['BossHeartContainer'] * 3
+        eq = []
+        pool = {}
 
         if 'eq' in weights['customizer']:
             for key in weights['customizer']['eq'].keys():
                 value = get_random_option(weights['customizer']['eq'][key])
-                eq += get_starting_equipment(key=key, value=value)
-            customizer = False if eq == ['BossHeartContainer'] * 3 else True
+                if value is not None:
+                    eq += get_starting_equipment(key=key, value=value)
+                    customizer = True
 
         if 'custom' in weights['customizer']:
             for key in weights['customizer']['custom'].keys():
                 value = get_random_option(weights['customizer']['custom'][key])
-                custom[key] = value
-            customizer = True
+                if value is not None:
+                    custom[key] = value
+                    customizer = True
 
-    else:
-        customizer = False
+        if 'pool' in weights['pool']:
+            for key in weights['customizer']['pool'].keys():
+                value = get_random_option(weights['customizer']['pool'][key])
+                if value is not None:
+                    pool[key] = value
+                    customizer = True
 
     if customizer:
         settings = copy.deepcopy(BASE_CUSTOMIZER_PAYLOAD)
@@ -78,15 +90,29 @@ def generate_random_settings(weights, tournament=True, spoilers="mystery"):
     settings["enemizer"]["enemy_health"] = get_random_option(weights['enemy_health'])
 
     if customizer:
-        settings['eq'] = eq
-
         # default to v31 prize packs
         settings['custom']['customPrizePacks'] = False
 
         # set custom settings that were rolled
         for key, value in custom.items():
-            settings["custom"][key] = value
-        
+            settings['custom'][key] = value
+
+        # set custom item pool that was rolled
+        for key, value in pool.items():
+            settings['custom']['item']['count'][key] = value
+
+        # apply custom starting equipment, and adjust the item pool accordingly
+        if eq:
+            # remove items from pool
+            for item in eq:
+                settings['custom']['item']['count'][item] = settings['custom']['item']['count'].get(item, 0) - 1 if settings['custom']['item']['count'].get(item, 0) > 0 else 0
+
+            # re-add 3 heart containers as a baseline
+            eq += ['BossHeartContainer'] * 3
+
+            # update the eq section of the settings
+            settings['eq'] = eq
+
         # if dark room navigation is enabled, then 
         # oh and yes item.require.Lamp is mixed around for whatever reason
         # False = dark room navigation isn't required
@@ -107,15 +133,12 @@ def generate_random_settings(weights, tournament=True, spoilers="mystery"):
                 goal_pieces = 20
 
             try:
-                pool_pieces = random.randint(weights['customizer']['triforce-hunt']['pool']['min'], weights['customizer']['triforce-hunt']['pool']['max'])
+                pool_pieces = random.randint(
+                    weights['customizer']['triforce-hunt']['pool']['min'] if weights['customizer']['triforce-hunt']['pool']['min'] + min_difference > goal_pieces else goal_pieces + min_difference,
+                    weights['customizer']['triforce-hunt']['pool']['max'],
+                )
             except KeyError:
                 pool_pieces = 30
-            
-            if pool_pieces - goal_pieces < min_difference:
-                pool_pieces = goal_pieces + min_difference
-
-            pool_pieces = 100 if pool_pieces > 100 else pool_pieces
-            goal_pieces = 100 if goal_pieces > 100 else goal_pieces
 
             settings['custom']['item.Goal.Required'] = goal_pieces
             settings['custom']['item']['count']['TriforcePiece'] = pool_pieces
