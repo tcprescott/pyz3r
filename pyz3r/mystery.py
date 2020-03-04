@@ -58,7 +58,7 @@ def generate_random_settings(weights, tournament=True, spoilers="mystery"):
                     custom[key] = value
                     customizer = True
 
-        if 'pool' in weights['pool']:
+        if 'pool' in weights['customizer']:
             for key in weights['customizer']['pool'].keys():
                 value = get_random_option(weights['customizer']['pool'][key])
                 if value is not None:
