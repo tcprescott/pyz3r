@@ -160,4 +160,7 @@ def generate_random_settings(weights, tournament=True, spoilers="mystery"):
     return settings, customizer
 
 def get_random_option(optset):
-    return random.choices(population=list(optset.keys()), weights=list(optset.values()))[0] if isinstance(optset, dict) else optset
+    try:
+        return random.choices(population=list(optset.keys()), weights=list(optset.values()))[0] if isinstance(optset, dict) else optset
+    except TypeError as err:
+        raise TypeError("There is a non-numeric value as a weight.") from err
