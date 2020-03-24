@@ -159,8 +159,25 @@ def generate_random_settings(weights, tournament=True, spoilers="mystery"):
 
     return settings, customizer
 
+# fix weights where strings are provided as keys, this fixes issues with injesting json as a weightset
+def conv(string):
+    # first try to convert it to a integer
+    try:
+        return int(string)
+    except ValueError:
+        pass
+
+    # then convert "true" and "false" to bool
+    if string.lower() == "true":
+        return True
+    if string.lower() == "false":
+        return False
+
+    # finally just return the string
+    return string
+
 def get_random_option(optset):
     try:
-        return random.choices(population=list(optset.keys()), weights=list(optset.values()))[0] if isinstance(optset, dict) else optset
+        return random.choices(population=[conv(key) for key in list(optset.keys())], weights=list(optset.values()))[0] if isinstance(optset, dict) else conv(optset)
     except TypeError as err:
         raise TypeError("There is a non-numeric value as a weight.") from err
