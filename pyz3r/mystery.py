@@ -69,7 +69,7 @@ def generate_random_settings(weights, tournament=True, spoilers="mystery"):
         settings = copy.deepcopy(BASE_CUSTOMIZER_PAYLOAD)
     else:
         settings = copy.deepcopy(BASE_RANDOMIZER_PAYLOAD)
-    
+
     settings["glitches"] = get_random_option(weights['glitches_required'])
     settings["item_placement"] = get_random_option(weights['item_placement'])
     settings["dungeon_items"] = get_random_option(weights['dungeon_items'])
@@ -145,6 +145,15 @@ def generate_random_settings(weights, tournament=True, spoilers="mystery"):
 
     else:
         settings["entrances"] = entrances
+
+    # If mc or mcs shuffle gets rolled, and its entrance, shift to either standard or full accordingly
+    # mc and mcs are not supported by the entrance randomizer version currently used for v31.0.4.
+    # If this changes, these statements will get removed.
+    if settings.get('entrances', 'none') != 'none':
+        if settings.get('dungeon_items', 'standard') == 'mc':
+            settings['dungeon_items'] = 'standard'
+        elif settings.get('dungeon_items', 'standard') == 'mcs':
+            settings['dungeon_items'] = 'full'
 
     # This if statement is dedicated to the survivors of http://www.speedrunslive.com/races/result/#!/264658
     if settings['weapons'] not in ['vanilla', 'assured'] and settings['mode'] == 'standard' and (
