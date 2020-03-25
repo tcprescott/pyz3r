@@ -126,18 +126,22 @@ def generate_random_settings(weights, tournament=True, spoilers="mystery"):
 
         # set custom triforce hunt settings if TFH is the goal
         if settings['goal'] == 'triforce-hunt':
-            min_difference = get_random_option(weights['customizer']['triforce-hunt'].get('min_difference', 0))
-            try:
-                goal_pieces = random.randint(weights['customizer']['triforce-hunt']['goal']['min'], weights['customizer']['triforce-hunt']['goal']['max'])
-            except KeyError:
-                goal_pieces = 20
+            if 'triforce-hunt' in weights['customizer']:
+                min_difference = get_random_option(weights['customizer']['triforce-hunt'].get('min_difference', 0))
+                try:
+                    goal_pieces = random.randint(weights['customizer']['triforce-hunt']['goal']['min'], weights['customizer']['triforce-hunt']['goal']['max'])
+                except KeyError:
+                    goal_pieces = 20
 
-            try:
-                pool_pieces = random.randint(
-                    weights['customizer']['triforce-hunt']['pool']['min'] if weights['customizer']['triforce-hunt']['pool']['min'] + min_difference > goal_pieces else goal_pieces + min_difference,
-                    weights['customizer']['triforce-hunt']['pool']['max'],
-                )
-            except KeyError:
+                try:
+                    pool_pieces = random.randint(
+                        weights['customizer']['triforce-hunt']['pool']['min'] if weights['customizer']['triforce-hunt']['pool']['min'] + min_difference > goal_pieces else goal_pieces + min_difference,
+                        weights['customizer']['triforce-hunt']['pool']['max'],
+                    )
+                except KeyError:
+                    pool_pieces = 30
+            else:
+                goal_pieces = 20
                 pool_pieces = 30
 
             settings['custom']['item.Goal.Required'] = goal_pieces
