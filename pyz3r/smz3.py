@@ -47,11 +47,6 @@ class smz3Class():
             else:
                 self.data = await self.site.retrieve_game(self.hash)
 
-            self.url = '{baseurl}/h/{hash}'.format(
-                baseurl=self.baseurl,
-                hash=self.hash
-            )
-
     async def randomizer_settings(self):
         """Returns a dictonary of valid settings, based on the randomizer in use (item or entrance).
 
@@ -60,3 +55,10 @@ class smz3Class():
         """
         return await self.site.retrieve_json('/randomizer/settings')
 
+    @property
+    def url(self):
+        return f"{self.baseurl}/h/{self.hash}"
+
+    @property
+    def code(self):
+        return None

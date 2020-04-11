@@ -100,7 +100,7 @@ if __name__ == '__main__':
 This will return to you a list of strings with the "code" that appears on the file select screen.
 
 ```python
-code = await seed.code()
+code = seed.code
 print("Hash: [{hash}]".format(
     hash = ' | '.join(code)
 ))

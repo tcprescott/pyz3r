@@ -93,7 +93,8 @@ class alttprClass():
         daily = await http.request_generic(f'{self.baseurl}/api/daily', returntype='json')
         return daily['hash']
 
-    async def code(self):
+    @property
+    def code(self):
         """An list of strings that represents the
 
         Raises:

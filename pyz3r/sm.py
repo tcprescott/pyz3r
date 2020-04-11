@@ -76,8 +76,6 @@ class smClass():
             self.slug_id = None
             self.guid = None
 
-        self.url = f'{self.baseurl}/seed/{self.slug_id}'
-
     async def randomizer_settings(self):
         """Returns a dictonary of valid settings.
 
@@ -90,3 +88,10 @@ class smClass():
             returntype='json'
         )
 
+    @property
+    def url(self):
+        return f'{self.baseurl}/seed/{self.slug_id}'
+
+    @property
+    def code(self):
+        return self.data['hash']
