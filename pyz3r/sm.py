@@ -7,7 +7,7 @@ async def sm(
     settings=None,
     slug_id=None,
     guid_id=None,
-    baseurl='https://beta.samus.link',
+    baseurl='https://samus.link',
     randomizer='sm',
     username=None,
     password=None,
