@@ -47,6 +47,19 @@ class smz3Class():
             else:
                 self.data = await self.site.retrieve_game(self.hash)
 
+    @classmethod
+    async def create(
+        cls,
+        settings=None,
+        hash_id=None,
+        baseurl='https://samus.link',
+        username=None,
+        password=None,
+    ):
+        seed = cls(settings, hash_id, baseurl, username, password)
+        await seed._init()
+        return seed
+
     async def randomizer_settings(self):
         """Returns a dictonary of valid settings, based on the randomizer in use (item or entrance).
 

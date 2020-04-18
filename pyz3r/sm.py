@@ -76,6 +76,29 @@ class smClass():
             self.slug_id = None
             self.guid = None
 
+    @classmethod
+    async def create(
+        cls,
+        settings=None,
+        slug_id=None,
+        guid_id=None,
+        baseurl='https://samus.link',
+        randomizer='sm',
+        username=None,
+        password=None,
+    ):
+        seed = cls(
+            settings=settings,
+            slug_id=slug_id,
+            guid_id=guid_id,
+            baseurl=baseurl,
+            randomizer=randomizer,
+            username=username,
+            password=password
+        )
+        await seed._init()
+        return seed
+
     async def randomizer_settings(self):
         """Returns a dictonary of valid settings.
 

@@ -73,6 +73,23 @@ class alttprClass():
                 hash=self.hash
             )
 
+    @classmethod
+    async def create(
+        cls,
+        settings=None,
+        hash_id=None,
+        randomizer='item',
+        customizer=False,
+        baseurl='https://alttpr.com',
+        seed_baseurl='https://s3.us-east-2.amazonaws.com/alttpr-patches',
+        username=None,
+        password=None,
+    ):
+        seed = cls(settings=settings, hash_id=hash_id, randomizer=randomizer, customizer=customizer,
+                        baseurl=baseurl, seed_baseurl=seed_baseurl, username=username, password=password, festive=False)
+        await seed._init()
+        return seed
+
     async def randomizer_settings(self):
         """Returns a dictonary of valid settings, based on the randomizer in use (item or entrance).
 
