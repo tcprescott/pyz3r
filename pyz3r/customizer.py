@@ -1,3 +1,4 @@
+import copy
 import math
 
 BASE_CUSTOMIZER_PAYLOAD = {
@@ -269,7 +270,7 @@ def convert2settings(
 
     # the settings defaults, hopefully this is accurate
 
-    settings = BASE_CUSTOMIZER_PAYLOAD
+    settings = copy.deepcopy(BASE_CUSTOMIZER_PAYLOAD)
     settings['tournament'] = tournament
     settings['spoilers'] = spoilers
 
