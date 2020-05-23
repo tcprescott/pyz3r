@@ -129,15 +129,19 @@ def generate_random_settings(weights, tournament=True, spoilers="mystery"):
             if 'triforce-hunt' in weights['customizer']:
                 min_difference = get_random_option(weights['customizer']['triforce-hunt'].get('min_difference', 0))
                 try:
-                    goal_pieces = random.randint(weights['customizer']['triforce-hunt']['goal']['min'], weights['customizer']['triforce-hunt']['goal']['max'])
+                    goal_pieces = randval(weights['customizer']['triforce-hunt']['goal'])
                 except KeyError:
                     goal_pieces = 20
 
                 try:
-                    pool_pieces = random.randint(
-                        weights['customizer']['triforce-hunt']['pool']['min'] if weights['customizer']['triforce-hunt']['pool']['min'] + min_difference > goal_pieces else goal_pieces + min_difference,
-                        weights['customizer']['triforce-hunt']['pool']['max'],
-                    )
+                    if isinstance(weights['customizer']['triforce-hunt']['pool'], list):
+                        if weights['customizer']['triforce-hunt']['pool'][0] + min_difference < goal_pieces:
+                            weights['customizer']['triforce-hunt']['pool'][0] = goal_pieces + min_difference
+                    pool_pieces = randval(weights['customizer']['triforce-hunt']['pool'])
+
+                    # a final catchall
+                    if pool_pieces < goal_pieces + min_difference:
+                        pool_pieces = goal_pieces + min_difference
                 except KeyError:
                     pool_pieces = 30
             else:
@@ -146,6 +150,20 @@ def generate_random_settings(weights, tournament=True, spoilers="mystery"):
 
             settings['custom']['item.Goal.Required'] = goal_pieces
             settings['custom']['item']['count']['TriforcePiece'] = pool_pieces
+
+        if settings['custom'].get('rom.timerMode', 'off') == 'countdown-ohko':
+            if 'timed-ohko' in weights['customizer']:
+                for clock in weights['customizer']['timed-ohko'].get('clock', {}):
+                    settings['custom'][f'item.value.{clock}'] = randval(
+                        weights['customizer']['timed-ohko']['clock'][clock].get('value', 0)
+                    )
+                    settings['custom']['item']['count'][clock] = randval(
+                        weights['customizer']['timed-ohko']['clock'][clock].get('pool', 0)
+                    )
+
+                settings['custom']['rom.timerStart'] = randval(
+                    weights['customizer']['timed-ohko'].get('timerStart', 0)
+                )
 
     else:
         settings["entrances"] = entrances
@@ -188,6 +206,12 @@ def conv(string):
 
     # finally just return the string
     return string
+
+def randval(optset):
+    if isinstance(optset, list):
+        return random.randint(optset[0], optset[1])
+    else:
+        return optset
 
 def get_random_option(optset):
     try:
