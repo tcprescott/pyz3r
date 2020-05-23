@@ -166,7 +166,11 @@ def generate_random_settings(weights, tournament=True, spoilers="mystery"):
                 )
             
             for key, value in weights['customizer']['timed-ohko'].get('forced_settings', {}).items():
-                settings[key] = value
+                if isinstance(value, dict):
+                    for k, v in value.items():
+                        settings[key][k] = v
+                else:
+                    settings[key] = value
 
     else:
         settings["entrances"] = entrances
