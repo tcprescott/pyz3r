@@ -165,12 +165,14 @@ def generate_random_settings(weights, tournament=True, spoilers="mystery"):
                     weights['customizer']['timed-ohko'].get('timerStart', 0)
                 )
             
-            for key, value in weights['customizer']['timed-ohko'].get('forced_settings', {}).items():
-                if isinstance(value, dict):
-                    for k, v in value.items():
-                        settings[key][k] = v
-                else:
-                    settings[key] = value
+            # for key, value in weights['customizer']['timed-ohko'].get('forced_settings', {}).items():
+            #     if isinstance(value, dict):
+            #         for k, v in value.items():
+            #             settings[key][k] = v
+            #     else:
+            #         settings[key] = value
+
+            settings = dict(mergedicts(settings, weights['customizer']['timed-ohko'].get('forced_settings', {})))
 
     else:
         settings["entrances"] = entrances
@@ -225,3 +227,19 @@ def get_random_option(optset):
         return random.choices(population=[conv(key) for key in list(optset.keys())], weights=list(optset.values()))[0] if isinstance(optset, dict) else conv(optset)
     except TypeError as err:
         raise TypeError("There is a non-numeric value as a weight.") from err
+
+# shamelessly stolen from https://stackoverflow.com/questions/7204805/how-to-merge-dictionaries-of-dictionaries
+def mergedicts(dict1, dict2):
+    for k in set(dict1.keys()).union(dict2.keys()):
+        if k in dict1 and k in dict2:
+            if isinstance(dict1[k], dict) and isinstance(dict2[k], dict):
+                yield (k, dict(mergedicts(dict1[k], dict2[k])))
+            else:
+                # If one of the values is not a dict, you can't continue merging it.
+                # Value from second dict overrides one in first and we move on.
+                yield (k, dict2[k])
+                # Alternatively, replace this with exception raiser to alert you of value conflicts
+        elif k in dict1:
+            yield (k, dict1[k])
+        else:
+            yield (k, dict2[k])
