@@ -164,13 +164,6 @@ def generate_random_settings(weights, tournament=True, spoilers="mystery"):
                 settings['custom']['rom.timerStart'] = randval(
                     weights['customizer']['timed-ohko'].get('timerStart', 0)
                 )
-            
-            # for key, value in weights['customizer']['timed-ohko'].get('forced_settings', {}).items():
-            #     if isinstance(value, dict):
-            #         for k, v in value.items():
-            #             settings[key][k] = v
-            #     else:
-            #         settings[key] = value
 
             settings = dict(mergedicts(settings, weights['customizer']['timed-ohko'].get('forced_settings', {})))
 
