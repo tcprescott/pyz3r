@@ -13,4 +13,4 @@ __version__ = '4.8.3'
 from .alttpr import alttpr
 from .sm import sm
 from .smz3 import smz3
-from . import rom, mystery, customizer, patch
+from . import mystery, customizer
