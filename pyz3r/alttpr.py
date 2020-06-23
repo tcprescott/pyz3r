@@ -1,6 +1,21 @@
 from .exceptions import alttprException
-from . import patch, misc, spoiler
+from . import misc, spoiler
 from . import http
+
+async def alttpr(
+    settings=None,
+    hash_id=None,
+    randomizer='item',
+    customizer=False,
+    baseurl='https://alttpr.com',
+    seed_baseurl='https://s3.us-east-2.amazonaws.com/alttpr-patches',
+    username=None,
+    password=None,
+):
+    seed = alttprClass(settings=settings, hash_id=hash_id, randomizer=randomizer, customizer=customizer,
+                       baseurl=baseurl, seed_baseurl=seed_baseurl, username=username, password=password, festive=False)
+    await seed._init()
+    return seed
 
 class alttprClass():
     def __init__(

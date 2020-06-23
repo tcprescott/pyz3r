@@ -90,7 +90,7 @@ def generate_random_settings(weights, tournament=True, spoilers="mystery"):
     settings["enemizer"]["enemy_damage"] = get_random_option(weights['enemy_damage'])
     settings["enemizer"]["enemy_health"] = get_random_option(weights['enemy_health'])
 
-    settings["allow_quickswap"] = get_random_option(weights['allow_quickswap'])
+    settings["allow_quickswap"] = get_random_option(weights.get('allow_quickswap', False))
 
     if customizer:
         # default to v31 prize packs
@@ -194,18 +194,18 @@ def generate_random_settings(weights, tournament=True, spoilers="mystery"):
 # fix weights where strings are provided as keys, this fixes issues with injesting json as a weightset
 def conv(string):
     # first try to convert it to a integer
-    try:
-        return int(string)
-    except ValueError:
-        pass
 
-    # then convert "true" and "false" to bool
-    if string.lower() == "true":
-        return True
-    if string.lower() == "false":
-        return False
+    if isinstance(string, str):
+        try:
+            return int(string)
+        except ValueError:
+            pass
 
-    # finally just return the string
+        if string.lower() == "true":
+            return True
+        if string.lower() == "false":
+            return False
+
     return string
 
 def randval(optset):
