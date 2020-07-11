@@ -1,3 +1,7 @@
+import bps.apply
+import bps.io
+import io
+
 import itertools
 from .exceptions import alttprException
 
@@ -10,7 +14,7 @@ def apply(rom, patches):
         patches {list} -- A list of dictionaries that depict of set of patches to be applied to the ROM.
 
     Returns:
-        list -- a list of bytes depicitng the patched rom
+        list -- a list of bytes depicting the patched rom
     """
     for patch in patches:
         offset = int(list(patch.keys())[0])
@@ -18,6 +22,26 @@ def apply(rom, patches):
         for idx, value in enumerate(patch_values):
             rom[offset + idx] = value
     return rom
+
+def apply_bps(rom, patches: bytes):
+    """Applies a patch, which is a bps
+
+    Arguments:
+        rom {list} -- A list of bytes depicting the ROM data to be patched.
+        patches {bytes} -- A series of bytes representing a bps patch
+
+    returns:
+        list -- a list of bytes depicting the patched rom
+    """
+    # create "files" for apply_to_files
+    # although there is an apply_to_bytearrays it does not perform CRC
+    # validation of input or output, apply_to_files does.
+    patch_file = io.BytesIO(patches)
+    source_file = io.BytesIO(bytes(rom))
+    target_file = io.BytesIO()
+
+    bps.apply.apply_to_files(patch_file, source_file, target_file)
+    return list(target_file.read())
 
 def heart_speed(speed='half'):
     """Set the low-health warning beep interval.

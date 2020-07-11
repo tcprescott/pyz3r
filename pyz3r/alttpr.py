@@ -149,7 +149,7 @@ class alttprClass():
             list -- a list of dictionaries that represent a rom patch
         """
         baserom_settings = await self.site.retrieve_json("/base_rom/settings")
-        req_patch = await self.site.retrieve_json(baserom_settings['base_file'])
+        req_patch = await self.site.retrieve_binary(baserom_settings['base_file'])
         return req_patch
 
     async def create_patched_game(
@@ -184,15 +184,15 @@ class alttprClass():
             raise alttprException(
                 'Please specify a seed or hash first to generate or retrieve a game.')
 
-        # expand the ROM to size requested in seed_data
-        patchrom_array = patch.expand(
-            patchrom_array, newlenmb=self.data['size'])
-
         # apply the base modifications
-        patchrom_array = patch.apply(
+        patchrom_array = patch.apply_bps(
             rom=patchrom_array,
             patches=await self.get_patch_base()
         )
+
+        # expand the ROM to size requested in seed_data
+        patchrom_array = patch.expand(
+            patchrom_array, newlenmb=self.data['size'])
 
         # apply the seed-specific changes
         patchrom_array = patch.apply(
