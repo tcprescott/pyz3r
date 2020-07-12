@@ -41,6 +41,7 @@ def apply_bps(rom, patches: bytes):
     target_file = io.BytesIO()
 
     bps.apply.apply_to_files(patch_file, source_file, target_file)
+    target_file.seek(0)
     return list(target_file.read())
 
 def heart_speed(speed='half'):
