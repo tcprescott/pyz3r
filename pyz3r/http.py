@@ -77,6 +77,19 @@ class site():
         )
         return req
 
+    async def retrieve_binary(self, endpoint, useauth=True):
+        if useauth:
+            auth = self.auth
+        else:
+            auth = None
+
+        req = await request_generic(
+            url=self.site_baseurl + endpoint,
+            auth=auth,
+            returntype='binary'
+        )
+        return req
+
     async def retrieve_url_raw_content(self, url, useauth=True):
         if useauth:
             auth = self.auth
