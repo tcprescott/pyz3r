@@ -28,7 +28,8 @@ BASE_RANDOMIZER_PAYLOAD = {
         "enemy_shuffle": "none",
         "enemy_damage": "default",
         "enemy_health": "default"
-    }
+    },
+    "allow_quickswap": False
 }
 
 def generate_random_settings(weights, tournament=True, spoilers="mystery"):
@@ -88,6 +89,8 @@ def generate_random_settings(weights, tournament=True, spoilers="mystery"):
     settings["enemizer"]["enemy_shuffle"] = get_random_option(weights['enemy_shuffle'])
     settings["enemizer"]["enemy_damage"] = get_random_option(weights['enemy_damage'])
     settings["enemizer"]["enemy_health"] = get_random_option(weights['enemy_health'])
+
+    settings["allow_quickswap"] = get_random_option(weights.get('allow_quickswap', False))
 
     if customizer:
         # default to v31 prize packs
@@ -186,27 +189,23 @@ def generate_random_settings(weights, tournament=True, spoilers="mystery"):
             or settings['enemizer']['enemy_health'] != 'default'):
         settings['weapons'] = 'assured'
 
-    # Stop gap measure until swordless entrance with a hard+ item pool is fixed
-    if settings.get('entrances', 'none') != 'none' and settings['item']['pool'] in ['hard', 'expert'] and settings['weapons'] == 'swordless':
-        settings['weapons'] = 'randomized'
-
     return settings, customizer
 
 # fix weights where strings are provided as keys, this fixes issues with injesting json as a weightset
 def conv(string):
     # first try to convert it to a integer
-    try:
-        return int(string)
-    except ValueError:
-        pass
 
-    # then convert "true" and "false" to bool
-    if string.lower() == "true":
-        return True
-    if string.lower() == "false":
-        return False
+    if isinstance(string, str):
+        try:
+            return int(string)
+        except ValueError:
+            pass
 
-    # finally just return the string
+        if string.lower() == "true":
+            return True
+        if string.lower() == "false":
+            return False
+
     return string
 
 def randval(optset):

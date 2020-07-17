@@ -18,9 +18,10 @@ BASE_CUSTOMIZER_PAYLOAD = {
         "pool": "normal",
         "functionality": "normal"
     },
-    "tournament": "false",
+    "tournament": False,
     "spoilers": "on",
     "lang": "en",
+    "allow_quickswap": False,
     "enemizer": {
         "boss_shuffle": "none",
         "enemy_shuffle": "none",

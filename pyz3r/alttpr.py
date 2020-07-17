@@ -1,7 +1,6 @@
 from .exceptions import alttprException
-from . import patch, misc, spoiler
+from . import misc, spoiler
 from . import http
-
 
 async def alttpr(
     settings=None,
@@ -17,7 +16,6 @@ async def alttpr(
                        baseurl=baseurl, seed_baseurl=seed_baseurl, username=username, password=password, festive=False)
     await seed._init()
     return seed
-
 
 class alttprClass():
     def __init__(
