@@ -108,6 +108,15 @@ def generate_random_settings(weights, tournament=True, spoilers="mystery"):
         if eq:
             # remove items from pool
             for item in eq:
+
+                # remove flute if starting with activated flute
+                # remove bottles as well
+                # TODO: This code is terrible, it should be its own function
+                if item == 'OcarinaActive':
+                    item = 'OcarinaInactive'
+                if item in ['Bottle', 'BottleWithRedPotion', 'BottleWithGreenPotion', 'BottleWithBluePotion', 'BottleWithBee', 'BottleWithGoldBee', 'BottleWithFairy']:
+                    item = 'BottleWithRandom'
+
                 settings['custom']['item']['count'][item] = settings['custom']['item']['count'].get(item, 0) - 1 if settings['custom']['item']['count'].get(item, 0) > 0 else 0
 
             # re-add 3 heart containers as a baseline
@@ -169,6 +178,10 @@ def generate_random_settings(weights, tournament=True, spoilers="mystery"):
                 )
 
             settings = dict(mergedicts(settings, weights['customizer']['timed-ohko'].get('forced_settings', {})))
+
+        # fill in empty items in pool with FillItemPoolWith option, defaults to "Nothing"
+        filler = weights.get('options', {}).get('FillItemPoolWith', 'Nothing')
+        settings['custom']['item']['count'][filler] = settings['custom']['item']['count'].get(filler, 0) + max(0, 216 - sum(settings['custom']['item']['count'].values()))
 
     else:
         settings["entrances"] = entrances
