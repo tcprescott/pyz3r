@@ -378,7 +378,29 @@ spoiler = seed.get_formatted_spoiler()
 
  You may then write this to whatever you see fit.
 
-### Generating an Super Metroid Varia randomizer game
+### Generating a Super Metroid + A Link to the Past Combo Randomizer
+
+```python
+from pyz3r.sm import sm
+
+seed = await sm(
+    settings={
+        "smlogic": "normal",
+        "goal": "defeatboth",
+        "swordlocation": "randomized",
+        "morphlocation": "randomized",
+        "seed": "",
+        "race": "true",
+        "gamemode": "normal",
+        "players": "1"
+    },
+    randomizer='smz3',
+)
+print(seed.url)
+print(seed.code)
+```
+
+### Generating a Super Metroid Varia randomizer game
 
 Only generating, not retrieving, SM Varia randomizer games is supported at this time.  ROM patching is also not supported.
 
@@ -406,5 +428,7 @@ print(seed.url)
 2. Jaysee87 for his input into specific functionality, and suggesting asyncio support for usage with discord bots.
 
 Github for alttp_vt_randomizer: https://github.com/sporchia/alttp_vt_randomizer
+Super Metroid + A Link to the Past Combo Randomizer: https://github.com/tewtal/SMZ3Randomizer
+Super Metroid VARIA Randomizer: https://github.com/theonlydude/RandomMetroidSolver
 
 For a "real"-world usage of this library, check out SahasrahBot at https://github.com/tcprescott/sahasrahbot
