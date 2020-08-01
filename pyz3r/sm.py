@@ -118,7 +118,7 @@ class smClass():
         Returns:
             dict -- dictonary of valid settings that can be used
         """
-        async with aiohttp.request(method='get', url=f'/api/randomizers/{self.randomizer}') as resp:
+        async with aiohttp.request(method='get', url=f'{self.base_url}/api/randomizers/{self.randomizer}') as resp:
             settings = await resp.json()
         return settings
 
