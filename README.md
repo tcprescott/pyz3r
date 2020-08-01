@@ -378,6 +378,21 @@ spoiler = seed.get_formatted_spoiler()
 
  You may then write this to whatever you see fit.
 
+### Generating an Super Metroid Varia randomizer game
+
+Only generating, not retrieving, SM Varia randomizer games is supported at this time.  ROM patching is also not supported.
+
+Usage is pretty simple.
+
+```python
+from pyz3r.smvaria import SuperMetroidVaria
+seed = await SuperMetroidVaria.create(
+    skills_preset='regular',
+    settings_preset='default'
+)
+print(seed.url)
+```
+
 ## To do
 
 0. Add a feature to verify a settings dictionary before attempting to generate a game.  This may become the default behavior, with the ability to override it.  This could also just be a separate function that could be invoked as well.
@@ -392,4 +407,4 @@ spoiler = seed.get_formatted_spoiler()
 
 Github for alttp_vt_randomizer: https://github.com/sporchia/alttp_vt_randomizer
 
-For a real-world usage of this library, check out SahasrahBot at https://github.com/tcprescott/sahasrahbot
+For a "real"-world usage of this library, check out SahasrahBot at https://github.com/tcprescott/sahasrahbot
