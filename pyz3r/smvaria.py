@@ -162,6 +162,7 @@ class SuperMetroidVaria():
         settings['raceMode'] = "on" if self.race else "off"
         settings['paramsFileTarget'] = json.dumps(skills_preset_data)
 
+        # convert any lists to comma-deliminated strings and return
         return {s:(','.join(v) if isinstance(v, list) else v) for (s, v) in settings.items()}
 
     async def fetch_settings_preset(self):
