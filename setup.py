@@ -26,6 +26,6 @@ setup(
     ],
     install_requires=['aiofiles','aiohttp','python-bps>=6','slugid'],
     dependency_links = [
-        "https://github.com/tcprescott/python-bps/tarball/v6#python-bps-6"
+        "https://github.com/tcprescott/python-bps/tarball/v6#egg=python-bps-6"
     ]
 )
