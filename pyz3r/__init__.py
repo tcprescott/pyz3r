@@ -12,4 +12,5 @@ __version__ = '5.2.0'
 
 from .alttpr import alttpr
 from .sm import sm
-from . import mystery, customizer
+from .smvaria import SuperMetroidVaria
+from . import mystery, customizer, rom, patch

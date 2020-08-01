@@ -36,7 +36,7 @@ The below example will generate an item randomizer game with a list of settings:
 ```python
 import pyz3r
 
-async def main()
+async def main():
     seed = await pyz3r.alttpr(
         settings={
             "glitches": "none",

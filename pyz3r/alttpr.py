@@ -1,5 +1,5 @@
 from .exceptions import alttprException
-from . import misc, spoiler
+from . import misc, spoiler, patch
 import aiohttp
 
 # Use the "create" class method instead of this.  This is here for backwards compatibility and will be deprecated.
@@ -174,7 +174,7 @@ class alttprClass():
             list -- a list of dictionaries that represent a rom patch
         """
         async with aiohttp.request(method='get', url=self.baseurl + '/base_rom/settings') as resp:
-            baserom_settings = await resp.json(content_type='text/html')
+            baserom_settings = await resp.json()
         async with aiohttp.request(method='get', url=self.baseurl + baserom_settings['base_file']) as resp:
             req_patch = await resp.read()
         return req_patch
@@ -286,7 +286,7 @@ class alttprClass():
             list -- a list of bytes depicting a SPR or ZSPR file
         """
         async with aiohttp.request(method='get', url=self.baseurl + '/sprites') as resp:
-            sprites = await resp.json(content_type='text/html')
+            sprites = await resp.json()
         try:
             spriteinfo = next((sprite for sprite in sprites if sprite["name"] == name))
         except StopIteration:
