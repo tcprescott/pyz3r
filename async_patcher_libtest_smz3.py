@@ -1,18 +1,10 @@
 import asyncio
-
 from pyz3r.smvaria import SuperMetroidVaria
 
-# get settings without generating a game
-# print(pyz3r.alttpr(randomizer='entrance').settings())
-
-# print(pyz3r.alttpr(randomizer='item').get_patch_sprite(name='Eggplant'))
-
-
-async def generation_test():
+async def gen():
     seed = await SuperMetroidVaria.create(
         skills_preset='regular',
-        settings_preset='quite_random',
-        baseurl='https://variabeta.pythonanywhere.com'
+        settings_preset='default'
     )
     print(seed.url)
 

@@ -1,8 +1,10 @@
-import uuid
 import asyncio
-import aiohttp
 import copy
 import json
+import uuid
+
+import aiohttp
+
 from .misc import mergedicts
 
 SETTINGS_DEFAULT = {
@@ -95,6 +97,7 @@ SETTINGS_DEFAULT = {
     ],
 }
 
+
 class SuperMetroidVaria():
     def __init__(
         self,
@@ -116,7 +119,12 @@ class SuperMetroidVaria():
     async def generate_game(self):
         for i in range(0, 5):
             try:
-                async with aiohttp.request(method='post', url=f'{self.baseurl}/randomizerWebService', data=self.settings, auth=self.auth) as resp:
+                async with aiohttp.request(
+                        method='post',
+                        url=f'{self.baseurl}/randomizerWebService',
+                        data=self.settings,
+                        auth=self.auth,
+                        raise_for_status=True) as resp:
                     print(await resp.text())
                     req = await resp.json(content_type='text/html')
             except aiohttp.client_exceptions.ServerDisconnectedError:
@@ -163,7 +171,7 @@ class SuperMetroidVaria():
         settings['paramsFileTarget'] = json.dumps(skills_preset_data)
 
         # convert any lists to comma-deliminated strings and return
-        return {s:(','.join(v) if isinstance(v, list) else v) for (s, v) in settings.items()}
+        return {s: (','.join(v) if isinstance(v, list) else v) for (s, v) in settings.items()}
 
     async def fetch_settings_preset(self):
         """Returns a dictonary of valid settings.
@@ -171,7 +179,7 @@ class SuperMetroidVaria():
         Returns:
             dict -- dictonary of valid settings that can be used
         """
-        data = { "randoPreset": self.settings_preset, "origin": "extStats" }
+        data = {"randoPreset": self.settings_preset, "origin": "extStats"}
         try:
             async with aiohttp.request(method='post', url=f'{self.baseurl}/randoPresetWebService', data=data, auth=self.auth, raise_for_status=True) as resp:
                 settings = await resp.json(content_type='text/html')
