@@ -24,7 +24,7 @@ setup(
         "Development Status :: 5 - Production/Stable",
         "Operating System :: OS Independent",
     ],
-    install_requires=['aiofiles','aiohttp','python-bps','slugid'],
+    install_requires=['aiofiles','aiohttp','python-bps>=6','slugid'],
     dependancy_links = [
         "https://github.com/tcprescott/python-bps/tarball/v6#python-bps-6"
     ]
