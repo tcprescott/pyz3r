@@ -12,5 +12,4 @@ __version__ = '5.1.1'
 
 from .alttpr import alttpr
 from .sm import sm
-from .smz3 import smz3
 from . import mystery, customizer

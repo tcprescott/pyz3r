@@ -1,7 +1,8 @@
 from .exceptions import alttprException
 from . import misc, spoiler
-from . import http
+import aiohttp
 
+# Use the "create" class method instead of this.  This is here for backwards compatibility and will be deprecated.
 async def alttpr(
     settings=None,
     hash_id=None,
@@ -34,42 +35,59 @@ class alttprClass():
         self.hash = hash_id
         self.seed_baseurl = seed_baseurl
         self.baseurl = baseurl
-        self.seed_baseurl = seed_baseurl
         self.customizer = customizer
-        self.username = username
-        self.password = password
+        self.auth = aiohttp.BasicAuth(login=username, password=password) if username and password else None
         self.festive = festive
 
     async def _init(self):
-        self.site = http.site(
-            site_baseurl=self.baseurl,
-            patch_baseurl=self.seed_baseurl,
-            username=self.username,
-            password=self.password,
-        )
-
         self.randomizer = 'alttpr'
 
         if self.customizer:
-            endpoint = '/api/customizer'
+            self.endpoint = '/api/customizer'
         elif self.festive:
-            endpoint = '/api/festive'
+            self.endpoint = '/api/festive'
         else:
-            endpoint = '/api/randomizer'
+            self.endpoint = '/api/randomizer'
 
         if self.settings is None and self.hash is None:
             self.data = None
         else:
             if self.settings:
-                self.data = await self.site.generate_game(endpoint, self.settings)
+                self.data = await self.generate_game()
                 self.hash = self.data['hash']
             else:
-                self.data = await self.site.retrieve_game(self.hash)
+                self.data = await self.retrieve_game()
 
-            self.url = '{baseurl}/h/{hash}'.format(
-                baseurl=self.baseurl,
-                hash=self.hash
-            )
+            
+
+    async def generate_game(self):
+        for i in range(0, 5):
+            try:
+                async with aiohttp.request(method='post', url=self.baseurl + self.endpoint, json=self.settings, auth=self.auth) as resp:
+                    req = await resp.json(content_type='text/html')
+            except aiohttp.client_exceptions.ServerDisconnectedError:
+                continue
+            # except aiohttp.ClientResponseError:
+            #     continue
+            return req
+        raise exceptions.alttprFailedToGenerate('failed to generate game')
+
+    async def retrieve_game(self):
+        for i in range(0, 5):
+            try:
+                if self.seed_baseurl is not None:
+                    async with aiohttp.request(method='get', url=self.seed_baseurl + '/' + self.hash + '.json') as resp:
+                        patch = await resp.json()
+                else:
+                    async with aiohttp.request(method='get', url=self.baseurl + '/hash/' + self.hash, auth=self.auth) as resp:
+                        patch = await resp.json(content_type='text/html')
+            except aiohttp.ClientResponseError:
+                async with aiohttp.request(method='get', url=self.baseurl + '/hash/' + self.hash, auth=self.auth) as resp:
+                    patch = await resp.json(content_type='text/html')
+            except aiohttp.client_exceptions.ServerDisconnectedError:
+                continue
+            return patch
+        raise exceptions.alttprFailedToRetrieve(f'failed to retrieve game {self.hash}, the game is likely not found')
 
     @classmethod
     async def create(
@@ -94,7 +112,9 @@ class alttprClass():
         Returns:
             dict -- dictonary of valid settings that can be used
         """
-        return await self.site.retrieve_json('/randomizer/settings')
+        async with aiohttp.request(method='get', url=self.baseurl + '/randomizer/settings') as resp:
+            settings = await resp.json()
+        return settings
 
     async def customizer_settings(self):
         """Returns a dictonary of valid settings, based on the randomizer in use (item or entrance).
@@ -102,11 +122,18 @@ class alttprClass():
         Returns:
             dict -- dictonary of valid settings that can be used
         """
-        return await self.site.retrieve_json('/customizer/settings')
+        async with aiohttp.request(method='get', url=self.baseurl + '/customizer/settings') as resp:
+            settings = await resp.json()
+        return settings
 
     async def find_daily_hash(self):
-        daily = await http.request_generic(f'{self.baseurl}/api/daily', returntype='json')
+        async with aiohttp.request(method='get', url=f'{self.baseurl}/api/daily') as resp:
+            daily = await resp.json()
         return daily['hash']
+
+    @property
+    def url(self):
+        return f'{self.baseurl}/h/{self.hash}'
 
     @property
     def code(self):
@@ -146,8 +173,10 @@ class alttprClass():
         Returns:
             list -- a list of dictionaries that represent a rom patch
         """
-        baserom_settings = await self.site.retrieve_json("/base_rom/settings")
-        req_patch = await self.site.retrieve_binary(baserom_settings['base_file'])
+        async with aiohttp.request(method='get', url=self.baseurl + '/base_rom/settings') as resp:
+            baserom_settings = await resp.json(content_type='text/html')
+        async with aiohttp.request(method='get', url=self.baseurl + baserom_settings['base_file']) as resp:
+            req_patch = await resp.read()
         return req_patch
 
     async def create_patched_game(
@@ -256,18 +285,18 @@ class alttprClass():
         Returns:
             list -- a list of bytes depicting a SPR or ZSPR file
         """
-        sprites = await self.site.retrieve_json('/sprites')
-        for sprite in sprites:
-            if sprite['name'] == name:
-                fileurl = sprite['file']
-                break
+        async with aiohttp.request(method='get', url=self.baseurl + '/sprites') as resp:
+            sprites = await resp.json(content_type='text/html')
         try:
-            sprite = await self.site.retrieve_url_raw_content(fileurl, useauth=False)
-        except BaseException:
-            raise alttprException('Sprite \"{name}\" is not available.'.format(
-                name=name
-            ))
-        spr = list(sprite)
+            spriteinfo = next((sprite for sprite in sprites if sprite["name"] == name))
+        except StopIteration:
+            raise alttprException(f"Sprite {name} does not exist on {self.base_url}.")
+        try:
+            async with aiohttp.request(method='get', url=spriteinfo["file"]) as resp:
+                spritedata = await resp.read()
+        except Exception as e:
+            raise alttprException(f'Sprite "{name}" could not be downloaded.') from e
+        spr = list(spritedata)
         return spr
 
     def get_formatted_spoiler(self, translate_dungeon_items=False):

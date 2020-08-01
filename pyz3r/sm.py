@@ -1,6 +1,7 @@
-from . import http
 import slugid
 import uuid
+import asyncio
+import aiohttp
 
 
 async def sm(
@@ -43,38 +44,50 @@ class smClass():
         self.randomizer = randomizer
         self.username = username
         self.password = password
+        self.auth = aiohttp.BasicAuth(login=username, password=password) if username and password else None
 
     async def _init(self):
-        self.site = http.site(
-            site_baseurl=self.baseurl,
-            username=self.username,
-            password=self.password,
-        )
-
         if self.settings:
-            endpoint = f'/api/randomizers/{self.randomizer}/generate'
-            self.data = await self.site.generate_game(endpoint, self.settings)
+            self.endpoint = f'/api/randomizers/{self.randomizer}/generate'
+            self.data = await self.generate_game()
             self.guid = uuid.UUID(hex=self.data['guid'])
             self.slug_id = slugid.encode(self.guid)
         elif self.slug_id:
             self.guid = slugid.decode(self.slug_id)
-            self.data = await http.request_generic(
-                url=f'{self.baseurl}/api/seed/{self.guid.hex}',
-                method='get',
-                returntype='json'
-            )
+            self.data = await self.retrieve_game()
         elif self.guid_id:
             self.guid = uuid.UUID(hex=self.guid_id)
             self.slug_id = slugid.encode(self.guid)
-            self.data = await http.request_generic(
-                url=f'{self.baseurl}/api/seed/{self.guid.hex}',
-                method='get',
-                returntype='json'
-            )
+            self.data = await self.retrieve_game()
         else:
             self.data = None
             self.slug_id = None
             self.guid = None
+
+    async def generate_game(self):
+        for i in range(0, 5):
+            try:
+                async with aiohttp.request(method='post', url=self.baseurl + self.endpoint, json=self.settings, auth=self.auth) as resp:
+                    req = await resp.json()
+            except aiohttp.client_exceptions.ServerDisconnectedError:
+                continue
+            # except aiohttp.ClientResponseError:
+            #     continue
+            return req
+        raise exceptions.alttprFailedToGenerate('failed to generate game')
+
+    async def retrieve_game(self):
+        for i in range(0, 5):
+            try:
+                async with aiohttp.request(method='get', url=f'{self.baseurl}/api/seed/{self.guid.hex}') as resp:
+                    patch = await resp.json()
+            except aiohttp.ClientResponseError:
+                await asyncio.sleep(5)
+                continue
+            except aiohttp.client_exceptions.ServerDisconnectedError:
+                continue
+            return patch
+        raise exceptions.alttprFailedToRetrieve(f'failed to retrieve game {self.slug_id}, the game is likely not found')
 
     @classmethod
     async def create(
@@ -105,14 +118,14 @@ class smClass():
         Returns:
             dict -- dictonary of valid settings that can be used
         """
-        return await http.request_generic(
-            url=f'/api/randomizers/{self.randomizer}',
-            method='get',
-            returntype='json'
-        )
+        async with aiohttp.request(method='get', url=f'/api/randomizers/{self.randomizer}') as resp:
+            settings = await resp.json()
+        return settings
 
     @property
     def url(self):
+        if self.data.get('mode', 'normal') == 'multiworld':
+            return f'{self.baseurl}/multiworld/{self.slug_id}'
         return f'{self.baseurl}/seed/{self.slug_id}'
 
     @property
