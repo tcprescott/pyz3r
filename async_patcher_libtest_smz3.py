@@ -11,7 +11,8 @@ from pyz3r.smvaria import SuperMetroidVaria
 async def generation_test():
     seed = await SuperMetroidVaria.create(
         skills_preset='regular',
-        settings_preset='quite_random'
+        settings_preset='quite_random',
+        baseurl='https://variabeta.pythonanywhere.com'
     )
     print(seed.url)
 

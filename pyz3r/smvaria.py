@@ -11,6 +11,7 @@ SETTINGS_DEFAULT = {
     "preset": "regular",
     "raceMode": "off",
     "areaLayout": "off",
+    "lightAreaRandomization": "off",
     "removeEscapeEnemies": "off",
     "layoutPatches": "on",
     "variaTweaks": "on",
@@ -44,7 +45,54 @@ SETTINGS_DEFAULT = {
     "energyQty": "vanilla",
     "morphPlacement": "early",
     "progressionDifficulty": "normal",
-    "progressionSpeed": "medium"
+    "progressionSpeed": "medium",
+    "startLocationMultiSelect": [
+        'Ceres',
+        'Landing Site',
+        'Gauntlet Top',
+        'Green Brinstar Elevator',
+        'Big Pink,Etecoons Supers',
+        'Wrecked Ship Main',
+        'Firefleas Top',
+        'Business Center',
+        'Bubble Mountain',
+        'Mama Turtle',
+        'Watering Hole',
+        'Aqueduct',
+        'Red Brinstar Elevator',
+        'Golden Four'
+    ],
+    "majorsSplitMultiSelect": [
+        'Full',
+        'Major',
+        'Chozo'
+    ],
+    "progressionDifficultyMultiSelect": [
+        'easier',
+        'normal',
+        'harder'
+    ],
+    "progressionSpeedMultiSelect": [
+        'slowest',
+        'slow',
+        'medium',
+        'fast',
+        'fastest',
+        'basic',
+        'VARIAble',
+        'speedrun'
+    ],
+    "morphPlacementMultiSelect": [
+        'early',
+        'late',
+        'normal'
+    ],
+    "energyQtyMultiSelect": [
+        'ultra sparse',
+        'sparse',
+        'medium',
+        'vanilla'
+    ],
 }
 
 class SuperMetroidVaria():
@@ -52,6 +100,7 @@ class SuperMetroidVaria():
         self,
         skills_preset,
         settings_preset,
+        race,
         baseurl,
         username,
         password,
@@ -59,6 +108,7 @@ class SuperMetroidVaria():
         self.skills_preset = skills_preset
         self.settings_preset = settings_preset
         self.baseurl = baseurl
+        self.race = race
         self.username = username
         self.password = password
         self.auth = aiohttp.BasicAuth(login=username, password=password) if username and password else None
@@ -66,7 +116,7 @@ class SuperMetroidVaria():
     async def generate_game(self):
         for i in range(0, 5):
             try:
-                async with aiohttp.request(method='post', url=self.baseurl + self.endpoint, data=self.settings, auth=self.auth) as resp:
+                async with aiohttp.request(method='post', url=f'{self.baseurl}/randomizerWebService', data=self.settings, auth=self.auth) as resp:
                     print(await resp.text())
                     req = await resp.json(content_type='text/html')
             except aiohttp.client_exceptions.ServerDisconnectedError:
@@ -81,6 +131,7 @@ class SuperMetroidVaria():
         cls,
         skills_preset='regular',
         settings_preset='default',
+        race=False,
         baseurl='https://randommetroidsolver.pythonanywhere.com',
         username=None,
         password=None,
@@ -88,30 +139,30 @@ class SuperMetroidVaria():
         seed = cls(
             skills_preset=skills_preset,
             settings_preset=settings_preset,
+            race=race,
             baseurl=baseurl,
             username=username,
             password=password
         )
 
-        seed.endpoint = f'/randomizerWebService'
-
-        settings_preset_data = await seed.fetch_settings_preset()
-        skills_preset_data = await seed.fetch_skills_preset()
-
-        seed.settings = copy.deepcopy(SETTINGS_DEFAULT)
-        seed.settings = dict(mergedicts(seed.settings, settings_preset_data))
-        seed.settings['preset'] = skills_preset
-        seed.settings['paramsFileTarget'] = json.dumps(skills_preset_data)
-
-        seed.settings['energyQtyMultiSelect'] = 'sparse,medium,vanilla'
-        # seed.settings['morphPlacementMultiSelect'] = ['early','late','normal']
-        # seed.settings['progressionDifficultyMultiSelect'] = ['easier','normal','harder']
-        # seed.settings['progressionSpeedMultiSelect'] = ['slowest','slow','medium','fast','fastest','basic','VARIAble','speedrun']
+        seed.settings = await seed.get_settings()
 
         seed.data = await seed.generate_game()
         seed.guid = uuid.UUID(hex=seed.data['seedKey'])
 
         return seed
+
+    async def get_settings(self):
+        settings_preset_data = await self.fetch_settings_preset()
+        skills_preset_data = await self.fetch_skills_preset()
+
+        settings = copy.deepcopy(SETTINGS_DEFAULT)
+        settings = dict(mergedicts(settings, settings_preset_data))
+        settings['preset'] = self.skills_preset
+        settings['raceMode'] = "on" if self.race else "off"
+        settings['paramsFileTarget'] = json.dumps(skills_preset_data)
+
+        return {s:(','.join(v) if isinstance(v, list) else v) for (s, v) in settings.items()}
 
     async def fetch_settings_preset(self):
         """Returns a dictonary of valid settings.
