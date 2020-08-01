@@ -1,4 +1,4 @@
 aiohttp
 aiofiles
-python-bps
+python-bps @ https://github.com/tcprescott/python-bps/tarball/v6#egg=python-bps
 slugid
