@@ -1,4 +1,4 @@
-# pyz3r for Python 3.6/3.7!
+# pyz3r for Python 3.6, 3.7, and 3.8!
 Pyz3r is an unofficial python abstraction library for interacting with the [alttpr.com](https://alttpr.com) API.
 
 This allows developers to create applications that not only generate games on [alttpr.com](https://alttpr.com),
