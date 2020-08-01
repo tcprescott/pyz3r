@@ -20,6 +20,7 @@ setup(
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
         "License :: OSI Approved :: Apache Software License",
         "Development Status :: 5 - Production/Stable",
         "Operating System :: OS Independent",
@@ -27,7 +28,7 @@ setup(
     install_requires=[
         'aiofiles',
         'aiohttp',
-        'python-bps>=6 @ https://github.com/tcprescott/python-bps/archive/v6.zip#egg=python-bps-6',
+        'python-bps>=6 @ https://github.com/tcprescott/python-bps/tarball/v6#egg=python-bps-6',
         'slugid'
     ]
 )
