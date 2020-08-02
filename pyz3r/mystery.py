@@ -49,7 +49,7 @@ def generate_random_settings(weights, tournament=True, spoilers="mystery"):
         if 'eq' in weights['customizer']:
             for key in weights['customizer']['eq'].keys():
                 value = get_random_option(weights['customizer']['eq'][key])
-                if value is not None:
+                if value:
                     eq += get_starting_equipment(key=key, value=value)
                     customizer = True
 
