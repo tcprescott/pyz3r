@@ -44,7 +44,8 @@ class smClass():
         self.randomizer = randomizer
         self.username = username
         self.password = password
-        self.auth = aiohttp.BasicAuth(login=username, password=password) if username and password else None
+        self.auth = aiohttp.BasicAuth(
+            login=username, password=password) if username and password else None
 
     async def _init(self):
         if self.settings:
@@ -87,7 +88,8 @@ class smClass():
             except aiohttp.client_exceptions.ServerDisconnectedError:
                 continue
             return patch
-        raise exceptions.alttprFailedToRetrieve(f'failed to retrieve game {self.slug_id}, the game is likely not found')
+        raise exceptions.alttprFailedToRetrieve(
+            f'failed to retrieve game {self.slug_id}, the game is likely not found')
 
     @classmethod
     async def create(
