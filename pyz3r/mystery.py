@@ -28,7 +28,8 @@ BASE_RANDOMIZER_PAYLOAD = {
         "boss_shuffle": "none",
         "enemy_shuffle": "none",
         "enemy_damage": "default",
-        "enemy_health": "default"
+        "enemy_health": "default",
+        "pot_shuffle": "off"
     },
     "allow_quickswap": False
 }
@@ -90,6 +91,7 @@ def generate_random_settings(weights, tournament=True, spoilers="mystery"):
     settings["enemizer"]["enemy_shuffle"] = get_random_option(weights['enemy_shuffle'])
     settings["enemizer"]["enemy_damage"] = get_random_option(weights['enemy_damage'])
     settings["enemizer"]["enemy_health"] = get_random_option(weights['enemy_health'])
+    settings["enemizer"]["pot_shuffle"] = get_random_option(weights.get('pot_shuffle', 'off'))
 
     settings["allow_quickswap"] = get_random_option(weights.get('allow_quickswap', False))
 
@@ -132,6 +134,7 @@ def generate_random_settings(weights, tournament=True, spoilers="mystery"):
         if settings['custom'].get('item.require.Lamp', False):
             settings['enemizer']['enemy_shuffle'] = 'none'
             settings['enemizer']['enemy_damage'] = 'default'
+            settings['enemizer']['pot_shuffle'] = 'off'
 
         # set dungeon_items to standard if any region.wild* custom settings are present
         if any(key in ['region.wildKeys', 'region.wildBigKeys', 'region.wildCompasses', 'region.wildMaps'] for key in custom):

@@ -26,7 +26,8 @@ BASE_CUSTOMIZER_PAYLOAD = {
         "boss_shuffle": "none",
         "enemy_shuffle": "none",
         "enemy_damage": "default",
-        "enemy_health": "default"
+        "enemy_health": "default",
+        "pot_shuffle": "off"
     },
     "name": "",
     "notes": "",

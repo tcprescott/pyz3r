@@ -63,7 +63,7 @@ class alttprClass():
     async def generate_game(self):
         for i in range(0, 5):
             try:
-                async with aiohttp.request(method='post', url=self.baseurl + self.endpoint, json=self.settings, auth=self.auth) as resp:
+                async with aiohttp.request(method='post', url=self.baseurl + self.endpoint, json=self.settings, auth=self.auth, raise_for_status=True) as resp:
                     req = await resp.json(content_type='text/html')
             except aiohttp.client_exceptions.ServerDisconnectedError:
                 continue
@@ -79,10 +79,10 @@ class alttprClass():
                     async with aiohttp.request(method='get', url=self.seed_baseurl + '/' + self.hash + '.json') as resp:
                         patch = await resp.json()
                 else:
-                    async with aiohttp.request(method='get', url=self.baseurl + '/hash/' + self.hash, auth=self.auth) as resp:
+                    async with aiohttp.request(method='get', url=self.baseurl + '/hash/' + self.hash, auth=self.auth, raise_for_status=True) as resp:
                         patch = await resp.json(content_type='text/html')
             except aiohttp.ClientResponseError:
-                async with aiohttp.request(method='get', url=self.baseurl + '/hash/' + self.hash, auth=self.auth) as resp:
+                async with aiohttp.request(method='get', url=self.baseurl + '/hash/' + self.hash, auth=self.auth, raise_for_status=True) as resp:
                     patch = await resp.json(content_type='text/html')
             except aiohttp.client_exceptions.ServerDisconnectedError:
                 continue
@@ -112,7 +112,7 @@ class alttprClass():
         Returns:
             dict -- dictonary of valid settings that can be used
         """
-        async with aiohttp.request(method='get', url=self.baseurl + '/randomizer/settings') as resp:
+        async with aiohttp.request(method='get', url=self.baseurl + '/randomizer/settings', auth=self.auth, raise_for_status=True) as resp:
             settings = await resp.json()
         return settings
 
@@ -122,12 +122,12 @@ class alttprClass():
         Returns:
             dict -- dictonary of valid settings that can be used
         """
-        async with aiohttp.request(method='get', url=self.baseurl + '/customizer/settings') as resp:
+        async with aiohttp.request(method='get', url=self.baseurl + '/customizer/settings', auth=self.auth, raise_for_status=True) as resp:
             settings = await resp.json()
         return settings
 
     async def find_daily_hash(self):
-        async with aiohttp.request(method='get', url=f'{self.baseurl}/api/daily') as resp:
+        async with aiohttp.request(method='get', url=f'{self.baseurl}/api/daily', auth=self.auth, raise_for_status=True) as resp:
             daily = await resp.json()
         return daily['hash']
 
@@ -173,9 +173,9 @@ class alttprClass():
         Returns:
             list -- a list of dictionaries that represent a rom patch
         """
-        async with aiohttp.request(method='get', url=self.baseurl + '/base_rom/settings') as resp:
+        async with aiohttp.request(method='get', url=self.baseurl + '/base_rom/settings', auth=self.auth, raise_for_status=True) as resp:
             baserom_settings = await resp.json()
-        async with aiohttp.request(method='get', url=self.baseurl + baserom_settings['base_file']) as resp:
+        async with aiohttp.request(method='get', url=self.baseurl + baserom_settings['base_file'], auth=self.auth, raise_for_status=True) as resp:
             req_patch = await resp.read()
         return req_patch
 
@@ -285,14 +285,14 @@ class alttprClass():
         Returns:
             list -- a list of bytes depicting a SPR or ZSPR file
         """
-        async with aiohttp.request(method='get', url=self.baseurl + '/sprites') as resp:
+        async with aiohttp.request(method='get', url=self.baseurl + '/sprites', auth=self.auth, raise_for_status=True) as resp:
             sprites = await resp.json()
         try:
             spriteinfo = next((sprite for sprite in sprites if sprite["name"] == name))
         except StopIteration:
             raise alttprException(f"Sprite {name} does not exist on {self.base_url}.")
         try:
-            async with aiohttp.request(method='get', url=spriteinfo["file"]) as resp:
+            async with aiohttp.request(method='get', url=spriteinfo["file"], raise_for_status=True) as resp:
                 spritedata = await resp.read()
         except Exception as e:
             raise alttprException(f'Sprite "{name}" could not be downloaded.') from e
