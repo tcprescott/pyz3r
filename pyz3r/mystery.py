@@ -34,12 +34,13 @@ BASE_RANDOMIZER_PAYLOAD = {
     "allow_quickswap": False
 }
 
+
 def generate_random_settings(weights, tournament=True, spoilers="mystery"):
     # customizer isn't used until its used
     customizer = False
 
     # we need to figure out if entrance shuffle is a thing, since that tells us if we should even bother with rolling customizer things
-    entrances =  get_random_option(weights['entrance_shuffle'])
+    entrances = get_random_option(weights['entrance_shuffle'])
 
     # only roll customizer stuff if entrance shuffle isn't on, and we have a customizer section
     if entrances == "none" and 'customizer' in weights:
@@ -84,16 +85,23 @@ def generate_random_settings(weights, tournament=True, spoilers="mystery"):
     settings["hints"] = get_random_option(weights['hints'])
     settings["weapons"] = get_random_option(weights['weapons'])
     settings["item"]["pool"] = get_random_option(weights['item_pool'])
-    settings["item"]["functionality"] = get_random_option(weights['item_functionality'])
+    settings["item"]["functionality"] = get_random_option(
+        weights['item_functionality'])
     settings["tournament"] = tournament
     settings["spoilers"] = spoilers
-    settings["enemizer"]["boss_shuffle"] = get_random_option(weights['boss_shuffle'])
-    settings["enemizer"]["enemy_shuffle"] = get_random_option(weights['enemy_shuffle'])
-    settings["enemizer"]["enemy_damage"] = get_random_option(weights['enemy_damage'])
-    settings["enemizer"]["enemy_health"] = get_random_option(weights['enemy_health'])
-    settings["enemizer"]["pot_shuffle"] = get_random_option(weights.get('pot_shuffle', 'off'))
+    settings["enemizer"]["boss_shuffle"] = get_random_option(
+        weights['boss_shuffle'])
+    settings["enemizer"]["enemy_shuffle"] = get_random_option(
+        weights['enemy_shuffle'])
+    settings["enemizer"]["enemy_damage"] = get_random_option(
+        weights['enemy_damage'])
+    settings["enemizer"]["enemy_health"] = get_random_option(
+        weights['enemy_health'])
+    settings["enemizer"]["pot_shuffle"] = get_random_option(
+        weights.get('pot_shuffle', 'off'))
 
-    settings["allow_quickswap"] = get_random_option(weights.get('allow_quickswap', False))
+    settings["allow_quickswap"] = get_random_option(
+        weights.get('allow_quickswap', False))
 
     if customizer:
         # default to v31 prize packs
@@ -120,7 +128,8 @@ def generate_random_settings(weights, tournament=True, spoilers="mystery"):
                 if item in ['Bottle', 'BottleWithRedPotion', 'BottleWithGreenPotion', 'BottleWithBluePotion', 'BottleWithBee', 'BottleWithGoldBee', 'BottleWithFairy']:
                     item = 'BottleWithRandom'
 
-                settings['custom']['item']['count'][item] = settings['custom']['item']['count'].get(item, 0) - 1 if settings['custom']['item']['count'].get(item, 0) > 0 else 0
+                settings['custom']['item']['count'][item] = settings['custom']['item']['count'].get(
+                    item, 0) - 1 if settings['custom']['item']['count'].get(item, 0) > 0 else 0
 
             # re-add 3 heart containers as a baseline
             eq += ['BossHeartContainer'] * 3
@@ -128,7 +137,7 @@ def generate_random_settings(weights, tournament=True, spoilers="mystery"):
             # update the eq section of the settings
             settings['eq'] = eq
 
-        # if dark room navigation is enabled, then 
+        # if dark room navigation is enabled, then
         # oh and yes item.require.Lamp is mixed around for whatever reason
         # False = dark room navigation isn't required
         if settings['custom'].get('item.require.Lamp', False):
@@ -143,17 +152,21 @@ def generate_random_settings(weights, tournament=True, spoilers="mystery"):
         # set custom triforce hunt settings if TFH is the goal
         if settings['goal'] == 'triforce-hunt':
             if 'triforce-hunt' in weights['customizer']:
-                min_difference = get_random_option(weights['customizer']['triforce-hunt'].get('min_difference', 0))
+                min_difference = get_random_option(
+                    weights['customizer']['triforce-hunt'].get('min_difference', 0))
                 try:
-                    goal_pieces = randval(weights['customizer']['triforce-hunt']['goal'])
+                    goal_pieces = randval(
+                        weights['customizer']['triforce-hunt']['goal'])
                 except KeyError:
                     goal_pieces = 20
 
                 try:
                     if isinstance(weights['customizer']['triforce-hunt']['pool'], list):
                         if weights['customizer']['triforce-hunt']['pool'][0] + min_difference < goal_pieces:
-                            weights['customizer']['triforce-hunt']['pool'][0] = goal_pieces + min_difference
-                    pool_pieces = randval(weights['customizer']['triforce-hunt']['pool'])
+                            weights['customizer']['triforce-hunt']['pool'][0] = goal_pieces + \
+                                min_difference
+                    pool_pieces = randval(
+                        weights['customizer']['triforce-hunt']['pool'])
 
                     # a final catchall
                     if pool_pieces < goal_pieces + min_difference:
@@ -171,21 +184,25 @@ def generate_random_settings(weights, tournament=True, spoilers="mystery"):
             if 'timed-ohko' in weights['customizer']:
                 for clock in weights['customizer']['timed-ohko'].get('clock', {}):
                     settings['custom'][f'item.value.{clock}'] = randval(
-                        weights['customizer']['timed-ohko']['clock'][clock].get('value', 0)
+                        weights['customizer']['timed-ohko']['clock'][clock].get(
+                            'value', 0)
                     )
                     settings['custom']['item']['count'][clock] = randval(
-                        weights['customizer']['timed-ohko']['clock'][clock].get('pool', 0)
+                        weights['customizer']['timed-ohko']['clock'][clock].get(
+                            'pool', 0)
                     )
 
                 settings['custom']['rom.timerStart'] = randval(
                     weights['customizer']['timed-ohko'].get('timerStart', 0)
                 )
 
-            settings = dict(mergedicts(settings, weights['customizer']['timed-ohko'].get('forced_settings', {})))
+            settings = dict(mergedicts(
+                settings, weights['customizer']['timed-ohko'].get('forced_settings', {})))
 
         # fill in empty items in pool with FillItemPoolWith option, defaults to "Nothing"
         filler = weights.get('options', {}).get('FillItemPoolWith', 'Nothing')
-        settings['custom']['item']['count'][filler] = settings['custom']['item']['count'].get(filler, 0) + max(0, 216 - sum(settings['custom']['item']['count'].values()))
+        settings['custom']['item']['count'][filler] = settings['custom']['item']['count'].get(
+            filler, 0) + max(0, 216 - sum(settings['custom']['item']['count'].values()))
 
     else:
         settings["entrances"] = entrances
@@ -206,9 +223,15 @@ def generate_random_settings(weights, tournament=True, spoilers="mystery"):
             or settings['enemizer']['enemy_health'] != 'default'):
         settings['weapons'] = 'assured'
 
+    # deactivate a starting flute that's pre-activated, as it'll cause some really dumb rainstate scenarios
+    if settings["mode"] == 'standard':
+        settings['eq'] = [item if item !=
+                          'OcarinaActive' else 'OcarinaInactive' for item in settings.get('eq', {})]
     return settings, customizer
 
 # fix weights where strings are provided as keys, this fixes issues with injesting json as a weightset
+
+
 def conv(string):
     # first try to convert it to a integer
 
@@ -225,11 +248,13 @@ def conv(string):
 
     return string
 
+
 def randval(optset):
     if isinstance(optset, list):
         return random.randint(optset[0], optset[1])
     else:
         return optset
+
 
 def get_random_option(optset):
     try:
