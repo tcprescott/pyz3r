@@ -1,8 +1,10 @@
-from .exceptions import alttprException
+from .exceptions import alttprException, alttprFailedToRetrieve, alttprFailedToGenerate
 from . import misc, spoiler, patch
 import aiohttp
 
 # Use the "create" class method instead of this.  This is here for backwards compatibility and will be deprecated.
+
+
 async def alttpr(
     settings=None,
     hash_id=None,
@@ -17,6 +19,7 @@ async def alttpr(
                        baseurl=baseurl, seed_baseurl=seed_baseurl, username=username, password=password, festive=False)
     await seed._init()
     return seed
+
 
 class alttprClass():
     def __init__(
@@ -36,7 +39,8 @@ class alttprClass():
         self.seed_baseurl = seed_baseurl
         self.baseurl = baseurl
         self.customizer = customizer
-        self.auth = aiohttp.BasicAuth(login=username, password=password) if username and password else None
+        self.auth = aiohttp.BasicAuth(
+            login=username, password=password) if username and password else None
         self.festive = festive
 
     async def _init(self):
@@ -58,8 +62,6 @@ class alttprClass():
             else:
                 self.data = await self.retrieve_game()
 
-            
-
     async def generate_game(self):
         for i in range(0, 5):
             try:
@@ -67,10 +69,10 @@ class alttprClass():
                     req = await resp.json(content_type='text/html')
             except aiohttp.client_exceptions.ServerDisconnectedError:
                 continue
-            # except aiohttp.ClientResponseError:
-            #     continue
+            except aiohttp.ClientResponseError:
+                continue
             return req
-        raise exceptions.alttprFailedToGenerate('failed to generate game')
+        raise alttprFailedToGenerate('failed to generate game')
 
     async def retrieve_game(self):
         for i in range(0, 5):
@@ -87,7 +89,8 @@ class alttprClass():
             except aiohttp.client_exceptions.ServerDisconnectedError:
                 continue
             return patch
-        raise exceptions.alttprFailedToRetrieve(f'failed to retrieve game {self.hash}, the game is likely not found')
+        raise alttprFailedToRetrieve(
+            f'failed to retrieve game {self.hash}, the game is likely not found')
 
     @classmethod
     async def create(
@@ -102,7 +105,7 @@ class alttprClass():
         password=None,
     ):
         seed = cls(settings=settings, hash_id=hash_id, randomizer=randomizer, customizer=customizer,
-                        baseurl=baseurl, seed_baseurl=seed_baseurl, username=username, password=password, festive=False)
+                   baseurl=baseurl, seed_baseurl=seed_baseurl, username=username, password=password, festive=False)
         await seed._init()
         return seed
 
@@ -288,14 +291,17 @@ class alttprClass():
         async with aiohttp.request(method='get', url=self.baseurl + '/sprites', auth=self.auth, raise_for_status=True) as resp:
             sprites = await resp.json()
         try:
-            spriteinfo = next((sprite for sprite in sprites if sprite["name"] == name))
+            spriteinfo = next(
+                (sprite for sprite in sprites if sprite["name"] == name))
         except StopIteration:
-            raise alttprException(f"Sprite {name} does not exist on {self.base_url}.")
+            raise alttprException(
+                f"Sprite {name} does not exist on {self.base_url}.")
         try:
             async with aiohttp.request(method='get', url=spriteinfo["file"], raise_for_status=True) as resp:
                 spritedata = await resp.read()
         except Exception as e:
-            raise alttprException(f'Sprite "{name}" could not be downloaded.') from e
+            raise alttprException(
+                f'Sprite "{name}" could not be downloaded.') from e
         spr = list(spritedata)
         return spr
 
