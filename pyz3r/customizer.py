@@ -348,6 +348,12 @@ def convert2settings(
     except KeyError:
         pass
 
+    settings['enemizer']['boss_shuffle'] = customizer_save.get('randomizer.boss_shuffle', 'none')
+    settings['enemizer']['enemy_shuffle'] = customizer_save.get('randomizer.enemy_shuffle', 'none')
+    settings['enemizer']['enemy_damage'] = customizer_save.get('randomizer.enemy_damage', 'default')
+    settings['enemizer']['enemy_health'] = customizer_save.get('randomizer.enemy_health', 'default')
+    settings['enemizer']['pot_shuffle'] = customizer_save.get('randomizer.pot_shuffle', 'off')
+
     # vt.custom.prizepacks
     try:
         if not customizer_save['vt.custom.prizepacks'] is None:
