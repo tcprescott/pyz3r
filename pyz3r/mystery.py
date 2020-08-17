@@ -227,6 +227,11 @@ def generate_random_settings(weights, tournament=True, spoilers="mystery"):
     if settings["mode"] == 'standard':
         settings['eq'] = [item if item !=
                           'OcarinaActive' else 'OcarinaInactive' for item in settings.get('eq', {})]
+
+    # fix a bad interaction between pedestal goal and prize.crossWorld
+    if settings["goal"] == 'pedestal':
+        settings['custom']['prize.crossWorld'] = True
+
     return settings, customizer
 
 # fix weights where strings are provided as keys, this fixes issues with injesting json as a weightset
