@@ -228,8 +228,8 @@ def generate_random_settings(weights, tournament=True, spoilers="mystery"):
         settings['eq'] = [item if item !=
                           'OcarinaActive' else 'OcarinaInactive' for item in settings.get('eq', {})]
 
-    # fix a bad interaction between pedestal goal and prize.crossWorld
-    if settings["goal"] == 'pedestal':
+    # fix a bad interaction between pedestal/dungeons goals and prize.crossWorld
+    if settings["goal"] in ['pedestal','dungeons']:
         settings['custom']['prize.crossWorld'] = True
 
     return settings, customizer
