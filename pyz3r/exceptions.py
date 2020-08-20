@@ -8,3 +8,10 @@ class alttprFailedToRetrieve(Exception):
 
 class alttprFailedToGenerate(Exception):
     pass
+
+
+class UnableToRetrieve(Exception):
+    pass
+
+class UnableToGenerate(Exception):
+    pass

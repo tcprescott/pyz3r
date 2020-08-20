@@ -29,6 +29,7 @@ setup(
         'aiofiles',
         'aiohttp',
         'python-bps-continued>=7',
-        'slugid'
+        'slugid',
+        'tenacity'
     ]
 )

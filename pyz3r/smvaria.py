@@ -4,8 +4,10 @@ import json
 import uuid
 
 import aiohttp
+from tenacity import RetryError, AsyncRetrying, stop_after_attempt, retry_if_exception_type
 
 from .misc import mergedicts
+from .exceptions import UnableToRetrieve, UnableToGenerate
 
 SETTINGS_DEFAULT = {
     "complexity": "advanced",
@@ -117,22 +119,21 @@ class SuperMetroidVaria():
         self.auth = aiohttp.BasicAuth(login=username, password=password) if username and password else None
 
     async def generate_game(self):
-        for i in range(0, 5):
-            try:
-                async with aiohttp.request(
-                        method='post',
-                        url=f'{self.baseurl}/randomizerWebService',
-                        data=self.settings,
-                        auth=self.auth,
-                        raise_for_status=True) as resp:
-                    print(await resp.text())
-                    req = await resp.json(content_type='text/html')
-            except aiohttp.client_exceptions.ServerDisconnectedError:
-                continue
-            # except aiohttp.ClientResponseError:
-            #     continue
-            return req
-        raise exceptions.alttprFailedToGenerate('failed to generate game')
+        try:
+            async for attempt in AsyncRetrying(
+                    stop=stop_after_attempt(5),
+                    retry=retry_if_exception_type((aiohttp.ClientResponseError, aiohttp.client_exceptions.ServerDisconnectedError))):
+                with attempt:
+                    async with aiohttp.request(
+                            method='post',
+                            url=f'{self.baseurl}/randomizerWebService',
+                            data=self.settings,
+                            auth=self.auth,
+                            raise_for_status=True) as resp:
+                        req = await resp.json(content_type='text/html')
+                    return req
+        except RetryError as e:
+            raise e.last_attempt._exception from e
 
     @classmethod
     async def create(
@@ -161,8 +162,8 @@ class SuperMetroidVaria():
         return seed
 
     async def get_settings(self):
-        settings_preset_data = await self.fetch_settings_preset()
         skills_preset_data = await self.fetch_skills_preset()
+        settings_preset_data = await self.fetch_settings_preset()
 
         settings = copy.deepcopy(SETTINGS_DEFAULT)
         settings = dict(mergedicts(settings, settings_preset_data))
@@ -184,6 +185,8 @@ class SuperMetroidVaria():
             async with aiohttp.request(method='post', url=f'{self.baseurl}/randoPresetWebService', data=data, auth=self.auth, raise_for_status=True) as resp:
                 settings = await resp.json(content_type='text/html')
         except aiohttp.client_exceptions.ClientResponseError as e:
+            if e.code == 400:
+                raise UnableToRetrieve(f'Unable to retrieve settings preset "{self.settings_preset}".  It may not exist?') from e
             raise
         return settings
 
@@ -193,8 +196,13 @@ class SuperMetroidVaria():
         Returns:
             dict -- dictonary of valid settings that can be used
         """
-        async with aiohttp.request(method='post', url=f'{self.baseurl}/presetWebService', data={"preset": self.skills_preset}, auth=self.auth, raise_for_status=True) as resp:
-            settings = await resp.json(content_type='text/html')
+        try:
+            async with aiohttp.request(method='post', url=f'{self.baseurl}/presetWebService', data={"preset": self.skills_preset}, auth=self.auth, raise_for_status=True) as resp:
+                settings = await resp.json(content_type='text/html')
+        except aiohttp.client_exceptions.ClientResponseError as e:
+            if e.code == 400:
+                raise UnableToRetrieve(f'Unable to retrieve skill preset "{self.skills_preset}".  It may not exist?') from e
+            raise
         return settings
 
     @property
