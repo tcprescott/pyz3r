@@ -204,6 +204,14 @@ def generate_random_settings(weights, tournament=True, spoilers="mystery"):
         settings['custom']['item']['count'][filler] = settings['custom']['item']['count'].get(
             filler, 0) + max(0, 216 - sum(settings['custom']['item']['count'].values()))
 
+        # deactivate a starting flute that's pre-activated, as it'll cause some really dumb rainstate scenarios
+        if settings["mode"] == 'standard':
+            settings['eq'] = [item if item !=
+                              'OcarinaActive' else 'OcarinaInactive' for item in settings.get('eq', {})]
+
+        # fix a bad interaction between pedestal/dungeons goals and prize.crossWorld
+        if settings["goal"] in ['pedestal', 'dungeons']:
+            settings['custom']['prize.crossWorld'] = True
     else:
         settings["entrances"] = entrances
 
@@ -222,15 +230,6 @@ def generate_random_settings(weights, tournament=True, spoilers="mystery"):
             or settings['enemizer']['enemy_damage'] != 'default'
             or settings['enemizer']['enemy_health'] != 'default'):
         settings['weapons'] = 'assured'
-
-    # deactivate a starting flute that's pre-activated, as it'll cause some really dumb rainstate scenarios
-    if settings["mode"] == 'standard':
-        settings['eq'] = [item if item !=
-                          'OcarinaActive' else 'OcarinaInactive' for item in settings.get('eq', {})]
-
-    # fix a bad interaction between pedestal/dungeons goals and prize.crossWorld
-    if settings["goal"] in ['pedestal','dungeons']:
-        settings['custom']['prize.crossWorld'] = True
 
     return settings, customizer
 
