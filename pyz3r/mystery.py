@@ -36,6 +36,13 @@ BASE_RANDOMIZER_PAYLOAD = {
 
 
 def generate_random_settings(weights, tournament=True, spoilers="mystery"):
+    subweight_name = get_random_option(
+        {k: v['chance'] for (k, v) in weights.get('subweights', {}).items()})
+    if subweight_name is not None:
+        subweights = weights.get('subweights', {}).get(
+            subweight_name, {}).get('weights', {})
+        weights = {**weights, **subweights}
+
     # customizer isn't used until its used
     customizer = False
 
@@ -43,7 +50,7 @@ def generate_random_settings(weights, tournament=True, spoilers="mystery"):
     entrances = get_random_option(weights['entrance_shuffle'])
 
     # only roll customizer stuff if entrance shuffle isn't on, and we have a customizer section
-    if entrances == "none" and 'customizer' in weights:
+    if entrances == "none" and weights.get('customizer', None):
         custom = {}
         eq = []
         pool = {}
@@ -233,8 +240,6 @@ def generate_random_settings(weights, tournament=True, spoilers="mystery"):
 
     return settings, customizer
 
-# fix weights where strings are provided as keys, this fixes issues with injesting json as a weightset
-
 
 def conv(string):
     # first try to convert it to a integer
@@ -261,6 +266,8 @@ def randval(optset):
 
 
 def get_random_option(optset):
+    if not optset:
+        return None
     try:
         return random.choices(population=[conv(key) for key in list(optset.keys())], weights=list(optset.values()))[0] if isinstance(optset, dict) else conv(optset)
     except TypeError as err:
