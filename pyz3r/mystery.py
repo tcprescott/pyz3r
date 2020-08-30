@@ -156,6 +156,10 @@ def generate_random_settings(weights, tournament=True, spoilers="mystery"):
         if any(key in ['region.wildKeys', 'region.wildBigKeys', 'region.wildCompasses', 'region.wildMaps'] for key in custom):
             settings['dungeon_items'] = 'standard'
 
+        if settings['custom'].get('region.wildKeys', False) or settings['custom'].get('region.wildBigKeys', False) or settings['custom'].get('region.wildCompasses', False) or settings['custom'].get('region.wildMaps', False):
+            settings['custom']['rom.freeItemMenu'] = True
+            settings['custom']['rom.freeItemText'] = True
+
         # set custom triforce hunt settings if TFH is the goal
         if settings['goal'] == 'triforce-hunt':
             if 'triforce-hunt' in weights['customizer']:
