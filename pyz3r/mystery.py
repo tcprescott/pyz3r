@@ -270,7 +270,7 @@ def randval(optset):
 
 
 def get_random_option(optset):
-    if optset is None:
+    if optset is None or optset == {}:
         return None
     try:
         return random.choices(population=[conv(key) for key in list(optset.keys())], weights=list(optset.values()))[0] if isinstance(optset, dict) else conv(optset)
