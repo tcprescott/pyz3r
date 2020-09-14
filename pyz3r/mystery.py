@@ -160,6 +160,12 @@ def generate_random_settings(weights, tournament=True, spoilers="mystery"):
             settings['custom']['rom.freeItemMenu'] = True
             settings['custom']['rom.freeItemText'] = True
 
+        if settings['custom'].get('region.wildMaps', False) and 'rom.mapOnPickup' not in weights['customizer']['custom']:
+            settings['custom']['rom.mapOnPickup'] = True
+
+        if settings['custom'].get('region.wildCompasses', False) and 'rom.dungeonCount' not in weights['customizer']['custom']:
+            settings['custom']['rom.dungeonCount'] = 'pickup'
+
         # set custom triforce hunt settings if TFH is the goal
         if settings['goal'] == 'triforce-hunt':
             if 'triforce-hunt' in weights['customizer']:
