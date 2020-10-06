@@ -242,6 +242,7 @@ def generate_random_settings(weights, tournament=True, spoilers="mystery"):
             settings['dungeon_items'] = 'full'
 
     # This if statement is dedicated to the survivors of http://www.speedrunslive.com/races/result/#!/264658
+    # Play https://alttpr.com/en/h/30yAqZ99yV if you don't believe me. <3
     if settings['weapons'] not in ['vanilla', 'assured'] and settings['mode'] == 'standard' and (
             settings['enemizer']['enemy_shuffle'] != 'none'
             or settings['enemizer']['enemy_damage'] != 'default'
