@@ -49,7 +49,7 @@ class alttprClass():
         if self.customizer:
             self.endpoint = '/api/customizer'
         elif self.festive:
-            self.endpoint = '/api/festive'
+            self.endpoint = '/festive/api/randomizer'
         else:
             self.endpoint = '/api/randomizer'
 
