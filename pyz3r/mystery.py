@@ -36,21 +36,47 @@ BASE_RANDOMIZER_PAYLOAD = {
 
 
 def generate_random_settings(weights, tournament=True, spoilers="mystery"):
-    subweight_name = get_random_option(
-        {k: v['chance'] for (k, v) in weights.get('subweights', {}).items()})
-    if subweight_name is not None:
-        subweights = weights.get('subweights', {}).get(
-            subweight_name, {}).get('weights', {})
+    # iterate through subweights until fully resolved
+    while True:
+        subweight_name = get_random_option(
+            {k: v['chance'] for (k, v) in weights.get('subweights', {}).items()})
+
+        print(f"{subweight_name=}")
+
+        if subweight_name is None:
+            break
+
+        subweights = weights.get('subweights', {}).get(subweight_name, {}).get('weights', {})
+        subweights['subweights'] = subweights.get('subweights', {})
         weights = {**weights, **subweights}
 
     # customizer isn't used until its used
     customizer = False
 
-    # we need to figure out if entrance shuffle is a thing, since that tells us if we should even bother with rolling customizer things
-    entrances = get_random_option(weights['entrance_shuffle'])
+    options = {}
+
+    options["glitches"] = get_random_option(weights['glitches_required'])
+    options["item_placement"] = get_random_option(weights['item_placement'])
+    options["dungeon_items"] = get_random_option(weights['dungeon_items'])
+    options["accessibility"] = get_random_option(weights['accessibility'])
+    options["goals"] = get_random_option(weights['goals'])
+    options["ganon_open"] = get_random_option(weights['ganon_open'])
+    options["tower_open"] = get_random_option(weights['tower_open'])
+    options["world_state"] = get_random_option(weights['world_state'])
+    options["hints"] = get_random_option(weights['hints'])
+    options["weapons"] = get_random_option(weights['weapons'])
+    options["item_pool"] = get_random_option(weights['item_pool'])
+    options["item_functionality"] = get_random_option(weights['item_functionality'])
+    options["boss_shuffle"] = get_random_option(weights['boss_shuffle'])
+    options["enemy_shuffle"] = get_random_option(weights['enemy_shuffle'])
+    options["enemy_damage"] = get_random_option(weights['enemy_damage'])
+    options["enemy_health"] = get_random_option(weights['enemy_health'])
+    options["pot_shuffle"] = get_random_option(weights.get('pot_shuffle', 'off'))
+    options["allow_quickswap"] = get_random_option(weights.get('allow_quickswap', False))
+    options['entrance'] = get_random_option(weights['entrance_shuffle'])
 
     # only roll customizer stuff if entrance shuffle isn't on, and we have a customizer section
-    if entrances == "none" and weights.get('customizer', None):
+    if options['entrance'] == "none" and weights.get('customizer', None):
         custom = {}
         eq = []
         pool = {}
@@ -80,35 +106,6 @@ def generate_random_settings(weights, tournament=True, spoilers="mystery"):
         settings = copy.deepcopy(BASE_CUSTOMIZER_PAYLOAD)
     else:
         settings = copy.deepcopy(BASE_RANDOMIZER_PAYLOAD)
-
-    settings["glitches"] = get_random_option(weights['glitches_required'])
-    settings["item_placement"] = get_random_option(weights['item_placement'])
-    settings["dungeon_items"] = get_random_option(weights['dungeon_items'])
-    settings["accessibility"] = get_random_option(weights['accessibility'])
-    settings["goal"] = get_random_option(weights['goals'])
-    settings["crystals"]["ganon"] = get_random_option(weights['ganon_open'])
-    settings["crystals"]["tower"] = get_random_option(weights['tower_open'])
-    settings["mode"] = get_random_option(weights['world_state'])
-    settings["hints"] = get_random_option(weights['hints'])
-    settings["weapons"] = get_random_option(weights['weapons'])
-    settings["item"]["pool"] = get_random_option(weights['item_pool'])
-    settings["item"]["functionality"] = get_random_option(
-        weights['item_functionality'])
-    settings["tournament"] = tournament
-    settings["spoilers"] = spoilers
-    settings["enemizer"]["boss_shuffle"] = get_random_option(
-        weights['boss_shuffle'])
-    settings["enemizer"]["enemy_shuffle"] = get_random_option(
-        weights['enemy_shuffle'])
-    settings["enemizer"]["enemy_damage"] = get_random_option(
-        weights['enemy_damage'])
-    settings["enemizer"]["enemy_health"] = get_random_option(
-        weights['enemy_health'])
-    settings["enemizer"]["pot_shuffle"] = get_random_option(
-        weights.get('pot_shuffle', 'off'))
-
-    settings["allow_quickswap"] = get_random_option(
-        weights.get('allow_quickswap', False))
 
     if customizer:
         # default to v31 prize packs
@@ -148,13 +145,13 @@ def generate_random_settings(weights, tournament=True, spoilers="mystery"):
         # oh and yes item.require.Lamp is mixed around for whatever reason
         # False = dark room navigation isn't required
         if settings['custom'].get('item.require.Lamp', False):
-            settings['enemizer']['enemy_shuffle'] = 'none'
-            settings['enemizer']['enemy_damage'] = 'default'
-            settings['enemizer']['pot_shuffle'] = 'off'
+            options['enemy_shuffle'] = 'none'
+            options['enemy_damage'] = 'default'
+            options['pot_shuffle'] = 'off'
 
         # set dungeon_items to standard if any region.wild* custom settings are present
         if any(key in ['region.wildKeys', 'region.wildBigKeys', 'region.wildCompasses', 'region.wildMaps'] for key in custom):
-            settings['dungeon_items'] = 'standard'
+            options['dungeon_items'] = 'standard'
 
         if settings['custom'].get('region.wildKeys', False) or settings['custom'].get('region.wildBigKeys', False) or settings['custom'].get('region.wildCompasses', False) or settings['custom'].get('region.wildMaps', False):
             settings['custom']['rom.freeItemMenu'] = True
@@ -167,7 +164,7 @@ def generate_random_settings(weights, tournament=True, spoilers="mystery"):
             settings['custom']['rom.dungeonCount'] = 'pickup'
 
         # set custom triforce hunt settings if TFH is the goal
-        if settings['goal'] == 'triforce-hunt':
+        if options['goals'] == 'triforce-hunt':
             if 'triforce-hunt' in weights['customizer']:
                 min_difference = get_random_option(
                     weights['customizer']['triforce-hunt'].get('min_difference', 0))
@@ -213,8 +210,7 @@ def generate_random_settings(weights, tournament=True, spoilers="mystery"):
                     weights['customizer']['timed-ohko'].get('timerStart', 0)
                 )
 
-            settings = dict(mergedicts(
-                settings, weights['customizer']['timed-ohko'].get('forced_settings', {})))
+            # settings = dict(mergedicts(options, weights['customizer']['timed-ohko'].get('forced_settings', {})))
 
         # fill in empty items in pool with FillItemPoolWith option, defaults to "Nothing"
         filler = weights.get('options', {}).get('FillItemPoolWith', 'Nothing')
@@ -222,32 +218,70 @@ def generate_random_settings(weights, tournament=True, spoilers="mystery"):
             filler, 0) + max(0, 216 - sum(settings['custom']['item']['count'].values()))
 
         # deactivate a starting flute that's pre-activated, as it'll cause some really dumb rainstate scenarios
-        if settings["mode"] == 'standard':
-            settings['eq'] = [item if item !=
-                              'OcarinaActive' else 'OcarinaInactive' for item in settings.get('eq', {})]
+        if options["world_state"] == 'standard':
+            settings['eq'] = [item if item != 'OcarinaActive' else 'OcarinaInactive' for item in settings.get('eq', {})]
 
         # fix a bad interaction between pedestal/dungeons goals and prize.crossWorld
-        if settings["goal"] in ['pedestal', 'dungeons']:
+        if options["goals"] in ['pedestal', 'dungeons']:
             settings['custom']['prize.crossWorld'] = True
-    else:
-        settings["entrances"] = entrances
 
     # If mc or mcs shuffle gets rolled, and its entrance, shift to either standard or full accordingly
     # mc and mcs are not supported by the entrance randomizer version currently used for v31.0.4.
     # If this changes, these statements will get removed.
-    if settings.get('entrances', 'none') != 'none':
-        if settings.get('dungeon_items', 'standard') == 'mc':
-            settings['dungeon_items'] = 'standard'
-        elif settings.get('dungeon_items', 'standard') == 'mcs':
-            settings['dungeon_items'] = 'full'
+    if options.get('entrances', 'none') != 'none':
+        if options.get('dungeon_items', 'standard') == 'mc':
+            options['dungeon_items'] = 'standard'
+        elif options.get('dungeon_items', 'standard') == 'mcs':
+            options['dungeon_items'] = 'full'
 
     # This if statement is dedicated to the survivors of http://www.speedrunslive.com/races/result/#!/264658
     # Play https://alttpr.com/en/h/30yAqZ99yV if you don't believe me. <3
-    if settings['weapons'] not in ['vanilla', 'assured'] and settings['mode'] == 'standard' and (
-            settings['enemizer']['enemy_shuffle'] != 'none'
-            or settings['enemizer']['enemy_damage'] != 'default'
-            or settings['enemizer']['enemy_health'] != 'default'):
-        settings['weapons'] = 'assured'
+    if options['weapons'] not in ['vanilla', 'assured'] and options['world_state'] == 'standard' and (
+            options['enemy_shuffle'] != 'none'
+            or options['enemy_damage'] != 'default'
+            or options['enemy_health'] != 'default'):
+        options['weapons'] = 'assured'
+
+    # apply rules
+    for rule in weights.get('rules', {}):
+        conditions = rule.get('conditions', {})
+        actions = rule.get('actions', {})
+
+        # iterate through each condition
+        match = True
+
+        for condition in conditions:
+            if condition.get('MatchType', 'exact') == 'exact':
+                if options[condition['Key']] == condition['Value']:
+                    continue
+                else:
+                    match = False
+
+        if match:
+            for key, value in actions.items():
+                options[key] = get_random_option(value)
+
+    settings["glitches"] = options["glitches"]
+    settings["item_placement"] = options['item_placement']
+    settings["dungeon_items"] = options['dungeon_items']
+    settings["accessibility"] = options['accessibility']
+    settings["goal"] = options['goals']
+    settings["crystals"]["ganon"] = options['ganon_open']
+    settings["crystals"]["tower"] = options['tower_open']
+    settings["mode"] = options['world_state']
+    settings["hints"] = options['hints']
+    settings["weapons"] = options['weapons']
+    settings["item"]["pool"] = options['item_pool']
+    settings["item"]["functionality"] = options['item_functionality']
+    settings["tournament"] = tournament
+    settings["spoilers"] = spoilers
+    settings["enemizer"]["boss_shuffle"] = options['boss_shuffle']
+    settings["enemizer"]["enemy_shuffle"] = options['enemy_shuffle']
+    settings["enemizer"]["enemy_damage"] = options['enemy_damage']
+    settings["enemizer"]["enemy_health"] = options['enemy_health']
+    settings["enemizer"]["pot_shuffle"] = options.get('pot_shuffle', 'off')
+
+    settings["allow_quickswap"] = get_random_option(weights.get('allow_quickswap', False))
 
     return settings, customizer
 
