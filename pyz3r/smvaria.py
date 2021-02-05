@@ -97,6 +97,10 @@ SETTINGS_DEFAULT = {
         'medium',
         'vanilla'
     ],
+    "minimizer": "off",
+    "minimizerTourian": "off",
+    "allowGreyDoors": "off",
+    "minimizerQty": "45",
 }
 
 
@@ -121,15 +125,15 @@ class SuperMetroidVaria():
     async def generate_game(self):
         try:
             async for attempt in AsyncRetrying(
-                    stop=stop_after_attempt(5),
+                    stop=stop_after_attempt(1),
                     retry=retry_if_exception_type((aiohttp.ClientResponseError, aiohttp.client_exceptions.ServerDisconnectedError))):
                 with attempt:
+                    print(json.dumps(self.settings, indent=4))
                     async with aiohttp.request(
                             method='post',
                             url=f'{self.baseurl}/randomizerWebService',
                             data=self.settings,
-                            auth=self.auth,
-                            raise_for_status=True) as resp:
+                            auth=self.auth) as resp:
                         req = await resp.json(content_type='text/html')
                     return req
         except RetryError as e:
