@@ -8,7 +8,7 @@ README = (HERE / "README.md").read_text()
 
 setup(
     name="pyz3r",
-    version="5.4.2",
+    version="5.5.0",
     author="Thomas Prescott",
     author_email="tcprescott@gmail.com",
     description="A python module for interacting with the web API of various randomizers, such as https://alttpr.com or https://samus.link.",
