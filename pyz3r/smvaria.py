@@ -113,6 +113,7 @@ class SuperMetroidVaria():
         baseurl,
         username,
         password,
+        settings_dict,
     ):
         self.skills_preset = skills_preset
         self.settings_preset = settings_preset
@@ -121,6 +122,7 @@ class SuperMetroidVaria():
         self.username = username
         self.password = password
         self.auth = aiohttp.BasicAuth(login=username, password=password) if username and password else None
+        self.settings_dict = settings_dict
 
     async def generate_game(self):
         try:
@@ -148,6 +150,7 @@ class SuperMetroidVaria():
         baseurl='https://randommetroidsolver.pythonanywhere.com',
         username=None,
         password=None,
+        settings_dict=None,
     ):
         seed = cls(
             skills_preset=skills_preset,
@@ -155,7 +158,8 @@ class SuperMetroidVaria():
             race=race,
             baseurl=baseurl,
             username=username,
-            password=password
+            password=password,
+            settings_dict=settings_dict,
         )
 
         seed.settings = await seed.get_settings()
@@ -166,11 +170,13 @@ class SuperMetroidVaria():
         return seed
 
     async def get_settings(self):
-        skills_preset_data = await self.fetch_skills_preset()
-        settings_preset_data = await self.fetch_settings_preset()
+        skills_preset_data = await self.fetch_skills_preset(self.skills_preset)
+        settings_preset_data = await self.fetch_settings_preset(self.settings_preset)
 
         settings = copy.deepcopy(SETTINGS_DEFAULT)
         settings = dict(mergedicts(settings, settings_preset_data))
+        if self.settings_dict:
+            settings = dict(mergedicts(settings, self.settings_dict))
         settings['preset'] = self.skills_preset
         settings['raceMode'] = "on" if self.race else "off"
         settings['paramsFileTarget'] = json.dumps(skills_preset_data)
@@ -178,34 +184,34 @@ class SuperMetroidVaria():
         # convert any lists to comma-deliminated strings and return
         return {s: (','.join(v) if isinstance(v, list) else v) for (s, v) in settings.items()}
 
-    async def fetch_settings_preset(self):
+    async def fetch_settings_preset(self, setting):
         """Returns a dictonary of valid settings.
 
         Returns:
             dict -- dictonary of valid settings that can be used
         """
-        data = {"randoPreset": self.settings_preset, "origin": "extStats"}
+        data = {"randoPreset": setting, "origin": "extStats"}
         try:
             async with aiohttp.request(method='post', url=f'{self.baseurl}/randoPresetWebService', data=data, auth=self.auth, raise_for_status=True) as resp:
                 settings = await resp.json(content_type='text/html')
         except aiohttp.client_exceptions.ClientResponseError as e:
             if e.code == 400:
-                raise UnableToRetrieve(f'Unable to retrieve settings preset "{self.settings_preset}".  It may not exist?') from e
+                raise UnableToRetrieve(f'Unable to retrieve settings preset "{setting}".  It may not exist?') from e
             raise
         return settings
 
-    async def fetch_skills_preset(self):
+    async def fetch_skills_preset(self, skill):
         """Returns a dictonary of valid settings.
 
         Returns:
             dict -- dictonary of valid settings that can be used
         """
         try:
-            async with aiohttp.request(method='post', url=f'{self.baseurl}/presetWebService', data={"preset": self.skills_preset}, auth=self.auth, raise_for_status=True) as resp:
+            async with aiohttp.request(method='post', url=f'{self.baseurl}/presetWebService', data={"preset": skill}, auth=self.auth, raise_for_status=True) as resp:
                 settings = await resp.json(content_type='text/html')
         except aiohttp.client_exceptions.ClientResponseError as e:
             if e.code == 400:
-                raise UnableToRetrieve(f'Unable to retrieve skill preset "{self.skills_preset}".  It may not exist?') from e
+                raise UnableToRetrieve(f'Unable to retrieve skill preset "{skill}".  It may not exist?') from e
             raise
         return settings
 
