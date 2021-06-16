@@ -66,7 +66,7 @@ class alttprClass():
         for i in range(0, 5):
             try:
                 async with aiohttp.request(method='post', url=self.baseurl + self.endpoint, json=self.settings, auth=self.auth, raise_for_status=True) as resp:
-                    req = await resp.json(content_type='text/html')
+                    req = await resp.json()
             except aiohttp.client_exceptions.ServerDisconnectedError:
                 continue
             except aiohttp.ClientResponseError:
@@ -82,10 +82,10 @@ class alttprClass():
                         patch = await resp.json()
                 else:
                     async with aiohttp.request(method='get', url=self.baseurl + '/hash/' + self.hash, auth=self.auth, raise_for_status=True) as resp:
-                        patch = await resp.json(content_type='text/html')
+                        patch = await resp.json()
             except aiohttp.ClientResponseError:
                 async with aiohttp.request(method='get', url=self.baseurl + '/hash/' + self.hash, auth=self.auth, raise_for_status=True) as resp:
-                    patch = await resp.json(content_type='text/html')
+                    patch = await resp.json()
             except aiohttp.client_exceptions.ServerDisconnectedError:
                 continue
             return patch
