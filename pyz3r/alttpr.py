@@ -181,8 +181,7 @@ class alttpr():
         if not self.data:
             raise Pyz3rException('Please specify a seed or hash first to generate or retrieve a game.')
 
-        self.rom = Rom()
-        self.rom.read(input_filename)
+        self.rom = Rom(input_filename)
 
         self.rom.apply_bps_patch(patch=await self.get_patch_base())
 

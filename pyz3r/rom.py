@@ -7,8 +7,8 @@ from .exceptions import Pyz3rException
 
 
 class Rom(object):
-    def __init__(self):
-        pass
+    def __init__(self, input_filename):
+        self.read(input_filename)
 
     def read(self, filename: str):
         with open(filename, "rb") as f:
