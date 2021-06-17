@@ -1,17 +1,17 @@
-class alttprException(Exception):
+class Pyz3rException(Exception):
     pass
 
 
-class alttprFailedToRetrieve(Exception):
+class AlttprFailedToRetrieve(Pyz3rException):
     pass
 
 
-class alttprFailedToGenerate(Exception):
+class AlttprFailedToGenerate(Pyz3rException):
     pass
 
 
-class UnableToRetrieve(Exception):
+class UnableToRetrieve(Pyz3rException):
     pass
 
-class UnableToGenerate(Exception):
+class UnableToGenerate(Pyz3rException):
     pass

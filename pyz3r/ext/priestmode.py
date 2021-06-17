@@ -35,8 +35,7 @@ import random
 # import urllib.request as request
 # from threading import Thread
 from copy import deepcopy
-from math import factorial
-from pyz3r.alttpr import alttprClass as alttpr
+from pyz3r.alttpr import alttpr
 
 ORIG_SETTINGS = {
     "allow_quickswap": True,

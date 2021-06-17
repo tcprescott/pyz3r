@@ -1,113 +1,84 @@
-from .exceptions import alttprException, alttprFailedToRetrieve, alttprFailedToGenerate
-from . import misc, spoiler, patch
+from .exceptions import Pyz3rException, AlttprFailedToRetrieve, AlttprFailedToGenerate
+from . import misc, spoiler
+from .rom import Rom
 import aiohttp
+import logging
+import tempfile
+import os
+from pathlib import Path
 
-# Use the "create" class method instead of this.  This is here for backwards compatibility and will be deprecated.
+from pyz3r import rom
 
-
-async def alttpr(
-    settings=None,
-    hash_id=None,
-    randomizer='item',
-    customizer=False,
-    baseurl='https://alttpr.com',
-    seed_baseurl='https://s3.us-east-2.amazonaws.com/alttpr-patches',
-    username=None,
-    password=None,
-):
-    seed = alttprClass(settings=settings, hash_id=hash_id, randomizer=randomizer, customizer=customizer,
-                       baseurl=baseurl, seed_baseurl=seed_baseurl, username=username, password=password, festive=False)
-    await seed._init()
-    return seed
-
-
-class alttprClass():
+class alttpr():
     def __init__(
         self,
         settings=None,
         hash_id=None,
-        randomizer=None,
-        customizer=False,
         baseurl='https://alttpr.com',
-        seed_baseurl='https://s3.us-east-2.amazonaws.com/alttpr-patches',
+        endpoint='/api/randomizer',
         username=None,
         password=None,
-        festive=False
     ):
         self.settings = settings
         self.hash = hash_id
-        self.seed_baseurl = seed_baseurl
         self.baseurl = baseurl
-        self.customizer = customizer
-        self.auth = aiohttp.BasicAuth(
-            login=username, password=password) if username and password else None
-        self.festive = festive
-
-    async def _init(self):
-        self.randomizer = 'alttpr'
-
-        if self.customizer:
-            self.endpoint = '/api/customizer'
-        elif self.festive:
-            self.endpoint = '/festive/api/randomizer'
-        else:
-            self.endpoint = '/api/randomizer'
-
-        if self.settings is None and self.hash is None:
-            self.data = None
-        else:
-            if self.settings:
-                self.data = await self.generate_game()
-                self.hash = self.data['hash']
-            else:
-                self.data = await self.retrieve_game()
-
-    async def generate_game(self):
-        for i in range(0, 5):
-            try:
-                async with aiohttp.request(method='post', url=self.baseurl + self.endpoint, json=self.settings, auth=self.auth, raise_for_status=True) as resp:
-                    req = await resp.json()
-            except aiohttp.client_exceptions.ServerDisconnectedError:
-                continue
-            except aiohttp.ClientResponseError:
-                continue
-            return req
-        raise alttprFailedToGenerate('failed to generate game')
-
-    async def retrieve_game(self):
-        for i in range(0, 5):
-            try:
-                if self.seed_baseurl is not None:
-                    async with aiohttp.request(method='get', url=self.seed_baseurl + '/' + self.hash + '.json') as resp:
-                        patch = await resp.json()
-                else:
-                    async with aiohttp.request(method='get', url=self.baseurl + '/hash/' + self.hash, auth=self.auth, raise_for_status=True) as resp:
-                        patch = await resp.json()
-            except aiohttp.ClientResponseError:
-                async with aiohttp.request(method='get', url=self.baseurl + '/hash/' + self.hash, auth=self.auth, raise_for_status=True) as resp:
-                    patch = await resp.json()
-            except aiohttp.client_exceptions.ServerDisconnectedError:
-                continue
-            return patch
-        raise alttprFailedToRetrieve(
-            f'failed to retrieve game {self.hash}, the game is likely not found')
+        self.endpoint = endpoint
+        self.auth = aiohttp.BasicAuth(login=username, password=password) if username and password else None
+        self.http = aiohttp.ClientSession(raise_for_status=True)
 
     @classmethod
     async def create(
         cls,
         settings=None,
         hash_id=None,
-        randomizer='item',
-        customizer=False,
         baseurl='https://alttpr.com',
-        seed_baseurl='https://s3.us-east-2.amazonaws.com/alttpr-patches',
+        endpoint='/api/randomizer',
         username=None,
         password=None,
     ):
-        seed = cls(settings=settings, hash_id=hash_id, randomizer=randomizer, customizer=customizer,
-                   baseurl=baseurl, seed_baseurl=seed_baseurl, username=username, password=password, festive=False)
-        await seed._init()
+        seed = cls(settings=settings, hash_id=hash_id, baseurl=baseurl, endpoint=endpoint, username=username, password=password)
+
+        if seed.settings is None and seed.hash is None:
+            seed.data = None
+            return
+
+        if seed.settings:
+            seed.data = await seed.generate_game()
+            seed.hash = seed.data['hash']
+        else:
+            seed.data = await seed.retrieve_game()
+
         return seed
+
+    async def generate_game(self):
+        for i in range(0, 5):
+            try:
+                async with self.http.post(url=self.uri(self.endpoint), json=self.settings, auth=self.auth) as resp:
+                    req = await resp.json()
+            except aiohttp.client_exceptions.ServerDisconnectedError:
+                logging.exception("Unable to generate game.")
+                continue
+            except aiohttp.ClientResponseError:
+                logging.exception("Unable to generate game.")
+                continue
+            return req
+        raise AlttprFailedToGenerate('failed to generate game')
+
+    async def retrieve_game(self):
+        for i in range(0, 5):
+            try:
+                async with self.http.get(url=self.uri('/hash/' + self.hash), auth=self.auth) as resp:
+                    patch = await resp.json(content_type="text/html")
+            except aiohttp.ClientResponseError:
+                logging.exception("Unable to retrieve game.")
+                continue
+            except aiohttp.client_exceptions.ServerDisconnectedError:
+                logging.exception("Unable to retrieve game.")
+                continue
+            return patch
+        raise AlttprFailedToRetrieve(
+            f'failed to retrieve game {self.hash}, the game is likely not found')
+
 
     async def randomizer_settings(self):
         """Returns a dictonary of valid settings, based on the randomizer in use (item or entrance).
@@ -115,7 +86,7 @@ class alttprClass():
         Returns:
             dict -- dictonary of valid settings that can be used
         """
-        async with aiohttp.request(method='get', url=self.baseurl + '/randomizer/settings', auth=self.auth, raise_for_status=True) as resp:
+        async with self.http.get(url=self.baseurl + '/randomizer/settings', auth=self.auth) as resp:
             settings = await resp.json()
         return settings
 
@@ -125,12 +96,12 @@ class alttprClass():
         Returns:
             dict -- dictonary of valid settings that can be used
         """
-        async with aiohttp.request(method='get', url=self.baseurl + '/customizer/settings', auth=self.auth, raise_for_status=True) as resp:
+        async with self.http.get(url=self.baseurl + '/customizer/settings', auth=self.auth) as resp:
             settings = await resp.json()
         return settings
 
     async def find_daily_hash(self):
-        async with aiohttp.request(method='get', url=f'{self.baseurl}/api/daily', auth=self.auth, raise_for_status=True) as resp:
+        async with self.http.get(url=f'{self.baseurl}/api/daily', auth=self.auth) as resp:
             daily = await resp.json()
         return daily['hash']
 
@@ -143,14 +114,13 @@ class alttprClass():
         """An list of strings that represents the
 
         Raises:
-            alttprException -- Raised if no game has been generated or retrieved.
+            Pyz3rException -- Raised if no game has been generated or retrieved.
 
         Returns:
             list -- List of strings depicting the code on the in-game file select screen.
         """
         if not self.data:
-            raise alttprException(
-                'Please specify a seed or hash first to generate or retrieve a game.')
+            raise Pyz3rException('Please specify a seed or hash first to generate or retrieve a game.')
 
         code_map = {
             0: 'Bow', 1: 'Boomerang', 2: 'Hookshot', 3: 'Bombs',
@@ -172,109 +142,83 @@ class alttprClass():
 
     async def get_patch_base(self):
         """Gets the base_rom from the website.  This is the first set of patches that must be applied to the ROM.
+        Caches BPS files in the system's temp directory (/tmp/pyz3r/bps on *nix systems).
 
         Returns:
-            list -- a list of dictionaries that represent a rom patch
+            bytes -- a bytes-like object representing a BPS patch
         """
-        async with aiohttp.request(method='get', url=self.baseurl + '/base_rom/settings', auth=self.auth, raise_for_status=True) as resp:
-            baserom_settings = await resp.json()
-        async with aiohttp.request(method='get', url=self.baseurl + baserom_settings['base_file'], auth=self.auth, raise_for_status=True) as resp:
-            req_patch = await resp.read()
+        async with self.http.get(url=self.uri("/api/h/" + self.hash), auth=self.auth) as resp:
+            seed_settings = await resp.json()
+
+        cachedbpstmp = os.path.join(tempfile.gettempdir(), "pyz3r", "bps")
+        cachedbpsfile = os.path.join(cachedbpstmp, f"{seed_settings['md5']}.bps")
+        try:
+            Path(cachedbpstmp).mkdir(parents=True, exist_ok=True)
+            with open(cachedbpsfile, "rb") as f:
+                req_patch = f.read()
+        except (FileNotFoundError, PermissionError):
+            async with self.http.get(url=self.baseurl + seed_settings['bpsLocation'], auth=self.auth) as resp:
+                req_patch = await resp.read()
+
+            try:
+                with open(cachedbpsfile, "wb") as f:
+                    f.write(req_patch)
+            except PermissionError:
+                logging.exception("Unable to cache BPS file.")
+
         return req_patch
 
     async def create_patched_game(
         self,
-        patchrom_array,
+        input_filename,
+        output_filename=None,
         heartspeed='half',
         heartcolor='red',
         quickswap=False,
         menu_speed='normal',
         spritename='Link',
-        music=True
-    ):
-        """Creates a list of bytes depicting a fully patched A Link to the Past Randomizer rom.
-
-        Arguments:
-            patchrom_array {list} -- a list of dictionaries that represent a Japan 1.0 ROM of A Link to the Past.
-
-        Keyword Arguments:
-            heartspeed {str} -- Chose the speed at which the low health warning beeps.
-                Options are 'off', 'double', 'normal', 'half', and 'quarter'. (default: {'half'})
-            color {str} -- The heart color.  Options are 'red', 'blue', 'green', and 'yellow' (default: {'red'})
-            spritename {str} -- The name of the sprite, as shown on https://alttpr.com/en/sprite_preview (default: {'Link'})
-            music {bool} -- If true, music is enabled.  If false, the music id disabled. (default: {True})
-
-        Raises:
-            alttprException -- Raised if no game has been generated or retrieved.
-
-        Returns:
-            list -- a list of bytes depecting a fully patched ALTTPR game
-        """
+        music=True) -> Rom:
         if not self.data:
-            raise alttprException(
-                'Please specify a seed or hash first to generate or retrieve a game.')
+            raise Pyz3rException('Please specify a seed or hash first to generate or retrieve a game.')
 
-        # apply the base modifications
-        patchrom_array = patch.apply_bps(
-            rom=patchrom_array,
-            patches=await self.get_patch_base()
-        )
+        self.rom = Rom()
+        self.rom.read(input_filename)
+
+        self.rom.apply_bps_patch(patch=await self.get_patch_base())
 
         # expand the ROM to size requested in seed_data
-        patchrom_array = patch.expand(
-            patchrom_array, newlenmb=self.data['size'])
+        if self.data['size'] > 2:
+            self.rom.expand(newlenmb=self.data['size'])
 
         # apply the seed-specific changes
-        patchrom_array = patch.apply(
-            rom=patchrom_array,
-            patches=self.data['patch']
-        )
+        self.rom.apply_dict_patches(patches=self.data['patch'])
 
         # apply the heart speed change
-        patchrom_array = patch.apply(
-            rom=patchrom_array,
-            patches=patch.heart_speed(heartspeed)
-        )
+        self.rom.heart_speed(heartspeed)
 
         # apply the heart color change
-        patchrom_array = patch.apply(
-            rom=patchrom_array,
-            patches=patch.heart_color(heartcolor)
-        )
+        self.rom.heart_color(heartcolor)
 
         # apply menu speed
-        patchrom_array = patch.apply(
-            rom=patchrom_array,
-            patches=patch.menu_speed(menu_speed)
-        )
+        self.rom.menu_speed(menu_speed)
 
         # apply quickswap
-        patchrom_array = patch.apply(
-            rom=patchrom_array,
-            patches=patch.quickswap(quickswap)
-        )
+        self.rom.quickswap(quickswap)
+
+        if spritename != "Link":
+            # apply the sprite
+            self.rom.sprite(zspr=await self.get_sprite(spritename))
 
         # apply the sprite
-        patchrom_array = patch.apply(
-            rom=patchrom_array,
-            patches=patch.sprite(
-                spr=await self.get_sprite(spritename)
-            )
-        )
-
-        # apply the sprite
-        patchrom_array = patch.apply(
-            rom=patchrom_array,
-            patches=patch.music(music=music)
-        )
+        self.rom.music(music=music)
 
         # calculate the SNES checksum and apply it to the ROM
-        patchrom_array = patch.apply(
-            rom=patchrom_array,
-            patches=patch.checksum(patchrom_array)
-        )
+        self.rom.checksum()
 
-        return patchrom_array
+        if output_filename is not None:
+            self.rom.write_to_file(output_filename)
+
+        return self.rom
 
     async def get_sprite(self, name):
         """Retrieve the ZSPR file for the named sprite.
@@ -283,27 +227,30 @@ class alttprClass():
             name {str} -- The name of the sprite, as listed at https://alttpr.com/en/sprite_preview
 
         Raises:
-            alttprException -- Raised if no game has been generated or retrieved.
+            Pyz3rException -- Raised if no game has been generated or retrieved.
 
         Returns:
             list -- a list of bytes depicting a SPR or ZSPR file
         """
-        async with aiohttp.request(method='get', url=self.baseurl + '/sprites', auth=self.auth, raise_for_status=True) as resp:
+        async with self.http.get(url=self.baseurl + '/sprites', auth=self.auth) as resp:
             sprites = await resp.json()
         try:
             spriteinfo = next(
                 (sprite for sprite in sprites if sprite["name"] == name))
         except StopIteration:
-            raise alttprException(
+            raise Pyz3rException(
                 f"Sprite {name} does not exist on {self.base_url}.")
         try:
-            async with aiohttp.request(method='get', url=spriteinfo["file"], raise_for_status=True) as resp:
+            async with self.http.get(url=spriteinfo["file"]) as resp:
                 spritedata = await resp.read()
         except Exception as e:
-            raise alttprException(
+            raise Pyz3rException(
                 f'Sprite "{name}" could not be downloaded.') from e
-        spr = list(spritedata)
-        return spr
+
+        return bytearray(spritedata)
+
+    def uri(self, url):
+        return f'{self.baseurl}{url}'
 
     def get_formatted_spoiler(self, translate_dungeon_items=False):
         return spoiler.create_filtered_spoiler(self, translate_dungeon_items)

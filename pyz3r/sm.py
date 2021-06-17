@@ -2,7 +2,7 @@ import slugid
 import uuid
 import asyncio
 import aiohttp
-
+from . import exceptions
 
 async def sm(
     settings=None,
@@ -75,7 +75,7 @@ class smClass():
             # except aiohttp.ClientResponseError:
             #     continue
             return req
-        raise exceptions.alttprFailedToGenerate('failed to generate game')
+        raise exceptions.AlttprFailedToGenerate('failed to generate game')
 
     async def retrieve_game(self):
         for i in range(0, 5):
@@ -88,7 +88,7 @@ class smClass():
             except aiohttp.client_exceptions.ServerDisconnectedError:
                 continue
             return patch
-        raise exceptions.alttprFailedToRetrieve(
+        raise exceptions.AlttprFailedToRetrieve(
             f'failed to retrieve game {self.slug_id}, the game is likely not found')
 
     @classmethod
