@@ -157,7 +157,7 @@ class Rom(object):
                 metadata_index = metadata_index + 1
 
             sprite_author_map = {
-                " ": (0x9F, 0x9F),  "0": (0x53, 0x79), "1": (0x54, 0x7A),
+                " ": (0x9F, 0x9F), "0": (0x53, 0x79), "1": (0x54, 0x7A),
                 "2": (0x55, 0x7B), "3": (0x56, 0x7C), "4": (0x57, 0x7D),
                 "5": (0x58, 0x7E), "6": (0x59, 0x7F), "7": (0x5A, 0x80),
                 "8": (0x5B, 0x81), "9": (0x5C, 0x82), "A": (0x5D, 0x83),
@@ -173,8 +173,8 @@ class Rom(object):
                 "/": (0xA2, 0xC2), ":": (0xA3, 0xC3), "_": (0xA6, 0xC6)
             }
 
-            sprite_author_short = sprite_author_short.center(28, ' ')
-            sprite_author_bytes = [sprite_author_map[a.upper()] if a.upper() in sprite_author_map else (0x9F, 0x9F) for a in sprite_author_short]
+            sprite_author_short = sprite_author_short[:28].center(28, ' ').upper()
+            sprite_author_bytes = [sprite_author_map[a] if a in sprite_author_map else (0x9F, 0x9F) for a in sprite_author_short]
 
             for idx, (upper, lower) in enumerate(sprite_author_bytes):
                 self.write_byte(0x118002 + idx, upper)
