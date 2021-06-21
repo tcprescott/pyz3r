@@ -336,7 +336,7 @@ async def create_priestmode(count, genclass=alttpr):
 
     seeds = []
     for i, s in enumerate(settings_lists):
-        seed = await genclass.create(settings=settings_lists[i], customizer=True)
+        seed = await genclass.generate(settings=settings_lists[i], endpoint="/api/customizer")
         seeds.append(seed)
 
     return seeds

@@ -9,75 +9,65 @@ from pathlib import Path
 
 from pyz3r import rom
 
-class alttpr():
+class ALTTPR():
     def __init__(
         self,
-        settings=None,
-        hash_id=None,
         baseurl='https://alttpr.com',
-        endpoint='/api/randomizer',
         username=None,
         password=None,
     ):
-        self.settings = settings
-        self.hash = hash_id
+        self.data = None
+        self.hash_id = None
+        self.settings = None
         self.baseurl = baseurl
-        self.endpoint = endpoint
         self.auth = aiohttp.BasicAuth(login=username, password=password) if username and password else None
         self.http = aiohttp.ClientSession(raise_for_status=True)
 
     @classmethod
-    async def create(
-        cls,
-        settings=None,
-        hash_id=None,
-        baseurl='https://alttpr.com',
-        endpoint='/api/randomizer',
-        username=None,
-        password=None,
-    ):
-        seed = cls(settings=settings, hash_id=hash_id, baseurl=baseurl, endpoint=endpoint, username=username, password=password)
+    async def generate(cls, settings, endpoint='/api/randomizer', **kwargs):
+        seed = cls(**kwargs)
 
-        if seed.settings is None and seed.hash is None:
-            seed.data = None
-            return
+        seed.settings = settings
 
-        if seed.settings:
-            seed.data = await seed.generate_game()
-            seed.hash = seed.data['hash']
-        else:
-            seed.data = await seed.retrieve_game()
+        seed.data = await seed.generate_game(endpoint)
+        seed.hash = seed.data['hash']
 
         return seed
 
-    async def generate_game(self):
-        for i in range(0, 5):
+    @classmethod
+    async def retrieve(cls, hash_id, **kwargs):
+        seed = cls(**kwargs)
+
+        seed.hash = hash_id
+        seed.data = await seed.retrieve_game()
+
+        return seed
+
+    async def generate_game(self, endpoint):
+        for _ in range(0, 5):
             try:
-                async with self.http.post(url=self.uri(self.endpoint), json=self.settings, auth=self.auth) as resp:
+                async with self.http.post(url=self.uri(endpoint), json=self.settings, auth=self.auth) as resp:
                     req = await resp.json()
-            except aiohttp.client_exceptions.ServerDisconnectedError:
+                self.data = req
+                return req
+            except (aiohttp.client_exceptions.ServerDisconnectedError, aiohttp.ClientResponseError):
                 logging.exception("Unable to generate game.")
-                continue
-            except aiohttp.ClientResponseError:
-                logging.exception("Unable to generate game.")
-                continue
-            return req
+
         raise AlttprFailedToGenerate('failed to generate game')
 
-    async def retrieve_game(self):
-        for i in range(0, 5):
+    async def retrieve_game(self, hash_id):
+        for _ in range(0, 5):
             try:
-                async with self.http.get(url=self.uri('/hash/' + self.hash), auth=self.auth) as resp:
-                    patch = await resp.json(content_type="text/html")
+                async with self.http.get(url=self.uri('/hash/' + hash_id), auth=self.auth) as resp:
+                    req = await resp.json(content_type="text/html")
+                self.data = req
+                return req
             except aiohttp.ClientResponseError:
                 logging.exception("Unable to retrieve game.")
-                continue
             except aiohttp.client_exceptions.ServerDisconnectedError:
                 logging.exception("Unable to retrieve game.")
-                continue
-            return patch
         raise AlttprFailedToRetrieve(
-            f'failed to retrieve game {self.hash}, the game is likely not found')
+            f'failed to retrieve game {hash_id}, the game is likely not found.')
 
 
     async def randomizer_settings(self):
