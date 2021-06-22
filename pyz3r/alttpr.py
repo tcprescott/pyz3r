@@ -27,9 +27,7 @@ class ALTTPR():
     async def generate(cls, settings, endpoint='/api/randomizer', **kwargs):
         seed = cls(**kwargs)
 
-        seed.settings = settings
-
-        seed.data = await seed.generate_game(endpoint)
+        seed.data = await seed.generate_game(settings, endpoint)
         seed.hash = seed.data['hash']
 
         return seed
@@ -39,14 +37,15 @@ class ALTTPR():
         seed = cls(**kwargs)
 
         seed.hash = hash_id
-        seed.data = await seed.retrieve_game()
+        seed.data = await seed.retrieve_game(hash_id)
 
         return seed
 
-    async def generate_game(self, endpoint):
+    async def generate_game(self, settings, endpoint):
+        self.settings = settings
         for _ in range(0, 5):
             try:
-                async with self.http.post(url=self.uri(endpoint), json=self.settings, auth=self.auth) as resp:
+                async with self.http.post(url=self.uri(endpoint), json=settings, auth=self.auth) as resp:
                     req = await resp.json()
                 self.data = req
                 return req

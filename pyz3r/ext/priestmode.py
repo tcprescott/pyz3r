@@ -35,7 +35,7 @@ import random
 # import urllib.request as request
 # from threading import Thread
 from copy import deepcopy
-from pyz3r.alttpr import alttpr
+from pyz3r.alttpr import ALTTPR
 
 ORIG_SETTINGS = {
     "allow_quickswap": True,
@@ -315,7 +315,7 @@ ORIG_SETTINGS = {
 UNCLE_LOCATION = "TGluaydzIFVuY2xlOjE="
 
 
-async def create_priestmode(count, genclass=alttpr):
+async def create_priestmode(count, genclass=ALTTPR):
     name = 'kiss-priest-' + batch_code() + '-{:0>2d}'
     settings_lists = [None]*count
     uncle = uncle_weapons(count)
