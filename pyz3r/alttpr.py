@@ -21,7 +21,6 @@ class ALTTPR():
         self.settings = None
         self.baseurl = baseurl
         self.auth = aiohttp.BasicAuth(login=username, password=password) if username and password else None
-        self.http = aiohttp.ClientSession(raise_for_status=True)
 
     @classmethod
     async def generate(cls, settings, endpoint='/api/randomizer', **kwargs):
@@ -45,7 +44,7 @@ class ALTTPR():
         self.settings = settings
         for _ in range(0, 5):
             try:
-                async with self.http.post(url=self.uri(endpoint), json=settings, auth=self.auth) as resp:
+                async with aiohttp.request(method='post', url=self.uri(endpoint), json=settings, auth=self.auth, raise_for_status=True) as resp:
                     req = await resp.json()
                 self.data = req
                 return req
@@ -57,7 +56,7 @@ class ALTTPR():
     async def retrieve_game(self, hash_id):
         for _ in range(0, 5):
             try:
-                async with self.http.get(url=self.uri('/hash/' + hash_id), auth=self.auth) as resp:
+                async with aiohttp.request(method='get', url=self.uri('/hash/' + hash_id), auth=self.auth, raise_for_status=True) as resp:
                     req = await resp.json(content_type="text/html")
                 self.data = req
                 return req
@@ -75,7 +74,7 @@ class ALTTPR():
         Returns:
             dict -- dictonary of valid settings that can be used
         """
-        async with self.http.get(url=self.baseurl + '/randomizer/settings', auth=self.auth) as resp:
+        async with aiohttp.request(method='get', url=self.baseurl + '/randomizer/settings', auth=self.auth, raise_for_status=True) as resp:
             settings = await resp.json()
         return settings
 
@@ -85,12 +84,12 @@ class ALTTPR():
         Returns:
             dict -- dictonary of valid settings that can be used
         """
-        async with self.http.get(url=self.baseurl + '/customizer/settings', auth=self.auth) as resp:
+        async with aiohttp.request(method='get', url=self.baseurl + '/customizer/settings', auth=self.auth, raise_for_status=True) as resp:
             settings = await resp.json()
         return settings
 
     async def find_daily_hash(self):
-        async with self.http.get(url=f'{self.baseurl}/api/daily', auth=self.auth) as resp:
+        async with aiohttp.request(method='get', url=f'{self.baseurl}/api/daily', auth=self.auth, raise_for_status=True) as resp:
             daily = await resp.json()
         return daily['hash']
 
@@ -136,7 +135,7 @@ class ALTTPR():
         Returns:
             bytes -- a bytes-like object representing a BPS patch
         """
-        async with self.http.get(url=self.uri("/api/h/" + self.hash), auth=self.auth) as resp:
+        async with aiohttp.request(method='get', url=self.uri("/api/h/" + self.hash), auth=self.auth, raise_for_status=True) as resp:
             seed_settings = await resp.json()
 
         cachedbpstmp = os.path.join(tempfile.gettempdir(), "pyz3r", "bps")
@@ -146,7 +145,7 @@ class ALTTPR():
             with open(cachedbpsfile, "rb") as f:
                 req_patch = f.read()
         except (FileNotFoundError, PermissionError):
-            async with self.http.get(url=self.baseurl + seed_settings['bpsLocation'], auth=self.auth) as resp:
+            async with aiohttp.request(method='get', url=self.baseurl + seed_settings['bpsLocation'], auth=self.auth, raise_for_status=True) as resp:
                 req_patch = await resp.read()
 
             try:
@@ -220,7 +219,7 @@ class ALTTPR():
         Returns:
             list -- a list of bytes depicting a SPR or ZSPR file
         """
-        async with self.http.get(url=self.baseurl + '/sprites', auth=self.auth) as resp:
+        async with aiohttp.request(method='get', url=self.baseurl + '/sprites', auth=self.auth, raise_for_status=True) as resp:
             sprites = await resp.json()
         try:
             spriteinfo = next(
@@ -229,7 +228,7 @@ class ALTTPR():
             raise Pyz3rException(
                 f"Sprite {name} does not exist on {self.base_url}.")
         try:
-            async with self.http.get(url=spriteinfo["file"]) as resp:
+            async with aiohttp.request(method='get', url=spriteinfo["file"], raise_for_status=True) as resp:
                 spritedata = await resp.read()
         except Exception as e:
             raise Pyz3rException(
