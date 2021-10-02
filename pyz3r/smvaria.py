@@ -35,6 +35,7 @@ SETTINGS_DEFAULT = {
     "superQty": "2",
     "powerBombQty": "1",
     "minorQty": "100",
+    "scavNumLocs": "10",
     "suitsRestriction": "on",
     "funCombat": "off",
     "funMovement": "off",
@@ -101,6 +102,8 @@ SETTINGS_DEFAULT = {
     "minimizerTourian": "off",
     "allowGreyDoors": "off",
     "minimizerQty": "45",
+    "scavRandomized": "off",
+    "hud": "off"
 }
 
 
