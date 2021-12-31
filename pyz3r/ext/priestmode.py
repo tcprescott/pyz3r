@@ -36,6 +36,7 @@ import random
 # from threading import Thread
 from copy import deepcopy
 from pyz3r.alttpr import ALTTPR
+from typing import List
 
 ORIG_SETTINGS = {
     "allow_quickswap": True,
@@ -334,7 +335,7 @@ async def create_priestmode(count, genclass=ALTTPR):
         settings_lists[i]["custom"]["item"]["count"]["ProgressiveSword"] -= 2
         settings_lists[i]["custom"]["item"]["count"]["PieceOfHeart"] += 9
 
-    seeds = []
+    seeds: List[genclass] = []
     for i, s in enumerate(settings_lists):
         seed = await genclass.generate(settings=settings_lists[i], endpoint="/api/customizer")
         seeds.append(seed)
