@@ -73,6 +73,7 @@ def generate_random_settings(weights, tournament=True, spoilers="mystery"):
     options["enemy_health"] = get_random_option(weights['enemy_health'])
     options["pot_shuffle"] = get_random_option(weights.get('pot_shuffle', 'off'))
     options["allow_quickswap"] = get_random_option(weights.get('allow_quickswap', False))
+    options["pseudoboots"] = get_random_option(weights.get('pseudoboots', False))
     options['entrance_shuffle'] = get_random_option(weights['entrance_shuffle'])
 
     # only roll customizer stuff if entrance shuffle isn't on, and we have a customizer section
@@ -281,6 +282,7 @@ def generate_random_settings(weights, tournament=True, spoilers="mystery"):
     settings["enemizer"]["enemy_health"] = options['enemy_health']
     settings["enemizer"]["pot_shuffle"] = options.get('pot_shuffle', 'off')
     settings["entrances"] = options['entrance_shuffle']
+    settings["pseudoboots"] = options['pseudoboots']
 
     settings["allow_quickswap"] = get_random_option(weights.get('allow_quickswap', False))
 
