@@ -103,7 +103,10 @@ SETTINGS_DEFAULT = {
     "allowGreyDoors": "off",
     "minimizerQty": "45",
     "scavRandomized": "off",
-    "hud": "off"
+    "hud": "off",
+    "doorsColorsRando" : "off",
+    "tourian" : "Vanilla",
+    "objective" : ['kill all G4'],
 }
 
 
