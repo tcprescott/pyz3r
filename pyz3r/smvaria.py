@@ -172,7 +172,8 @@ class SuperMetroidVaria():
         seed.settings = await seed.get_settings()
 
         seed.data = await seed.generate_game(raise_for_status)
-        seed.guid = uuid.UUID(hex=seed.data['seedKey'])
+        if 'seedKey' in seed.data:
+            seed.guid = uuid.UUID(hex=seed.data['seedKey'])
 
         return seed
 
