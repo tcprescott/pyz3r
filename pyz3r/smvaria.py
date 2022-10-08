@@ -130,7 +130,7 @@ class SuperMetroidVaria():
         self.auth = aiohttp.BasicAuth(login=username, password=password) if username and password else None
         self.settings_dict = settings_dict
 
-    async def generate_game(self):
+    async def generate_game(self, raise_for_status=True):
         try:
             async for attempt in AsyncRetrying(
                     stop=stop_after_attempt(3),
@@ -141,7 +141,7 @@ class SuperMetroidVaria():
                             url=f'{self.baseurl}/randomizerWebService',
                             data=self.settings,
                             auth=self.auth,
-                            raise_for_status=True) as resp:
+                            raise_for_status=raise_for_status) as resp:
                         req = await resp.json(content_type='text/html')
                     return req
         except RetryError as e:
@@ -157,6 +157,7 @@ class SuperMetroidVaria():
         username=None,
         password=None,
         settings_dict=None,
+        raise_for_status=True,
     ):
         seed = cls(
             skills_preset=skills_preset,
@@ -170,8 +171,9 @@ class SuperMetroidVaria():
 
         seed.settings = await seed.get_settings()
 
-        seed.data = await seed.generate_game()
-        seed.guid = uuid.UUID(hex=seed.data['seedKey'])
+        seed.data = await seed.generate_game(raise_for_status)
+        if 'seedKey' in seed.data:
+            seed.guid = uuid.UUID(hex=seed.data['seedKey'])
 
         return seed
 
