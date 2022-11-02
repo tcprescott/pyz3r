@@ -107,6 +107,8 @@ SETTINGS_DEFAULT = {
     "doorsColorsRando" : "off",
     "tourian" : "Vanilla",
     "objective" : ['kill all G4'],
+    "objectiveRandom": "false",
+    "relaxed_round_robin_cf": "off",
 }
 
 
