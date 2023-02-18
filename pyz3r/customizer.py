@@ -276,6 +276,7 @@ def convert2settings(
     settings['tournament'] = tournament
     settings['spoilers'] = spoilers
 
+    # TODO we can probably compact this down a bit
     try:
         if not customizer_save['randomizer.glitches_required'] is None:
             settings['glitches'] = customizer_save['randomizer.glitches_required']
@@ -348,11 +349,36 @@ def convert2settings(
     except KeyError:
         pass
 
-    settings['enemizer']['boss_shuffle'] = customizer_save.get('randomizer.boss_shuffle', 'none')
-    settings['enemizer']['enemy_shuffle'] = customizer_save.get('randomizer.enemy_shuffle', 'none')
-    settings['enemizer']['enemy_damage'] = customizer_save.get('randomizer.enemy_damage', 'default')
-    settings['enemizer']['enemy_health'] = customizer_save.get('randomizer.enemy_health', 'default')
-    settings['enemizer']['pot_shuffle'] = customizer_save.get('randomizer.pot_shuffle', 'off')
+    try:
+        if not customizer_save['randomizer.boss_shuffle'] is None:
+            settings['enemizer']['boss_shuffle'] = customizer_save['randomizer.boss_shuffle']
+    except KeyError:
+        pass
+
+    try:
+        if not customizer_save['randomizer.enemy_shuffle'] is None:
+            settings['enemizer']['enemy_shuffle'] = customizer_save['randomizer.enemy_shuffle']
+    except KeyError:
+        pass
+
+    try:
+        if not customizer_save['randomizer.enemy_damage'] is None:
+            settings['enemizer']['enemy_damage'] = customizer_save['randomizer.enemy_damage']
+    except KeyError:
+        pass
+
+    try:
+        if not customizer_save['randomizer.enemy_health'] is None:
+            settings['enemizer']['enemy_health'] = customizer_save['randomizer.enemy_health']
+    except KeyError:
+        pass
+
+    try:
+        if not customizer_save['randomizer.pot_shuffle'] is None:
+            settings['enemizer']['pot_shuffle'] = customizer_save['randomizer.pot_shuffle']
+    except KeyError:
+        pass
+
 
     # vt.custom.prizepacks
     try:
