@@ -13,7 +13,6 @@ SETTINGS_DEFAULT = {
     "complexity": "advanced",
     "seed": "0",
     "preset": "regular",
-    "preset": "regular",
     "startLocation": "Landing Site",
     "majorsSplit": "Full",
     "scavNumLocs": "10",
