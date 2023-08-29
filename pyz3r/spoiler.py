@@ -151,6 +151,7 @@ def create_filtered_spoiler(seed, translate_dungeon_items=False):
     sorteddict['Drops']['RupeeCrab']['Final'] = drops['RupeeCrab']['Final']
     sorteddict['Drops']['Stun'] = drops['Stun']
     sorteddict['Drops']['FishSave'] = drops['FishSave']
+    sorteddict['Drops']['PrizePacks'] = drops['PrizePacks']
 
     sorteddict['Special']['DiggingGameDigs'] = misc.seek_patch_data(
         seed.data['patch'], 982421, 1)[0]
@@ -178,12 +179,14 @@ def get_seed_prizepacks(data):
     d = {}
     d['PullTree'] = {}
     d['RupeeCrab'] = {}
+    d['PrizePacks'] = {}
 
     stun_offset = '227731'
     pulltree_offset = '981972'
     rupeecrap_main_offset = '207304'
     rupeecrab_final_offset = '207300'
     fishsave_offset = '950988'
+    prize_packs_offset = '227960'
 
     for patch in data['patch']:
         if stun_offset in patch:
@@ -203,8 +206,50 @@ def get_seed_prizepacks(data):
                 patch[rupeecrab_final_offset][0])
         if fishsave_offset in patch:
             d['FishSave'] = get_sprite_droppable(patch[fishsave_offset][0])
+        if prize_packs_offset in patch:
+            d['PrizePacks'] = {}
+            prize_pack_values = list(zip(*[iter(patch[prize_packs_offset][0:56])] * 8))
+            for group_index, prize_pack_set in enumerate(prize_pack_values, 1):
+                group_name = get_enemy_group_name(group_index)
+                prize_pack_name = get_prize_pack_name(prize_pack_set)
+                d['PrizePacks'][group_name] = prize_pack_name
 
     return d
+
+
+def get_enemy_group_name(enemy_group_index):
+    if enemy_group_index == 1:
+        return 'HeartsGroup'
+    if enemy_group_index == 2:
+        return 'RupeesGroup'
+    if enemy_group_index == 3:
+        return 'MagicGroup'
+    if enemy_group_index == 4:
+        return 'BombsGroup'
+    if enemy_group_index == 5:
+        return 'ArrowsGroup'
+    if enemy_group_index == 6:
+        return 'SmallVarietyGroup'
+    if enemy_group_index == 7:
+        return 'LargeVarietyGroup'
+
+
+def get_prize_pack_name(prize_pack_set):
+    if prize_pack_set == (216, 216, 216, 216, 217, 216, 216, 217):
+        return 'HeartsPack'
+    if prize_pack_set == (218, 217, 218, 219, 218, 217, 218, 218):
+        return 'RupeesPack'
+    if prize_pack_set == (224, 223, 223, 218, 224, 223, 216, 223):
+        return 'MagicPack'
+    if prize_pack_set == (220, 220, 220, 221, 220, 220, 222, 220):
+        return 'BombsPack'
+    if prize_pack_set == (225, 216, 225, 226, 225, 216, 225, 226):
+        return 'ArrowsPack'
+    if prize_pack_set == (223, 217, 216, 225, 223, 220, 217, 216):
+        return 'SmallVarietyPack'
+    if prize_pack_set == (216, 227, 224, 219, 222, 216, 219, 226):
+        return 'LargeVarietyPack'
+    return ', '.join([get_sprite_droppable(drop) for drop in prize_pack_set])
 
 
 def get_sprite_droppable(i):
