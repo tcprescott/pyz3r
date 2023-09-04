@@ -151,7 +151,8 @@ patched_rom = await seed.create_patched_game(
     spritename='Link', #can be any sprite listed at https://alttpr.com/sprites
     music=False, # true or false, defaults true
     quickswap=False,
-    menu_speed='normal'
+    menu_speed='normal',
+    msu1_resume=True # true or false, defaults true
 )
 ```
 
@@ -164,64 +165,13 @@ Here you can customize the following:
 4. `music` - Optional. Whether music should play.  Acceptable values are `True` and `False`. `False` allows MSU-1 music to work correctly.  Default is `True`.
 5. `quickswap` - Optional.  Enable quickswap.  Only works on non-tournament games or entrance shuffle.  Acceptable values are `True` and `False`.  Default is `False`.
 6. `menu_speed` - Optional.  This is the menu speed setting.  Only works on non-tournament games.  Acceptable values are `instant`, `fast`, `normal`, `slow`.  Default is `normal`.
+7. `msu1_resume` - Optional.  This can disable the MSU1 Resume feature.  Defaults to true.
 
-The result of `create_patched_game` is an array of integers representing the fully patched ROM.
+The result of `create_patched_game` is a Rom object representing the fully patched game.
 
 Finally, you can write the ROM to a new file:
 ```python
 pyz3r.romfile.write(patched_rom, "path/to/patched_rom.sfc")
-```
-
-#### Advanced patching
-If you have a patched game, and just want to customize the already patched game, this library lets you do that too.
-
-The following example will let you bring in an already patched game and let you customize the heart speed, heart color, sprite, and music.
-
-```python
-import pyz3r
-from pyz3r.patch import patch
-
-rom = pyz3r.romfile.read('path/to/rom.sfc',verify_checksum=False)
-
-#apply the heart speed change
-rom = patch.apply(
-    rom=rom,
-    patches=patch.heart_speed('half')
-)
-
-#apply the heart color change
-rom = patch.apply(
-    rom=rom,
-    patches=patch.heart_color('blue')
-)
-
-#apply the sprite, retrieves a sprite from the alttpr website
-rom = patch.apply(
-    rom=rom,
-    patches=patch.sprite(
-        spr=pyz3r.alttpr().get_sprite('Negative Link')
-    )
-)
-
-#apply the music
-rom = patch.apply(
-    rom=rom,
-    patches=patch.music(True)
-)
-
-# apply menu speed
-rom = patch.apply(
-    rom=patchrom_array,
-    patches=patch.menu_speed('normal')
-)
-
-# apply quickswap
-rom = patch.apply(
-    rom=patchrom_array,
-    patches=patch.quickswap(False)
-)
-
-pyz3r.romfile.write(rom,'path/to/patched_rom.sfc')
 ```
 
 ### Using the customizer
