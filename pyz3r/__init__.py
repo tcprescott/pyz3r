@@ -8,7 +8,7 @@ __title__ = 'pyz3r'
 __author__ = 'Thomas Prescott'
 __license__ = 'Apache 2.0'
 __copyright__ = 'Copyright 2018-2022 Thomas Prescott'
-__version__ = '6.0.9'
+__version__ = '6.1.0'
 
 from pyz3r.alttpr import ALTTPR
 from pyz3r.sm import sm
