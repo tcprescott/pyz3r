@@ -165,7 +165,8 @@ class ALTTPR():
         quickswap=False,
         menu_speed='normal',
         spritename='Link',
-        music=True) -> Rom:
+        music=True,
+        msu1_resume=True) -> Rom:
         if not self.data:
             raise Pyz3rException('Please specify a seed or hash first to generate or retrieve a game.')
 
@@ -192,12 +193,13 @@ class ALTTPR():
         # apply quickswap
         self.rom.quickswap(quickswap)
 
-        if spritename != "Link":
+        if not spritename == "Link":
             # apply the sprite
             self.rom.sprite(zspr=await self.get_sprite(spritename))
 
-        # apply the sprite
+        # apply music options
         self.rom.music(music=music)
+        self.rom.msu1_resume(enable=msu1_resume)
 
         # calculate the SNES checksum and apply it to the ROM
         self.rom.checksum()
