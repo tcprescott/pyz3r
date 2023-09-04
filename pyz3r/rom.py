@@ -76,27 +76,39 @@ class Rom(object):
             color {str} -- The heart color.  Options are 'red', 'blue', 'green', and 'yellow' (default: {'red'})
         """
 
-        cbyte = {
-            'blue': [44, 13],
-            'green': [60, 25],
-            'yellow': [40, 9],
-            'red': [36, 5],
-        }
+        if self.rom_version >= 4:
+            cbyte = {
+                'blue': 0x01,
+                'green': 0x02,
+                'yellow': 0x03,
+                'red': 0x00,
+            }
+            try:
+                self.write_byte(0x187020, cbyte[color])
+            except KeyError:
+                raise Pyz3rException(f'Unknown heart color: {color}')
+        else:
+            cbyte = {
+                'blue': [44, 13],
+                'green': [60, 25],
+                'yellow': [40, 9],
+                'red': [36, 5],
+            }
 
-        byte = cbyte[color][0]
-        file_byte = cbyte[color][1]
+            byte = cbyte[color][0]
+            file_byte = cbyte[color][1]
 
-        self.write_byte(0x6fa1e, byte)
-        self.write_byte(0x6fa20, byte)
-        self.write_byte(0x6fa22, byte)
-        self.write_byte(0x6fa24, byte)
-        self.write_byte(0x6fa26, byte)
-        self.write_byte(0x6fa28, byte)
-        self.write_byte(0x6fa2a, byte)
-        self.write_byte(0x6fa2c, byte)
-        self.write_byte(0x6fa2e, byte)
-        self.write_byte(0x6fa30, byte)
-        self.write_byte(0x65561, file_byte)
+            self.write_byte(0x6fa1e, byte)
+            self.write_byte(0x6fa20, byte)
+            self.write_byte(0x6fa22, byte)
+            self.write_byte(0x6fa24, byte)
+            self.write_byte(0x6fa26, byte)
+            self.write_byte(0x6fa28, byte)
+            self.write_byte(0x6fa2a, byte)
+            self.write_byte(0x6fa2c, byte)
+            self.write_byte(0x6fa2e, byte)
+            self.write_byte(0x6fa30, byte)
+            self.write_byte(0x65561, file_byte)
 
     def music(self, music=True):
         """Enables, or disables, the in-game music.  Useful if you want to use an MSU-1 soundtrack instead.
@@ -223,3 +235,15 @@ class Rom(object):
         else:
             self.rom.extend(itertools.repeat(0, -diff))
             self.rom.append(0)
+
+    @property
+    def rom_version(self):
+        """Returns the version of the ROM.
+
+        Returns:
+            int -- The version of the ROM.  Returns zero if predates versioning.
+        """
+
+        ver = int.from_bytes(self.rom[0x7FE2:0x7FE3+1], byteorder='big', signed=False)
+        if ver == 65535:
+            return 0
