@@ -37,7 +37,7 @@ The below example will generate an item randomizer game with a list of settings:
 import pyz3r
 
 async def main():
-    seed = await pyz3r.alttpr(
+    seed = await pyz3r.ALTTPR.generate(
         settings={
             "glitches": "none",
             "item_placement": "advanced",
@@ -73,11 +73,6 @@ if __name__ == '__main__':
     loop.run_until_complete(main())
 ```
 
-This will give you a list of item randomizer options as a dictionary:
-```python
-pyz3r.alttpr().settings()
-```
-
 
 ### Loading an already generated game
 If the game you want to work with has already been generated, you can load the hash like this:
@@ -86,7 +81,7 @@ If the game you want to work with has already been generated, you can load the h
 import pyz3r
 
 async def main()
-    seed = await pyz3r.alttpr(
+    seed = await pyz3r.ALTTPR.retrieve(
         hash='zDvxWLLEMa'
     )
 
@@ -136,16 +131,13 @@ This is the meat and potatoes of the library.  There are two ways, the easy and 
 
 You'll first want to read your unmodified Japan 1.0 ROM of Link to the Past.  `read_rom()` will checksum the file to ensure its the correct ROM.
 
-```python
-base_rom = await pyz3r.rom.read("path/to/Zelda no Densetsu - Kamigami no Triforce (Japan).sfc")
-```
-
 `base_rom` will be an array of integers representing the bytes of the original ROM.
 
 You'll then want to use `create_patched_game` to apply all of the patches required to randomize and customize the ROM.
 ```python
 patched_rom = await seed.create_patched_game(
-    base_rom,  
+    input_filename="alttp_jp10.sfc", # this should be an ALTTP Japan 1.0 ROM
+    output_filename="/path/to/output.sfc", # this is the output ROM
     heartspeed='normal',
     heartcolor='red',
     spritename='Link', #can be any sprite listed at https://alttpr.com/sprites
@@ -158,7 +150,6 @@ patched_rom = await seed.create_patched_game(
 
 Here you can customize the following:
 
-0. `patchrom_array` - Required.  This is an array of bits that have your original Japan 1.0 ROM.  The `pyz3r.romfile.read()` function.
 1. `heartspeed` - Optional. The low health beep speed.  Acceptable values are `'off'`, `'quarter'`, `'half'`, `'double'`, or `'normal'`.  Defaults is `'normal'`.
 2. `heartcolor` - Optional. The color of your hearts.  Acceptable values are `'red'`, `'blue'`, `'green'`, or `'yellow'`.  Default is `'red'`.
 3. `spritename` - Optional. The sprite to use.  Acceptable values are the `name` keys in the json file at https://alttpr.com/sprites.  Default is `'Link'`.
@@ -167,12 +158,7 @@ Here you can customize the following:
 6. `menu_speed` - Optional.  This is the menu speed setting.  Only works on non-tournament games.  Acceptable values are `instant`, `fast`, `normal`, `slow`.  Default is `normal`.
 7. `msu1_resume` - Optional.  This can disable the MSU1 Resume feature.  Defaults to true.
 
-The result of `create_patched_game` is a Rom object representing the fully patched game.
-
-Finally, you can write the ROM to a new file:
-```python
-pyz3r.romfile.write(patched_rom, "path/to/patched_rom.sfc")
-```
+The result of `create_patched_game` is a Rom object representing the fully patched game.  It also writes the ROM out to the file path specified.
 
 ### Using the customizer
 The ALttPR website has a feature where a player may customize a game, including choosing starting equipment, item locations, game settings, drops and prizepack customization.  This library has a feature that allows you to generate games using the settings saved on alttpr.com's customizer.
@@ -373,7 +359,7 @@ print(seed.url)
 
 ## Credits and shoutouts
 
-0. Veetorp, Karkat, ChristosOwen, Smallhacker, and Dessyreqt for making an incredible randomizer.
+0. Veetorp, KatDevsGames, ChristosOwen, Smallhacker, and Dessyreqt for making an incredible randomizer.
 1. This work is dedicated to my father.  May he rest in peace.
 2. Jaysee87 for his input into specific functionality, and suggesting asyncio support for usage with discord bots.
 
