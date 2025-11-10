@@ -1,9 +1,16 @@
+"""ALTTPR Mystery game generation with weighted random settings."""
+
+from typing import Dict, Any, List, Optional, Union, Tuple
+import logging
 import copy
 import random
+
 from .customizer import get_starting_equipment, BASE_CUSTOMIZER_PAYLOAD
 from .misc import mergedicts
 
-BASE_RANDOMIZER_PAYLOAD = {
+logger = logging.getLogger(__name__)
+
+BASE_RANDOMIZER_PAYLOAD: Dict[str, Any] = {
     "glitches": "none",
     "item_placement": "advanced",
     "dungeon_items": "standard",
@@ -35,13 +42,33 @@ BASE_RANDOMIZER_PAYLOAD = {
 }
 
 
-def generate_random_settings(weights, tournament=True, spoilers="mystery"):
+def generate_random_settings(
+    weights: Dict[str, Any], 
+    tournament: bool = True, 
+    spoilers: str = "mystery"
+) -> Tuple[Dict[str, Any], bool]:
+    """Generate random ALTTPR settings based on weighted options.
+    
+    Creates mystery-style randomizer settings by randomly selecting options
+    according to provided weights. Supports customizer settings, subweights,
+    and rule-based adjustments.
+    
+    Args:
+        weights: Dictionary of weighted options for each setting category.
+        tournament: Whether to generate a tournament/race ROM. Defaults to True.
+        spoilers: Spoiler mode ('mystery', 'on', 'off'). Defaults to 'mystery'.
+        
+    Returns:
+        Tuple of (settings dictionary, whether customizer was used).
+    """
+    logger.info("Generating random mystery settings")
+    
     # iterate through subweights until fully resolved
     while True:
         subweight_name = get_random_option(
             {k: v['chance'] for (k, v) in weights.get('subweights', {}).items()})
 
-        print(f"{subweight_name=}")
+        logger.debug(f"Selected subweight: {subweight_name}")
 
         if subweight_name is None:
             break
@@ -289,9 +316,18 @@ def generate_random_settings(weights, tournament=True, spoilers="mystery"):
     return settings, customizer
 
 
-def conv(string):
-    # first try to convert it to a integer
-
+def conv(string: Any) -> Union[int, bool, Any]:
+    """Convert string values to appropriate types.
+    
+    Attempts to convert string to int, then checks for boolean strings,
+    otherwise returns the value unchanged.
+    
+    Args:
+        string: Value to convert.
+        
+    Returns:
+        Converted value (int, bool, or original value).
+    """
     if isinstance(string, str):
         try:
             return int(string)
@@ -306,17 +342,45 @@ def conv(string):
     return string
 
 
-def randval(optset):
+def randval(optset: Union[List[int], int]) -> int:
+    """Get a random value from an option set.
+    
+    Args:
+        optset: Either a single value or a [min, max] range list.
+        
+    Returns:
+        Random integer in range, or the value itself if not a list.
+    """
     if isinstance(optset, list):
         return random.randint(optset[0], optset[1])
     else:
         return optset
 
 
-def get_random_option(optset):
+def get_random_option(optset: Optional[Union[Dict[str, int], Any]]) -> Any:
+    """Select a random option from a weighted dictionary.
+    
+    Args:
+        optset: Dictionary with options as keys and weights as values,
+               or a single value.
+               
+    Returns:
+        Randomly selected option according to weights, or None if empty.
+        
+    Raises:
+        TypeError: If weights contain non-numeric values.
+    """
     if optset is None or optset == {}:
         return None
     try:
-        return random.choices(population=[conv(key) for key in list(optset.keys())], weights=list(optset.values()))[0] if isinstance(optset, dict) else conv(optset)
+        return (
+            random.choices(
+                population=[conv(key) for key in list(optset.keys())], 
+                weights=list(optset.values())
+            )[0] 
+            if isinstance(optset, dict) 
+            else conv(optset)
+        )
     except TypeError as err:
+        logger.error("Non-numeric value found in weights")
         raise TypeError("There is a non-numeric value as a weight.") from err

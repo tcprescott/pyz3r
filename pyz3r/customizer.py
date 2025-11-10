@@ -1,7 +1,10 @@
+"""ALTTPR Customizer settings converter."""
+
+from typing import Dict, Any, List, Union
 import copy
 import math
 
-BASE_CUSTOMIZER_PAYLOAD = {
+BASE_CUSTOMIZER_PAYLOAD: Dict[str, Any] = {
     "glitches": "none",
     "item_placement": "advanced",
     "dungeon_items": "standard",
@@ -249,29 +252,31 @@ BASE_CUSTOMIZER_PAYLOAD = {
 }
 
 def convert2settings(
-        customizer_save,
-        tournament=False,
-        spoilers="off",
-        spoilers_ongen=False):
-    """Converts a customizer-settings.json file from alttpr.com to a settings dictionary that can be used for generating a game.
+        customizer_save: Dict[str, Any],
+        tournament: bool = False,
+        spoilers: str = "off",
+        spoilers_ongen: bool = False
+) -> Dict[str, Any]:
+    """Convert customizer-settings.json from alttpr.com to API settings format.
+    
+    Takes a customizer save file and converts it into a settings dictionary
+    that can be used for generating a game via the API.
 
-    Arguments:
-        customizer_save {dict} -- A dictionary of the customizer-settings.json file (needs to already be converted to a dict)
-
-    Keyword Arguments:
-        tournament {bool} -- Setting to True generates a race rom, which excludes the spoiler log. (default: {False})
-        spoilers {str} -- Sets the spoiler mode. (default: {"off"})
-        spoielrs_ongen {bool} -- Sets spoiler mode to "generate".  This is deprecated. (default: {False})
+    Args:
+        customizer_save: Dictionary of the customizer-settings.json file.
+        tournament: If True, generates a race ROM which excludes the spoiler log.
+                   Defaults to False.
+        spoilers: Sets the spoiler mode ('off', 'on', 'generate'). Defaults to 'off'.
+        spoilers_ongen: Deprecated. If True, sets spoiler mode to 'generate'. 
+                       Defaults to False.
 
     Returns:
-        dict -- a dictionary of settings that can be used with pyz3r.alttpr()
+        Dictionary of settings that can be used with ALTTPR.generate().
     """
-
     if spoilers_ongen:
         spoilers = "generate"
 
     # the settings defaults, hopefully this is accurate
-
     settings = copy.deepcopy(BASE_CUSTOMIZER_PAYLOAD)
     settings['tournament'] = tournament
     settings['spoilers'] = spoilers
@@ -447,8 +452,17 @@ def convert2settings(
 
     return settings
 
-def get_starting_equipment(key, value):
-    eq = []
+def get_starting_equipment(key: str, value: Union[int, str]) -> List[str]:
+    """Convert starting equipment key-value pair to item list.
+    
+    Args:
+        key: Equipment key name (e.g., 'Bottle1', 'ProgressiveBow', 'Rupees').
+        value: Equipment value (integer count or specific type).
+        
+    Returns:
+        List of item names for the starting equipment.
+    """
+    eq: List[str] = []
     if key in ['Bottle1', 'Bottle2', 'Bottle3', 'Bottle4']:
         if value == 1:
             eq += ['Bottle']
