@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pyz3r"
-version = "6.1.0"
+version = "7.0.0"
 description = "A python module for interacting with the web API of various randomizers, such as https://alttpr.com or https://samus.link."
 readme = "README.md"
 requires-python = ">=3.8"
