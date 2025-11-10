@@ -1,9 +1,18 @@
+"""ALTTPR spoiler log formatting and filtering."""
+
+from typing import Dict, List, Tuple, Any, Optional, TYPE_CHECKING
 from collections import OrderedDict
+import logging
+
 from . import misc
 
-# creates an enhanced spoiler dictionary for spoiler log races
+if TYPE_CHECKING:
+    from .alttpr import ALTTPR
 
-translation = {
+logger = logging.getLogger(__name__)
+
+# Mapping of abbreviated dungeon item names to full names
+translation: Dict[str, str] = {
     'BigKeyP1':  'BigKeyP1-EasternPalace',
     'BigKeyP2':  'BigKeyP2-DesertPalace',
     'BigKeyP3':  'BigKeyP3-TowerOfHera',
@@ -52,8 +61,23 @@ translation = {
     'CompassA2': 'CompassA2-GanonsTower',
 }
 
-def create_filtered_spoiler(seed, translate_dungeon_items=False):
+def create_filtered_spoiler(seed: 'ALTTPR', translate_dungeon_items: bool = False) -> Optional[OrderedDict]:
+    """Create a filtered and formatted spoiler log from seed data.
+    
+    Formats the raw spoiler data into an organized structure with QOL
+    enhancements used during spoiler tournaments.
+    
+    Args:
+        seed: ALTTPR seed instance with spoiler data.
+        translate_dungeon_items: Whether to translate abbreviated dungeon item names.
+        
+    Returns:
+        OrderedDict of formatted spoiler data, or None if spoilers are disabled.
+    """
+    logger.debug("Creating filtered spoiler log")
+    
     if not seed.data['spoiler']['meta'].get('spoilers') in ['on', 'generate']:
+        logger.debug("Spoilers not available for this seed")
         return None
 
     spoiler = seed.data['spoiler']
@@ -175,8 +199,16 @@ def create_filtered_spoiler(seed, translate_dungeon_items=False):
     return sorteddict
 
 
-def get_seed_prizepacks(data):
-    d = {}
+def get_seed_prizepacks(data: Dict[str, Any]) -> Dict[str, Any]:
+    """Extract prize pack information from seed data.
+    
+    Args:
+        data: Seed data containing patch information.
+        
+    Returns:
+        Dictionary containing prize pack details for various drop types.
+    """
+    d: Dict[str, Any] = {}
     d['PullTree'] = {}
     d['RupeeCrab'] = {}
     d['PrizePacks'] = {}
@@ -217,7 +249,15 @@ def get_seed_prizepacks(data):
     return d
 
 
-def get_enemy_group_name(enemy_group_index):
+def get_enemy_group_name(enemy_group_index: int) -> Optional[str]:
+    """Get the name of an enemy group by index.
+    
+    Args:
+        enemy_group_index: Index of the enemy group (1-7).
+        
+    Returns:
+        Name of the enemy group, or None if invalid index.
+    """
     if enemy_group_index == 1:
         return 'HeartsGroup'
     if enemy_group_index == 2:
@@ -234,7 +274,15 @@ def get_enemy_group_name(enemy_group_index):
         return 'LargeVarietyGroup'
 
 
-def get_prize_pack_name(prize_pack_set):
+def get_prize_pack_name(prize_pack_set: Tuple[int, ...]) -> str:
+    """Get the name of a prize pack by its byte pattern.
+    
+    Args:
+        prize_pack_set: Tuple of 8 bytes representing the prize pack.
+        
+    Returns:
+        Name of the prize pack, or comma-separated drop names if unrecognized.
+    """
     if prize_pack_set == (216, 216, 216, 216, 217, 216, 216, 217):
         return 'HeartsPack'
     if prize_pack_set == (218, 217, 218, 219, 218, 217, 218, 218):
@@ -252,8 +300,16 @@ def get_prize_pack_name(prize_pack_set):
     return ', '.join([get_sprite_droppable(drop) for drop in prize_pack_set])
 
 
-def get_sprite_droppable(i):
-    spritemap = {
+def get_sprite_droppable(i: int) -> str:
+    """Get the name of a droppable item by its sprite ID.
+    
+    Args:
+        i: Sprite ID number.
+        
+    Returns:
+        Name of the droppable item, or 'ERR: UNKNOWN' if not recognized.
+    """
+    spritemap: Dict[int, str] = {
         121: "Bee", 178: "BeeGood", 216: "Heart",
         217: "RupeeGreen", 218: "RupeeBlue", 219: "RupeeRed",
         220: "BombRefill1", 221: "BombRefill4", 222: "BombRefill8",
@@ -267,7 +323,15 @@ def get_sprite_droppable(i):
         return 'ERR: UNKNOWN'
 
 
-def mw_filter(dict):
+def mw_filter(dict: Dict[str, str]) -> Dict[str, str]:
+    """Filter multiworld player indicators from keys and values.
+    
+    Args:
+        dict: Dictionary with potentially numbered keys/values (e.g., 'Item:1').
+        
+    Returns:
+        Dictionary with ':1' suffixes removed.
+    """
     sorteddict = {}
     for key, item in dict.items():
         sorteddict[key.replace(':1', '')] = dict[key].replace(':1', '')

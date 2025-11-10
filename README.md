@@ -1,16 +1,30 @@
-# pyz3r for Python 3.6, 3.7, and 3.8!
-Pyz3r is an unofficial python abstraction library for interacting with the [alttpr.com](https://alttpr.com) API.
+# pyz3r - Python Library for ALTTPR and Randomizer APIs
+
+Pyz3r is an unofficial python abstraction library for interacting with the [alttpr.com](https://alttpr.com) API and other randomizer APIs.
 
 This allows developers to create applications that not only generate games on [alttpr.com](https://alttpr.com),
 but also create the ROM as well using the patch data provided by the website.
 
+## ✨ New in v6.1.0+
+- **Type Hints**: Full type annotations for better IDE support and type checking
+- **Enhanced Logging**: Comprehensive logging throughout the library using Python's logging module
+- **Python 3.8-3.13 Support**: Modern Python version support
+- **Improved Documentation**: Google-style docstrings for all functions and classes
+- **Backwards Compatible**: All existing code continues to work without changes
+
+See [MIGRATION_GUIDE.md](MIGRATION_GUIDE.md) for details on new features.
+
 ## Installation
-This module is available on PyPI.  It can be installed via pip:
+This module is available on PyPI. It can be installed via pip:
 
-`pip install pyz3r`
+```bash
+pip install pyz3r
+```
 
-## Compatiblity
-This library has been tested on both Linux (Centos 7) and Windows on Python 3.6.  Python 3.7 should also work, though it hasn't been as extensively tested.  An internet connection is required so it can communicate with alttpr.com.
+## Compatibility
+- **Python**: 3.8, 3.9, 3.10, 3.11, 3.12, 3.13
+- **Platforms**: Linux, Windows, macOS
+- **Requirements**: Internet connection to communicate with randomizer APIs
 
 ## Disclaimer(s)
 This is an unofficial tool.  Please do not submit bug reports on the official ALTTPR repository Github for issues that
@@ -351,11 +365,27 @@ seed = await SuperMetroidVaria.create(
 print(seed.url)
 ```
 
+## Testing
+
+The library includes a comprehensive test suite with 79+ unit tests covering core functionality.
+
+### Running Tests
+```bash
+# Install test dependencies
+pip install pytest pytest-asyncio pytest-cov
+
+# Run all tests
+pytest tests/
+
+# Run with coverage report
+pytest tests/ --cov=pyz3r --cov-report=term-missing
+```
+
+See [tests/README.md](tests/README.md) for more details on the test suite.
+
 ## To do
 
 0. Add a feature to verify a settings dictionary before attempting to generate a game.  This may become the default behavior, with the ability to override it.  This could also just be a separate function that could be invoked as well.
-1. Improve logging.  Right now this library does zero logging on its own, which should be fixed.
-2. Add unit tests.
 
 ## Credits and shoutouts
 

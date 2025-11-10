@@ -1,3 +1,6 @@
+"""ROM manipulation utilities for ALTTPR."""
+
+from typing import List, Dict, Union, Optional
 import io
 import itertools
 
@@ -6,23 +9,49 @@ import bps.apply
 from .exceptions import Pyz3rException
 
 
-class Rom(object):
-    def __init__(self, input_filename):
+class Rom:
+    """Represents a Super Nintendo ROM with patching and modification capabilities.
+    
+    Attributes:
+        rom: The ROM data as a mutable bytearray.
+    """
+    
+    def __init__(self, input_filename: str) -> None:
+        """Initialize a ROM object by reading from a file.
+        
+        Args:
+            input_filename: Path to the ROM file to read.
+        """
+        self.rom: bytearray
         self.read(input_filename)
 
-    def read(self, filename: str):
+    def read(self, filename: str) -> None:
+        """Read ROM data from a file.
+        
+        Args:
+            filename: Path to the ROM file to read.
+        """
         with open(filename, "rb") as f:
             self.rom = bytearray(f.read())
 
-    def write_to_file(self, path: str):
+    def write_to_file(self, path: str) -> None:
+        """Write the ROM data to a file.
+        
+        Args:
+            path: Path to write the ROM file to.
+        """
         with open(path, "wb") as f:
             f.write(self.rom)
 
-    def apply_bps_patch(self, patch: bytes):
-        """Applies a patch, which is a bps
+    def apply_bps_patch(self, patch: bytes) -> None:
+        """Apply a BPS patch to the ROM.
 
-        Arguments:
-            patch {bytes} -- A series of bytes representing a bps patch
+        Args:
+            patch: A bytes object representing a BPS patch.
+            
+        Note:
+            Uses apply_to_files instead of apply_to_bytearrays to ensure
+            CRC validation of both input and output.
         """
         # create "files" for apply_to_files
         # although there is an apply_to_bytearrays it does not perform CRC
@@ -35,30 +64,44 @@ class Rom(object):
         target_file.seek(0)
         self.rom = bytearray(target_file.read())
 
-    def apply_dict_patches(self, patches: list):
-        """Applies a patch, which is a list of dictionaries
+    def apply_dict_patches(self, patches: List[Dict[str, List[int]]]) -> None:
+        """Apply a list of patch dictionaries to the ROM.
 
-        Arguments:
-            patches {list} -- A list of dictionaries that depict of set of patches to be applied to the ROM.
+        Args:
+            patches: A list of dictionaries mapping byte offsets to byte values.
+                    Each dict has one key (the offset) and the value is a list of bytes.
         """
         for patch in patches:
             offset = int(list(patch.keys())[0])
             values = list(patch.values())[0]
             self.write_bytes(offset, values)
 
-    def write_byte(self, offset, value):
+    def write_byte(self, offset: int, value: int) -> None:
+        """Write a single byte to the ROM at the specified offset.
+        
+        Args:
+            offset: The byte offset in the ROM.
+            value: The byte value to write (0-255).
+        """
         self.rom[offset] = value
 
-    def write_bytes(self, offset, values):
+    def write_bytes(self, offset: int, values: List[int]) -> None:
+        """Write multiple bytes to the ROM starting at the specified offset.
+        
+        Args:
+            offset: The starting byte offset in the ROM.
+            values: List of byte values to write.
+        """
         for idx, value in enumerate(values):
             self.write_byte(offset + idx, value)
 
-    def heart_speed(self, speed='half'):
+    def heart_speed(self, speed: str = 'half') -> None:
         """Set the low-health warning beep interval.
 
-        Keyword Arguments:
-            speed {str} -- Chose the speed at which the low health warning beeps.
-                Options are 'off', 'double', 'normal', 'half', and 'quarter'. (default: {'half'})
+        Args:
+            speed: The speed at which the low health warning beeps.
+                  Options are 'off', 'double', 'normal', 'half', and 'quarter'.
+                  Defaults to 'half'.
         """
         sbyte = {
             'off': 0,
@@ -69,11 +112,15 @@ class Rom(object):
         }
         self.write_byte(0x180033, sbyte[speed])
 
-    def heart_color(self, color='red'):
+    def heart_color(self, color: str = 'red') -> None:
         """Set the color of the hearts on the player's HUD.
 
-        Keyword Arguments:
-            color {str} -- The heart color.  Options are 'red', 'blue', 'green', and 'yellow' (default: {'red'})
+        Args:
+            color: The heart color. Options are 'red', 'blue', 'green', and 'yellow'.
+                  Defaults to 'red'.
+                  
+        Raises:
+            Pyz3rException: If an unknown heart color is specified.
         """
         if self.rom_version >= 4:
             cbyte = {
@@ -109,36 +156,52 @@ class Rom(object):
             self.write_byte(0x6fa30, byte)
             self.write_byte(0x65561, file_byte)
 
-    def music(self, music=True):
-        """Enables, or disables, the in-game music.  Useful if you want to use an MSU-1 soundtrack instead.
+    def music(self, music: bool = True) -> None:
+        """Enable or disable the in-game music.
+        
+        Useful if you want to use an MSU-1 soundtrack instead.
 
-        Keyword Arguments:
-            music {bool} -- If true, music is enabled.  If false, the music id disabled. (default: {True})
-
-        Returns:
-            list -- a list of dictionaries indicating which ROM address offsets to write and what to write to them
+        Args:
+            music: If True, music is enabled. If False, music is disabled. Defaults to True.
         """
-
         self.write_byte(0x18021a, 0x00 if music else 0x01)
 
-    def msu1_resume(self, enable=True):
-        """Enables, or disables, the MSU-1 resume feature.  If enabled, when the game is reset, the MSU-1 resumes playing where it left off.
+    def msu1_resume(self, enable: bool = True) -> None:
+        """Enable or disable the MSU-1 resume feature.
+        
+        If enabled, when the game is reset, the MSU-1 resumes playing where it left off.
 
-        Keyword Arguments:
-            enable {bool} -- If true, the MSU-1 resume feature is enabled.  If false, the MSU-1 resume feature is disabled. (default: {True})
+        Args:
+            enable: If True, the MSU-1 resume feature is enabled. 
+                   If False, it is disabled. Defaults to True.
         """
-
         if not enable:
             self.write_byte(0x18021D, 0x00)
             self.write_byte(0x18021E, 0x00)
 
-    def quickswap(self, quickswap=False):
+    def quickswap(self, quickswap: bool = False) -> None:
+        """Enable or disable quickswap functionality.
+        
+        Args:
+            quickswap: If True, quickswap is enabled. Defaults to False.
+        """
         self.write_byte(0x18004b, 0x01 if quickswap else 0x00)
 
-    def reduce_flashing(self, enable=False):
+    def reduce_flashing(self, enable: bool = False) -> None:
+        """Enable or disable reduced flashing for photosensitivity.
+        
+        Args:
+            enable: If True, flashing is reduced. Defaults to False.
+        """
         self.write_byte(0x18017f, 0x01 if enable else 0x00)
 
-    def menu_speed(self, speed='normal'):
+    def menu_speed(self, speed: str = 'normal') -> None:
+        """Set the menu speed.
+        
+        Args:
+            speed: Menu speed setting. Options are 'instant', 'fast', 'normal', 'slow'.
+                  Defaults to 'normal'.
+        """
         sbyte = {
             'instant': 0xE8,
             'fast': 0x10,
@@ -150,11 +213,11 @@ class Rom(object):
         self.write_byte(0x6df2a, 0x20 if speed == 'instant' else 0x12)
         self.write_byte(0x6e0e9, 0x20 if speed == 'instant' else 0x12)
 
-    def sprite(self, zspr):
-        """Creates a patch for to replace Link's sprite with the contents of a ZSPR file.
+    def sprite(self, zspr: Union[bytearray, bytes]) -> None:
+        """Replace Link's sprite with the contents of a ZSPR file.
 
-        Arguments:
-            spr {list} -- a bytes-like object of a ZSPR file
+        Args:
+            zspr: A bytes-like object containing ZSPR sprite data.
         """
 
         # stolen from VT's code
@@ -224,10 +287,11 @@ class Rom(object):
         self.write_bytes(0xDD308, zspr[palette_offset:palette_offset + 120])
         self.write_bytes(0xDEDF5, zspr[palette_offset + 120:palette_offset + 120 + 4])
 
-    def checksum(self):
-        """Writes a patch that fixes a ROM's checksum.  This should be the last patch applied to a ROM before it is written.
+    def checksum(self) -> None:
+        """Calculate and write the ROM's checksum.
+        
+        This should be the last patch applied to a ROM before it is written.
         """
-
         sum_of_bytes = sum(self.rom[:32731]) + sum(self.rom[32736:])
         checksum = (sum_of_bytes + 510) & 65535
         inverse = checksum ^ 65535
@@ -238,22 +302,17 @@ class Rom(object):
             checksum >> 8,
         ])
 
-    def expand(self, newlenmb):
-        """Expands the byte list of a ROM to the specified number of megabytes, filling in the new space with zeroes.
+    def expand(self, newlenmb: int) -> None:
+        """Expand the ROM to the specified size in megabytes.
+        
+        Fills new space with zeroes.
 
-        Arguments:
-            rom {list} -- a list of bytes depicitng the rom
-
-        Keyword Arguments:
-            newlenmb {int} -- The size of the ROM should be, in megabytes.
+        Args:
+            newlenmb: The target size of the ROM in megabytes.
 
         Raises:
-            Pyz3rException -- Raised if the new length is shorter than the current size of the byte list.
-
-        Returns:
-            list -- a list of bytes depicitng the rom
+            Pyz3rException: If the ROM is already larger than the target size.
         """
-
         newlen = int(newlenmb) * 1024 * 1024
         if len(self.rom) > newlen:
             raise Pyz3rException(f'ROM is already larger than {newlen}')
@@ -265,12 +324,11 @@ class Rom(object):
             self.rom.append(0)
 
     @property
-    def rom_version(self):
-        """Returns the version of the ROM.
+    def rom_version(self) -> int:
+        """Get the version of the ROM.
 
         Returns:
-            int -- The version of the ROM.  Returns zero if predates versioning.
+            The version number of the ROM. Returns 0 if the ROM predates versioning.
         """
-
         ver = int.from_bytes(self.rom[0x7FE2:0x7FE3+1], byteorder='little', signed=False)
         return 0 if ver == 65535 else ver
