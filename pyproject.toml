@@ -37,6 +37,19 @@ dependencies = [
 Homepage = "https://github.com/tcprescott/pyz3r"
 Repository = "https://github.com/tcprescott/pyz3r"
 
+[project.optional-dependencies]
+test = [
+    "pytest>=7.0",
+    "pytest-asyncio>=0.21",
+    "pytest-cov>=4.0",
+]
+dev = [
+    "pytest>=7.0",
+    "pytest-asyncio>=0.21",
+    "pytest-cov>=4.0",
+    "mypy>=1.0",
+]
+
 [tool.mypy]
 python_version = "3.8"
 warn_return_any = true

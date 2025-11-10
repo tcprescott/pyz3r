@@ -365,11 +365,27 @@ seed = await SuperMetroidVaria.create(
 print(seed.url)
 ```
 
+## Testing
+
+The library includes a comprehensive test suite with 79+ unit tests covering core functionality.
+
+### Running Tests
+```bash
+# Install test dependencies
+pip install pytest pytest-asyncio pytest-cov
+
+# Run all tests
+pytest tests/
+
+# Run with coverage report
+pytest tests/ --cov=pyz3r --cov-report=term-missing
+```
+
+See [tests/README.md](tests/README.md) for more details on the test suite.
+
 ## To do
 
 0. Add a feature to verify a settings dictionary before attempting to generate a game.  This may become the default behavior, with the ability to override it.  This could also just be a separate function that could be invoked as well.
-1. Improve logging.  Right now this library does zero logging on its own, which should be fixed.
-2. Add unit tests.
 
 ## Credits and shoutouts
 

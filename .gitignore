@@ -57,3 +57,7 @@ env/
 .vscode/
 input/
 /config.py
+# Test coverage
+htmlcov/
+.coverage
+.pytest_cache/
